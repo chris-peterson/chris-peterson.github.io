@@ -1,3 +1,5 @@
+var HUB_ORIGIN = 'https://chris-peterson.github.io';
+
 // Mobile sidebar toggle functions
 function toggleSidebar() {
   document.body.classList.toggle('sidebar-open');
@@ -76,18 +78,19 @@ function toggleTheme() {
 
 // Repo selector dropdown
 function toggleRepoSelector() {
-  document.getElementById('repoSelector').classList.toggle('open');
+  var selector = document.getElementById('repoSelector');
+  if (selector) selector.classList.toggle('open');
 }
 
 // Close repo selector when clicking outside
 document.addEventListener('click', function(e) {
   var selector = document.getElementById('repoSelector');
-  if (!selector.contains(e.target)) {
+  if (selector && !selector.contains(e.target)) {
     selector.classList.remove('open');
   }
 });
 
-// Load projects from projects.yml and populate repo dropdown
+// Inject breadcrumb nav and populate from projects.yml
 (function() {
   function parseYaml(text) {
     var projects = [];
@@ -95,12 +98,15 @@ document.addEventListener('click', function(e) {
     text.split('\n').forEach(function(line) {
       var nameMatch = line.match(/^- name:\s*(.+)/);
       var descMatch = line.match(/^\s+description:\s*(.+)/);
+      var iconMatch = line.match(/^\s+icon:\s*(.+)/);
       var urlMatch = line.match(/^\s+url:\s*(.+)/);
       if (nameMatch) {
         current = { name: nameMatch[1].trim() };
         projects.push(current);
       } else if (current && descMatch) {
         current.description = descMatch[1].trim();
+      } else if (current && iconMatch) {
+        current.icon = iconMatch[1].trim();
       } else if (current && urlMatch) {
         current.url = urlMatch[1].trim();
       }
@@ -108,15 +114,36 @@ document.addEventListener('click', function(e) {
     return projects;
   }
 
-  function renderDropdown(projects) {
-    var dropdown = document.querySelector('.breadcrumb-repo-dropdown');
-    if (!dropdown) return;
-    dropdown.innerHTML = '';
+  function injectBreadcrumb(projects) {
+    var spacer = document.querySelector('.titlebar-spacer');
+    if (!spacer) return;
+
+    var breadcrumb = document.createElement('div');
+    breadcrumb.className = 'titlebar-breadcrumb';
+
+    var separator = document.createElement('span');
+    separator.className = 'breadcrumb-separator';
+    separator.textContent = '/';
+    breadcrumb.appendChild(separator);
+
+    var selector = document.createElement('div');
+    selector.className = 'breadcrumb-repo-selector';
+    selector.id = 'repoSelector';
+
+    var toggle = document.createElement('button');
+    toggle.className = 'breadcrumb-repo-toggle';
+    toggle.setAttribute('onclick', 'toggleRepoSelector()');
+    toggle.innerHTML = 'repos <i class="fas fa-chevron-down"></i>';
+    selector.appendChild(toggle);
+
+    var dropdown = document.createElement('div');
+    dropdown.className = 'breadcrumb-repo-dropdown';
+
     projects.forEach(function(project) {
       var a = document.createElement('a');
       a.className = 'breadcrumb-repo-item';
       a.href = project.url || '#';
-      var faviconUrl = (project.url || '') + '/favicon.ico';
+      var faviconUrl = project.icon || (project.url + '/favicon.ico');
       a.innerHTML = '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="16" height="16"> ' +
         project.name +
         '<span class="repo-description">' + (project.description || '') + '</span>';
@@ -125,9 +152,13 @@ document.addEventListener('click', function(e) {
       }
       dropdown.appendChild(a);
     });
+
+    selector.appendChild(dropdown);
+    breadcrumb.appendChild(selector);
+    spacer.parentNode.insertBefore(breadcrumb, spacer);
   }
 
-  fetch('/projects.yml')
+  fetch(HUB_ORIGIN + '/projects.yml')
     .then(function(r) { return r.text(); })
-    .then(function(text) { renderDropdown(parseYaml(text)); });
+    .then(function(text) { injectBreadcrumb(parseYaml(text)); });
 })();

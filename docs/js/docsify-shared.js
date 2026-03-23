@@ -90,6 +90,234 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// Titlebar search
+(function() {
+  var searchContainer = document.getElementById('titlebarSearch');
+  if (!searchContainer) return;
+
+  var searchIcon = searchContainer.querySelector('.titlebar-search-icon');
+  var searchInput = document.getElementById('titlebarSearchInput');
+  var searchResults = document.getElementById('titlebarSearchResults');
+  var searchIndex = [];
+  var selectedIndex = -1;
+
+  function buildSearchIndex() {
+    searchIndex = [];
+    document.querySelectorAll('.sidebar-nav a').forEach(function(link) {
+      var href = link.getAttribute('href');
+      var title = link.textContent.trim();
+      if (href && title && href.startsWith('#')) {
+        searchIndex.push({
+          title: title,
+          url: href,
+          searchText: title.toLowerCase()
+        });
+      }
+    });
+  }
+
+  function expandSearch() {
+    searchContainer.classList.add('expanded');
+    setTimeout(function() { searchInput.focus(); }, 50);
+    buildSearchIndex();
+  }
+
+  function collapseSearch() {
+    searchContainer.classList.remove('expanded', 'has-results');
+    searchInput.value = '';
+    selectedIndex = -1;
+  }
+
+  function updateSelection() {
+    var items = searchResults.querySelectorAll('.titlebar-search-result');
+    items.forEach(function(item, i) {
+      item.classList.toggle('selected', i === selectedIndex);
+    });
+    if (selectedIndex >= 0 && items[selectedIndex]) {
+      items[selectedIndex].scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function navigateToResult(url) {
+    window.location.hash = url.startsWith('#') ? url.substring(1) : url;
+    collapseSearch();
+    searchInput.blur();
+  }
+
+  function addResultHandlers() {
+    searchResults.querySelectorAll('.titlebar-search-result').forEach(function(el) {
+      el.addEventListener('click', function() {
+        navigateToResult(el.dataset.url);
+      });
+      el.addEventListener('mouseenter', function() {
+        selectedIndex = parseInt(el.dataset.index, 10);
+        updateSelection();
+      });
+    });
+  }
+
+  function doFullTextSearch(query) {
+    var fullTextResults = [];
+    var searchData = null;
+
+    try {
+      var storedIndex = localStorage.getItem('docsify.search.index');
+      if (storedIndex) searchData = JSON.parse(storedIndex);
+    } catch (e) {}
+
+    if (!searchData && window.SEARCH_INDEX && window.SEARCH_INDEX.INDEXS) {
+      searchData = {};
+      window.SEARCH_INDEX.INDEXS.forEach(function(item) {
+        if (item.slug) searchData[item.slug] = { title: item.title, body: item.body };
+      });
+    }
+
+    if (searchData) {
+      Object.keys(searchData).forEach(function(path) {
+        var item = searchData[path];
+        var title = item.title || '';
+        var body = item.body || '';
+        var titleLower = title.toLowerCase();
+        var bodyLower = body.toLowerCase();
+        var titleMatch = titleLower.includes(query);
+        var bodyMatch = bodyLower.includes(query);
+
+        if (titleMatch || bodyMatch) {
+          var snippet = '';
+          if (bodyMatch) {
+            var idx = bodyLower.indexOf(query);
+            var start = Math.max(0, idx - 40);
+            var end = Math.min(body.length, idx + query.length + 60);
+            snippet = (start > 0 ? '...' : '') + body.substring(start, end).replace(/\n/g, ' ') + (end < body.length ? '...' : '');
+          }
+          if (path && path.length > 1 && !path.includes('#')) {
+            fullTextResults.push({
+              title: title || path.split('/').pop().replace('.md', ''),
+              url: '#' + path,
+              snippet: snippet,
+              score: titleMatch ? 2 : 1
+            });
+          }
+        }
+      });
+
+      fullTextResults.sort(function(a, b) { return b.score - a.score; });
+      var seen = new Set();
+      fullTextResults = fullTextResults.filter(function(r) {
+        if (seen.has(r.url)) return false;
+        seen.add(r.url);
+        return true;
+      }).slice(0, 15);
+    }
+
+    if (fullTextResults.length > 0) {
+      searchResults.innerHTML = fullTextResults.map(function(r, i) {
+        var snippetHtml = r.snippet ? '<div class="titlebar-search-result-content">' + r.snippet.replace(/</g, '&lt;') + '</div>' : '';
+        return '<div class="titlebar-search-result" data-url="' + r.url + '" data-index="' + i + '">' +
+          '<div class="titlebar-search-result-title">' + r.title + '</div>' +
+          snippetHtml +
+        '</div>';
+      }).join('');
+      searchContainer.classList.add('has-results');
+      addResultHandlers();
+    } else {
+      searchResults.innerHTML = '<div class="titlebar-search-result"><div class="titlebar-search-result-title" style="opacity: 0.6">No results for "' + query + '"</div></div>';
+      searchContainer.classList.add('has-results');
+    }
+  }
+
+  function performSearch() {
+    var query = searchInput.value.trim().toLowerCase();
+    selectedIndex = -1;
+
+    if (query.length < 1) {
+      searchContainer.classList.remove('has-results');
+      searchResults.innerHTML = '';
+      return;
+    }
+
+    if (searchIndex.length === 0) buildSearchIndex();
+
+    var results = searchIndex.filter(function(item) {
+      return item.searchText.includes(query);
+    });
+
+    results.sort(function(a, b) {
+      var aStarts = a.searchText.startsWith(query);
+      var bStarts = b.searchText.startsWith(query);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+      return a.title.localeCompare(b.title);
+    });
+
+    var topResults = results.slice(0, 15);
+
+    if (topResults.length > 0) {
+      searchResults.innerHTML = topResults.map(function(r, i) {
+        return '<div class="titlebar-search-result" data-url="' + r.url + '" data-index="' + i + '">' +
+          '<div class="titlebar-search-result-title">' + r.title + '</div>' +
+        '</div>';
+      }).join('');
+      searchContainer.classList.add('has-results');
+      addResultHandlers();
+    } else {
+      doFullTextSearch(query);
+    }
+  }
+
+  searchIcon.addEventListener('click', function(e) {
+    e.stopPropagation();
+    expandSearch();
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!searchContainer.contains(e.target)) collapseSearch();
+  });
+
+  searchInput.addEventListener('input', performSearch);
+
+  searchInput.addEventListener('keydown', function(e) {
+    var items = searchResults.querySelectorAll('.titlebar-search-result');
+    var maxIndex = items.length - 1;
+
+    if (e.key === 'Escape') {
+      collapseSearch();
+      searchInput.blur();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, maxIndex);
+      updateSelection();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, 0);
+      updateSelection();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && items[selectedIndex]) {
+        navigateToResult(items[selectedIndex].dataset.url);
+      } else if (items.length > 0) {
+        navigateToResult(items[0].dataset.url);
+      }
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+      e.preventDefault();
+      expandSearch();
+      searchInput.select();
+    }
+  });
+
+  if (window.$docsify) {
+    window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+      hook.doneEach(function() {
+        setTimeout(buildSearchIndex, 200);
+      });
+    });
+  }
+})();
+
 // Inject breadcrumb nav and populate from projects.yml
 (function() {
   function parseYaml(text) {

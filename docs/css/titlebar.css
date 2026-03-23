@@ -82,6 +82,14 @@
   .breadcrumb-repo-selector {
     font-size: 14px !important;
   }
+
+  .titlebar-search.expanded .titlebar-search-input {
+    width: 140px;
+  }
+
+  .titlebar-search-results {
+    width: 280px;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -89,9 +97,16 @@
     display: none;
   }
 
-  .breadcrumb-separator,
-  .breadcrumb-repo-selector {
+  .breadcrumb-separator {
     display: none !important;
+  }
+
+  .titlebar-search.expanded .titlebar-search-input {
+    width: 120px;
+  }
+
+  .titlebar-search-results {
+    width: 240px;
   }
 }
 
@@ -196,7 +211,7 @@
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
-  min-width: 220px;
+  min-width: 320px;
   background: var(--sidebar-background);
   border: 1px solid var(--border-subtle);
   border-radius: 6px;
@@ -283,6 +298,116 @@
 
 .titlebar-github:hover {
   opacity: 1;
+}
+
+/* Titlebar search */
+.titlebar-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.titlebar-search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  color: var(--base-color);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.titlebar-search-icon:hover {
+  opacity: 1;
+}
+
+.titlebar-search-input {
+  width: 0;
+  padding: 0;
+  border: none;
+  background: var(--button-bg);
+  border-radius: 4px;
+  color: var(--base-color);
+  font-size: 14px;
+  outline: none;
+  transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.titlebar-search-input::placeholder {
+  color: var(--color-comment);
+}
+
+.titlebar-search.expanded .titlebar-search-input {
+  width: 200px;
+  padding: 6px 10px;
+  opacity: 1;
+}
+
+.titlebar-search.expanded .titlebar-search-icon {
+  display: none;
+}
+
+.titlebar-search-results {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 350px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--sidebar-background);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  display: none;
+  margin-top: 8px;
+  z-index: 1002;
+}
+
+.titlebar-search.has-results .titlebar-search-results {
+  display: block;
+}
+
+.titlebar-search-result {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.titlebar-search-result:hover,
+.titlebar-search-result.selected {
+  background: var(--button-bg-hover);
+}
+
+.titlebar-search-result.selected {
+  outline: none;
+}
+
+.titlebar-search-result:last-child {
+  border-bottom: none;
+}
+
+.titlebar-search-result-title {
+  font-weight: 600;
+  color: var(--base-color);
+  margin-bottom: 4px;
+}
+
+.titlebar-search-result-content {
+  font-size: 12px;
+  color: var(--color-comment);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titlebar-search-no-results {
+  padding: 12px;
+  color: var(--color-comment);
+  text-align: center;
 }
 
 /* Adjust main content for fixed titlebar */

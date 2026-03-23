@@ -30,6 +30,13 @@
     </a>
     <div class="titlebar-spacer"></div>
     <div class="titlebar-actions">
+      <div class="titlebar-search" id="titlebarSearch">
+        <div class="titlebar-search-icon" title="Search">
+          <i class="fas fa-search"></i>
+        </div>
+        <input type="text" class="titlebar-search-input" placeholder="Search..." id="titlebarSearchInput">
+        <div class="titlebar-search-results" id="titlebarSearchResults"></div>
+      </div>
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme"><i class="fas fa-moon"></i></button>
       <a href="https://github.com/chris-peterson" target="_blank" class="titlebar-github" title="View on GitHub">
         <i class="fab fa-github"></i>
@@ -49,11 +56,18 @@
       alias: {
         '/.*/_sidebar.md': '/_sidebar.md'
       },
-      hideSidebar: false
+      hideSidebar: false,
+      search: {
+        placeholder: 'Search...',
+        noData: 'No results',
+        paths: 'auto'
+      }
     }
   </script>
   <!-- Docsify core -->
   <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+  <!-- Search plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
   <!-- Copy code plugin -->
   <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
   <!-- Syntax highlighting -->

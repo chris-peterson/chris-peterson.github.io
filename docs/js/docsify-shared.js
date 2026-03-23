@@ -67,10 +67,10 @@ function initProject(config) {
   });
 
   var steps = [
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify@4' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' },
-    { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' },
-    { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' }
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' }
   ];
 
   (config.code_languages || []).forEach(function(lang) {

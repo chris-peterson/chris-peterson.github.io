@@ -79,7 +79,7 @@
   }
 
   .breadcrumb-separator,
-  .breadcrumb-repo {
+  .breadcrumb-repo-selector {
     font-size: 14px !important;
   }
 }
@@ -90,7 +90,7 @@
   }
 
   .breadcrumb-separator,
-  .breadcrumb-repo {
+  .breadcrumb-repo-selector {
     display: none !important;
   }
 }

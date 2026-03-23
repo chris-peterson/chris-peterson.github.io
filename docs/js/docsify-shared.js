@@ -159,6 +159,10 @@ document.addEventListener('click', function(e) {
   }
 
   fetch(HUB_ORIGIN + '/projects.yml')
-    .then(function(r) { return r.text(); })
-    .then(function(text) { injectBreadcrumb(parseYaml(text)); });
+    .then(function(r) {
+      if (!r.ok) throw new Error('projects.yml responded with ' + r.status);
+      return r.text();
+    })
+    .then(function(text) { injectBreadcrumb(parseYaml(text)); })
+    .catch(function(err) { console.error('Failed to load projects.yml:', err); });
 })();

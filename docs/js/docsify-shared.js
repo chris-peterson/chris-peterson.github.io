@@ -27,6 +27,30 @@ function initProject(config) {
   config.site_url = HUB_ORIGIN + '/' + config.name;
   config.repo_source = 'https://github.com/' + org + '/' + config.name;
 
+  var defaults = {
+    loadSidebar: true,
+    subMaxLevel: 2,
+    auto2top: true,
+    coverpage: false,
+    notFoundPage: true,
+    relativePath: false,
+    alias: { '/.*/_sidebar.md': '/_sidebar.md' },
+    hideSidebar: false,
+    search: {
+      placeholder: 'Search...',
+      noData: 'No results',
+      paths: 'auto'
+    },
+    'flexible-alerts': {
+      style: 'callout'
+    }
+  };
+  Object.keys(defaults).forEach(function(key) {
+    if (!(key in window.$docsify)) {
+      window.$docsify[key] = defaults[key];
+    }
+  });
+
   var cssOrigin = window.location.origin === HUB_ORIGIN || window.location.hostname === 'localhost' ? '' : HUB_ORIGIN;
   [
     'https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.min.css',
@@ -132,14 +156,14 @@ function buildTitlebarDOM(config) {
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
   var isHub = config.name === org;
 
-  var navSection = isHub
-    ? '<div class="breadcrumb-repo-selector" id="repoSelector">' +
-        '<button class="breadcrumb-repo-toggle" onclick="toggleRepoSelector()">' +
-          'repos ' + ICONS.chevronDown +
-        '</button>' +
-        '<div class="breadcrumb-repo-dropdown" id="repoDropdownContainer"></div>' +
-      '</div>'
-    : '<a href="' + config.site_url + '" class="titlebar-site-name">' + config.name + '</a>';
+  var toggleLabel = isHub ? 'repos' : config.name;
+  var navSection =
+    '<div class="breadcrumb-repo-selector" id="repoSelector">' +
+      '<button class="breadcrumb-repo-toggle" onclick="toggleRepoSelector()">' +
+        toggleLabel + ' ' + ICONS.chevronDown +
+      '</button>' +
+      '<div class="breadcrumb-repo-dropdown" id="repoDropdownContainer"></div>' +
+    '</div>';
 
   var wrapper = document.createElement('div');
   wrapper.innerHTML =

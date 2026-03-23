@@ -113,6 +113,26 @@
 /* Adjust sidebar for fixed titlebar */
 .sidebar {
   padding-top: 48px !important;
+  position: relative;
+  transition: width 0.2s ease;
+}
+
+/* Sidebar resize handle */
+.sidebar-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.2s ease;
+  z-index: 20;
+}
+
+.sidebar-resize-handle:hover,
+.sidebar-resize-handle.dragging {
+  background: var(--color-purple);
 }
 
 /* Hide sidebar search (moved to titlebar) */
@@ -268,35 +288,45 @@
 }
 
 /* Theme toggle */
-.theme-toggle {
-  background: var(--button-bg);
-  border: 1px solid var(--button-border);
-  border-radius: 14px;
+.titlebar-theme {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
-  font-size: 14px;
-  padding: 3px 8px;
-  opacity: 0.9;
-  transition: all 0.2s ease;
+  color: var(--theme-icon-color);
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.3s ease;
 }
 
-.theme-toggle:hover {
+.titlebar-theme:hover {
   opacity: 1;
-  background: var(--button-bg-hover);
-  transform: scale(1.05);
+}
+
+.titlebar-theme svg {
+  transition: transform 0.4s ease;
+}
+
+.titlebar-theme:active svg {
+  transform: rotate(30deg);
 }
 
 /* GitHub link */
 .titlebar-github {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   color: var(--base-color);
   opacity: 0.8;
   transition: opacity 0.2s ease;
-  font-size: 22px;
 }
 
 .titlebar-github:hover {
   opacity: 1;
+  color: var(--color-purple);
 }
 
 /* Titlebar search */
@@ -333,6 +363,10 @@
   outline: none;
   transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
   opacity: 0;
+}
+
+.titlebar-search-input:focus {
+  border: 1px solid var(--color-purple);
 }
 
 .titlebar-search-input::placeholder {

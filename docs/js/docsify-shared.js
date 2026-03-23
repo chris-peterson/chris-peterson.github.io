@@ -3,32 +3,37 @@ var HUB_ORIGIN = 'https://chris-peterson.github.io';
 var ICONS = {
   bars: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>',
   search: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
-  moon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
-  sun: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" width="18" height="18" style="fill:var(--theme-icon-color);stroke:var(--theme-icon-color)" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  sun: '<svg viewBox="0 0 24 24" width="18" height="18" style="fill:var(--theme-icon-color);stroke:var(--theme-icon-color)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
   github: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>',
   chevronDown: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>'
 };
 
 var PLUGIN_CATALOG = {
   mermaid: [
-    '<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"><\/script>',
-    '<script>mermaid.initialize({ startOnLoad: false });<\/script>',
-    '<script src="https://cdn.jsdelivr.net/npm/docsify-mermaid@2/dist/docsify-mermaid.js"><\/script>'
+    { src: 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js' },
+    { code: 'mermaid.initialize({ startOnLoad: false });' },
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-mermaid@2/dist/docsify-mermaid.js' }
   ],
   footnotes: [
-    '<script src="https://cdn.jsdelivr.net/npm/@sy-records/docsify-footnotes@2/dist/index.min.js"><\/script>'
+    { src: 'https://cdn.jsdelivr.net/npm/@sy-records/docsify-footnotes@2/dist/index.min.js' }
   ]
 };
 
 // --- Public init ---
 
 function initProject(config) {
+  var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
+  config.site_url = HUB_ORIGIN + '/' + config.name;
+  config.repo_source = 'https://github.com/' + org + '/' + config.name;
+
+  var cssOrigin = window.location.origin === HUB_ORIGIN || window.location.hostname === 'localhost' ? '' : HUB_ORIGIN;
   [
     'https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.min.css',
     'https://cdn.jsdelivr.net/npm/prism-themes@1/themes/prism-dracula.min.css',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
-    HUB_ORIGIN + '/css/theme.css',
-    HUB_ORIGIN + '/css/titlebar.css'
+    cssOrigin + '/css/theme.css',
+    cssOrigin + '/css/titlebar.css'
   ].forEach(function(href) {
     var link = document.createElement('link');
     link.rel = 'stylesheet';
@@ -36,36 +41,46 @@ function initProject(config) {
     document.head.appendChild(link);
   });
 
-  var tags = [
-    '<script src="https://cdn.jsdelivr.net/npm/docsify@4"><\/script>',
-    '<script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"><\/script>',
-    '<script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"><\/script>',
-    '<script src="https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts"><\/script>'
+  var steps = [
+    { src: 'https://cdn.jsdelivr.net/npm/docsify@4' },
+    { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' },
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' },
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' }
   ];
 
-  (config.prism || []).forEach(function(lang) {
-    tags.push('<script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-' + lang + '.min.js"><\/script>');
+  (config.code_languages || []).forEach(function(lang) {
+    steps.push({ src: 'https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-' + lang + '.min.js' });
   });
 
   (config.plugins || []).forEach(function(name) {
     if (PLUGIN_CATALOG[name]) {
-      tags = tags.concat(PLUGIN_CATALOG[name]);
+      steps = steps.concat(PLUGIN_CATALOG[name]);
     }
   });
 
-  window.__projectConfig = config;
-  tags.push('<script>_initProjectDOM(window.__projectConfig)<\/script>');
-
-  document.write(tags.join('\n'));
-}
-
-function _initProjectDOM(config) {
   buildTitlebarDOM(config);
   initTheme();
-  initCopyButtons();
   initSearch();
-  initBreadcrumb();
   initEventListeners();
+
+  function loadNext(i) {
+    if (i >= steps.length) {
+      initCopyButtons();
+      initBreadcrumb();
+      return;
+    }
+    var step = steps[i];
+    if (step.src) {
+      var el = document.createElement('script');
+      el.src = step.src;
+      el.onload = function() { loadNext(i + 1); };
+      document.body.appendChild(el);
+    } else if (step.code) {
+      new Function(step.code)();
+      loadNext(i + 1);
+    }
+  }
+  loadNext(0);
 }
 
 // --- Global toggle functions (referenced by onclick attributes) ---
@@ -87,9 +102,23 @@ function toggleTheme() {
   var btn = document.getElementById('themeToggle');
   var currentScheme = html.style.colorScheme || 'dark';
   var newScheme = currentScheme === 'dark' ? 'light' : 'dark';
-  html.style.colorScheme = newScheme;
-  btn.innerHTML = newScheme === 'dark' ? ICONS.moon : ICONS.sun;
-  localStorage.setItem('theme', newScheme);
+  var svg = btn.querySelector('svg');
+  if (svg) {
+    svg.style.transform = 'rotate(360deg) scale(0)';
+  }
+  setTimeout(function() {
+    html.style.colorScheme = newScheme;
+    btn.innerHTML = newScheme === 'dark' ? ICONS.moon : ICONS.sun;
+    localStorage.setItem('theme', newScheme);
+    var newSvg = btn.querySelector('svg');
+    if (newSvg) {
+      newSvg.style.transition = 'none';
+      newSvg.style.transform = 'rotate(-360deg) scale(0)';
+      newSvg.offsetHeight;
+      newSvg.style.transition = '';
+      newSvg.style.transform = '';
+    }
+  }, 200);
 }
 
 function toggleRepoSelector() {
@@ -118,9 +147,9 @@ function buildTitlebarDOM(config) {
   titlebar.appendChild(mobileToggle);
 
   var brand = document.createElement('a');
-  brand.href = config.brand.url;
+  brand.href = config.site_url;
   brand.className = 'titlebar-brand';
-  brand.innerHTML = '<span>' + config.brand.name + '</span>';
+  brand.innerHTML = '<span>' + config.name + '</span>';
   titlebar.appendChild(brand);
 
   var spacer = document.createElement('div');
@@ -139,23 +168,21 @@ function buildTitlebarDOM(config) {
     '<div class="titlebar-search-results" id="titlebarSearchResults"></div>';
   actions.appendChild(search);
 
-  var themeBtn = document.createElement('button');
-  themeBtn.className = 'theme-toggle';
+  var themeBtn = document.createElement('span');
+  themeBtn.className = 'titlebar-theme';
   themeBtn.id = 'themeToggle';
   themeBtn.setAttribute('onclick', 'toggleTheme()');
   themeBtn.title = 'Toggle theme';
   themeBtn.innerHTML = ICONS.moon;
   actions.appendChild(themeBtn);
 
-  if (config.github) {
-    var gh = document.createElement('a');
-    gh.href = config.github;
-    gh.target = '_blank';
-    gh.className = 'titlebar-github';
-    gh.title = 'View on GitHub';
-    gh.innerHTML = ICONS.github;
-    actions.appendChild(gh);
-  }
+  var gh = document.createElement('a');
+  gh.href = config.repo_source;
+  gh.target = '_blank';
+  gh.className = 'titlebar-github';
+  gh.title = 'View on GitHub';
+  gh.innerHTML = ICONS.github;
+  actions.appendChild(gh);
 
   titlebar.appendChild(actions);
 
@@ -532,5 +559,64 @@ function initEventListeners() {
       selector.classList.remove('open');
     }
   });
+
+  initSidebarResize();
+}
+
+function initSidebarResize() {
+  var sidebar = document.querySelector('.sidebar');
+  if (!sidebar) {
+    setTimeout(initSidebarResize, 100);
+    return;
+  }
+
+  var handle = document.createElement('div');
+  handle.className = 'sidebar-resize-handle';
+  sidebar.appendChild(handle);
+
+  var dragging = false;
+
+  handle.addEventListener('dblclick', function() {
+    var nav = sidebar.querySelector('.sidebar-nav');
+    if (!nav) return;
+    sidebar.style.width = 'min-content';
+    nav.style.whiteSpace = 'nowrap';
+    var fitWidth = sidebar.offsetWidth + 20;
+    sidebar.style.width = '';
+    nav.style.whiteSpace = '';
+    var width = Math.max(150, Math.min(fitWidth, window.innerWidth * 0.5));
+    document.documentElement.style.setProperty('--sidebar-width', width + 'px');
+    localStorage.setItem('sidebar-width', width + 'px');
+  });
+
+  handle.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    dragging = true;
+    handle.classList.add('dragging');
+    sidebar.style.transition = 'none';
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    var width = Math.max(150, Math.min(e.clientX, window.innerWidth * 0.5));
+    document.documentElement.style.setProperty('--sidebar-width', width + 'px');
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    sidebar.style.transition = '';
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    localStorage.setItem('sidebar-width', document.documentElement.style.getPropertyValue('--sidebar-width'));
+  });
+
+  var saved = localStorage.getItem('sidebar-width');
+  if (saved) {
+    document.documentElement.style.setProperty('--sidebar-width', saved);
+  }
 }
 

@@ -1,3 +1,8 @@
+- name: chris-peterson
+  description: Project hub
+  icon: https://chris-peterson.github.io/favicon.svg
+  url: https://chris-peterson.github.io
+
 - name: ClaudeWatch
   description: Claude Code safety plugin
   icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg

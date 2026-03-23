@@ -51,6 +51,7 @@
   --button-bg-hover: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.2));
   --button-border: light-dark(rgba(0,0,0,0.15), rgba(255,255,255,0.2));
   --success-color: light-dark(#28a745, #50fa7b);
+  --theme-icon-color: light-dark(#ffb86c, #f1fa8c);
 
   /* Sidebar width */
   --sidebar-width: 25vw;
@@ -139,6 +140,7 @@
 .sidebar-nav > ul > li > a {
   font-weight: bold;
 }
+
 
 /* Remove horizontal lines/dividers under headings */
 .markdown-section h1,

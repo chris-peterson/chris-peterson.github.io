@@ -129,66 +129,42 @@ function toggleRepoSelector() {
 // --- DOM builders ---
 
 function buildTitlebarDOM(config) {
-  var overlay = document.createElement('div');
-  overlay.className = 'sidebar-overlay';
-  overlay.id = 'sidebarOverlay';
-  overlay.setAttribute('onclick', 'closeSidebar()');
+  var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
+  var isHub = config.name === org;
 
-  var titlebar = document.createElement('div');
-  titlebar.className = 'titlebar';
-  titlebar.id = 'titlebar';
+  var navSection = isHub
+    ? '<div class="breadcrumb-repo-selector" id="repoSelector">' +
+        '<button class="breadcrumb-repo-toggle" onclick="toggleRepoSelector()">' +
+          'repos ' + ICONS.chevronDown +
+        '</button>' +
+        '<div class="breadcrumb-repo-dropdown" id="repoDropdownContainer"></div>' +
+      '</div>'
+    : '<a href="' + config.site_url + '" class="titlebar-site-name">' + config.name + '</a>';
 
-  var mobileToggle = document.createElement('button');
-  mobileToggle.className = 'mobile-menu-toggle';
-  mobileToggle.id = 'mobileMenuToggle';
-  mobileToggle.setAttribute('onclick', 'toggleSidebar()');
-  mobileToggle.title = 'Toggle menu';
-  mobileToggle.innerHTML = ICONS.bars;
-  titlebar.appendChild(mobileToggle);
-
-  var brand = document.createElement('a');
-  brand.href = config.site_url;
-  brand.className = 'titlebar-brand';
-  brand.innerHTML = '<span>' + config.name + '</span>';
-  titlebar.appendChild(brand);
-
-  var spacer = document.createElement('div');
-  spacer.className = 'titlebar-spacer';
-  titlebar.appendChild(spacer);
-
-  var actions = document.createElement('div');
-  actions.className = 'titlebar-actions';
-
-  var search = document.createElement('div');
-  search.className = 'titlebar-search';
-  search.id = 'titlebarSearch';
-  search.innerHTML =
-    '<div class="titlebar-search-icon" title="Search">' + ICONS.search + '</div>' +
-    '<input type="text" class="titlebar-search-input" placeholder="Search..." id="titlebarSearchInput">' +
-    '<div class="titlebar-search-results" id="titlebarSearchResults"></div>';
-  actions.appendChild(search);
-
-  var themeBtn = document.createElement('span');
-  themeBtn.className = 'titlebar-theme';
-  themeBtn.id = 'themeToggle';
-  themeBtn.setAttribute('onclick', 'toggleTheme()');
-  themeBtn.title = 'Toggle theme';
-  themeBtn.innerHTML = ICONS.moon;
-  actions.appendChild(themeBtn);
-
-  var gh = document.createElement('a');
-  gh.href = config.repo_source;
-  gh.target = '_blank';
-  gh.className = 'titlebar-github';
-  gh.title = 'View on GitHub';
-  gh.innerHTML = ICONS.github;
-  actions.appendChild(gh);
-
-  titlebar.appendChild(actions);
+  var wrapper = document.createElement('div');
+  wrapper.innerHTML =
+    '<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>' +
+    '<div class="titlebar" id="titlebar">' +
+      '<button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleSidebar()" title="Toggle menu">' + ICONS.bars + '</button>' +
+      '<a href="' + HUB_ORIGIN + '" class="titlebar-brand"><span>' + org + '</span></a>' +
+      '<span class="breadcrumb-separator">/</span>' +
+      navSection +
+      '<div class="titlebar-spacer"></div>' +
+      '<div class="titlebar-actions">' +
+        '<div class="titlebar-search" id="titlebarSearch">' +
+          '<div class="titlebar-search-icon" title="Search">' + ICONS.search + '</div>' +
+          '<input type="text" class="titlebar-search-input" placeholder="Search..." id="titlebarSearchInput">' +
+          '<div class="titlebar-search-results" id="titlebarSearchResults"></div>' +
+        '</div>' +
+        '<span class="titlebar-theme" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">' + ICONS.moon + '</span>' +
+        '<a href="' + config.repo_source + '" target="_blank" class="titlebar-github" title="View on GitHub">' + ICONS.github + '</a>' +
+      '</div>' +
+    '</div>';
 
   var app = document.getElementById('app');
-  app.parentNode.insertBefore(overlay, app);
-  app.parentNode.insertBefore(titlebar, app);
+  while (wrapper.firstChild) {
+    app.parentNode.insertBefore(wrapper.firstChild, app);
+  }
 }
 
 // --- Feature initializers ---
@@ -478,53 +454,18 @@ function initBreadcrumb() {
   }
 
   function injectBreadcrumb(projects) {
-    var spacer = document.querySelector('.titlebar-spacer');
-    if (!spacer) return;
+    var dropdown = document.getElementById('repoDropdownContainer');
+    if (!dropdown) return;
 
-    var currentUrl = window.location.origin + window.location.pathname.replace(/\/$/, '');
-    var currentProject = projects.find(function(p) {
-      return p.url && currentUrl.startsWith(p.url.replace(/\/$/, ''));
-    });
-
-    var breadcrumb = document.createElement('div');
-    breadcrumb.className = 'titlebar-breadcrumb';
-
-    var separator = document.createElement('span');
-    separator.className = 'breadcrumb-separator';
-    separator.textContent = '/';
-    breadcrumb.appendChild(separator);
-
-    var selector = document.createElement('div');
-    selector.className = 'breadcrumb-repo-selector';
-    selector.id = 'repoSelector';
-
-    var toggle = document.createElement('button');
-    toggle.className = 'breadcrumb-repo-toggle';
-    toggle.setAttribute('onclick', 'toggleRepoSelector()');
-    var toggleLabel = currentProject ? currentProject.name : 'repos';
-    toggle.innerHTML = toggleLabel + ' ' + ICONS.chevronDown;
-    selector.appendChild(toggle);
-
-    var dropdown = document.createElement('div');
-    dropdown.className = 'breadcrumb-repo-dropdown';
-
-    projects.forEach(function(project) {
-      var a = document.createElement('a');
-      a.className = 'breadcrumb-repo-item';
-      a.href = project.url || '#';
+    dropdown.innerHTML = projects.map(function(project) {
       var faviconUrl = project.icon || (project.url + '/favicon.ico');
-      a.innerHTML = '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="16" height="16"> ' +
+      return '<a class="breadcrumb-repo-item" href="' + (project.url || '#') + '"' +
+        (project.description ? ' title="' + project.description + '"' : '') + '>' +
+        '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="16" height="16"> ' +
         project.name +
-        '<span class="repo-description">' + (project.description || '') + '</span>';
-      if (project.description) {
-        a.title = project.description;
-      }
-      dropdown.appendChild(a);
-    });
-
-    selector.appendChild(dropdown);
-    breadcrumb.appendChild(selector);
-    spacer.parentNode.insertBefore(breadcrumb, spacer);
+        '<span class="repo-description">' + (project.description || '') + '</span>' +
+      '</a>';
+    }).join('');
   }
 
   fetch(HUB_ORIGIN + '/projects.yml')

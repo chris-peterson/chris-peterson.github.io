@@ -23,6 +23,7 @@ var PLUGIN_CATALOG = {
 // --- Public init ---
 
 function initProject(config) {
+  window.$docsify = window.$docsify || {};
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
   config.site_url = HUB_ORIGIN + '/' + config.name;
   config.repo_source = 'https://github.com/' + org + '/' + config.name;

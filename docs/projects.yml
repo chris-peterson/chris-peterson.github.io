@@ -1,0 +1,3 @@
+- name: pwsh-gitlab
+  description: GitLab CLI
+  url: https://chris-peterson.github.io/pwsh-gitlab

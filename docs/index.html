@@ -18,31 +18,6 @@
   <link rel="stylesheet" href="/css/titlebar.css">
 </head>
 <body>
-  <!-- Overlay for mobile sidebar -->
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-  <!-- Unified titlebar -->
-  <div class="titlebar" id="titlebar">
-    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleSidebar()" title="Toggle menu">
-      <i class="fas fa-bars"></i>
-    </button>
-    <a href="https://chris-peterson.github.io/" class="titlebar-brand">
-      <span>chris-peterson</span>
-    </a>
-    <div class="titlebar-spacer"></div>
-    <div class="titlebar-actions">
-      <div class="titlebar-search" id="titlebarSearch">
-        <div class="titlebar-search-icon" title="Search">
-          <i class="fas fa-search"></i>
-        </div>
-        <input type="text" class="titlebar-search-input" placeholder="Search..." id="titlebarSearchInput">
-        <div class="titlebar-search-results" id="titlebarSearchResults"></div>
-      </div>
-      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme"><i class="fas fa-moon"></i></button>
-      <a href="https://github.com/chris-peterson" target="_blank" class="titlebar-github" title="View on GitHub">
-        <i class="fab fa-github"></i>
-      </a>
-    </div>
-  </div>
   <div id="app">Loading...</div>
   <script>
     window.$docsify = {
@@ -76,5 +51,11 @@
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-powershell.min.js"></script>
   <!-- Shared docsify functionality (theme, sidebar, repo selector, copy buttons) -->
   <script src="/js/docsify-shared.js"></script>
+  <script>
+    initTitlebar({
+      brand: { name: 'chris-peterson', url: 'https://chris-peterson.github.io/' },
+      github: 'https://github.com/chris-peterson'
+    });
+  </script>
 </body>
 </html>

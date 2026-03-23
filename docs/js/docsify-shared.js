@@ -1,6 +1,7 @@
 var HUB_ORIGIN = 'https://chris-peterson.github.io';
 
-// Mobile sidebar toggle functions
+// --- Global toggle functions (referenced by onclick attributes) ---
+
 function toggleSidebar() {
   document.body.classList.toggle('sidebar-open');
   document.getElementById('sidebarOverlay').classList.toggle('visible');
@@ -11,23 +12,6 @@ function closeSidebar() {
   document.getElementById('sidebarOverlay').classList.remove('visible');
 }
 
-// Close sidebar when a link is clicked (on mobile)
-document.addEventListener('click', function(e) {
-  if (e.target.closest('.sidebar-nav a')) {
-    if (window.innerWidth <= 768) {
-      closeSidebar();
-    }
-  }
-});
-
-// Close sidebar on window resize if going to desktop
-window.addEventListener('resize', function() {
-  if (window.innerWidth > 768) {
-    closeSidebar();
-  }
-});
-
-// Theme toggle
 function toggleTheme() {
   var html = document.documentElement;
   var btn = document.getElementById('themeToggle');
@@ -39,8 +23,81 @@ function toggleTheme() {
   localStorage.setItem('theme', newScheme);
 }
 
-// Load saved theme preference
-(function() {
+function toggleRepoSelector() {
+  var selector = document.getElementById('repoSelector');
+  if (selector) selector.classList.toggle('open');
+}
+
+// --- DOM builders ---
+
+function buildTitlebarDOM(config) {
+  var overlay = document.createElement('div');
+  overlay.className = 'sidebar-overlay';
+  overlay.id = 'sidebarOverlay';
+  overlay.setAttribute('onclick', 'closeSidebar()');
+
+  var titlebar = document.createElement('div');
+  titlebar.className = 'titlebar';
+  titlebar.id = 'titlebar';
+
+  var mobileToggle = document.createElement('button');
+  mobileToggle.className = 'mobile-menu-toggle';
+  mobileToggle.id = 'mobileMenuToggle';
+  mobileToggle.setAttribute('onclick', 'toggleSidebar()');
+  mobileToggle.title = 'Toggle menu';
+  mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  titlebar.appendChild(mobileToggle);
+
+  var brand = document.createElement('a');
+  brand.href = config.brand.url;
+  brand.className = 'titlebar-brand';
+  brand.innerHTML = '<span>' + config.brand.name + '</span>';
+  titlebar.appendChild(brand);
+
+  var spacer = document.createElement('div');
+  spacer.className = 'titlebar-spacer';
+  titlebar.appendChild(spacer);
+
+  var actions = document.createElement('div');
+  actions.className = 'titlebar-actions';
+
+  var search = document.createElement('div');
+  search.className = 'titlebar-search';
+  search.id = 'titlebarSearch';
+  search.innerHTML =
+    '<div class="titlebar-search-icon" title="Search"><i class="fas fa-search"></i></div>' +
+    '<input type="text" class="titlebar-search-input" placeholder="Search..." id="titlebarSearchInput">' +
+    '<div class="titlebar-search-results" id="titlebarSearchResults"></div>';
+  actions.appendChild(search);
+
+  var themeBtn = document.createElement('button');
+  themeBtn.className = 'theme-toggle';
+  themeBtn.id = 'themeToggle';
+  themeBtn.setAttribute('onclick', 'toggleTheme()');
+  themeBtn.title = 'Toggle theme';
+  themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+  actions.appendChild(themeBtn);
+
+  if (config.github) {
+    var gh = document.createElement('a');
+    gh.href = config.github;
+    gh.target = '_blank';
+    gh.className = 'titlebar-github';
+    gh.title = 'View on GitHub';
+    gh.innerHTML = '<i class="fab fa-github"></i>';
+    actions.appendChild(gh);
+  }
+
+  titlebar.appendChild(actions);
+
+  var app = document.getElementById('app');
+  app.parentNode.insertBefore(overlay, app);
+  app.parentNode.insertBefore(titlebar, app);
+}
+
+// --- Feature initializers ---
+
+function initTheme() {
   var saved = localStorage.getItem('theme');
   var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   var theme = saved || (systemPrefersDark ? 'dark' : 'light');
@@ -50,10 +107,9 @@ function toggleTheme() {
     var icon = btn.querySelector('i');
     if (icon) icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
   }
-})();
+}
 
-// Custom copy button behavior with checkmark feedback
-(function() {
+function initCopyButtons() {
   function setupCopyButtons() {
     document.querySelectorAll('.docsify-copy-code-button').forEach(function(btn) {
       if (btn.dataset.customized) return;
@@ -74,24 +130,9 @@ function toggleTheme() {
       });
     });
   }
-})();
-
-// Repo selector dropdown
-function toggleRepoSelector() {
-  var selector = document.getElementById('repoSelector');
-  if (selector) selector.classList.toggle('open');
 }
 
-// Close repo selector when clicking outside
-document.addEventListener('click', function(e) {
-  var selector = document.getElementById('repoSelector');
-  if (selector && !selector.contains(e.target)) {
-    selector.classList.remove('open');
-  }
-});
-
-// Titlebar search
-(function() {
+function initSearch() {
   var searchContainer = document.getElementById('titlebarSearch');
   if (!searchContainer) return;
 
@@ -316,10 +357,9 @@ document.addEventListener('click', function(e) {
       });
     });
   }
-})();
+}
 
-// Inject breadcrumb nav and populate from projects.yml
-(function() {
+function initBreadcrumb() {
   function parseYaml(text) {
     var projects = [];
     var current = null;
@@ -346,6 +386,11 @@ document.addEventListener('click', function(e) {
     var spacer = document.querySelector('.titlebar-spacer');
     if (!spacer) return;
 
+    var currentUrl = window.location.origin + window.location.pathname.replace(/\/$/, '');
+    var currentProject = projects.find(function(p) {
+      return p.url && currentUrl.startsWith(p.url.replace(/\/$/, ''));
+    });
+
     var breadcrumb = document.createElement('div');
     breadcrumb.className = 'titlebar-breadcrumb';
 
@@ -361,7 +406,8 @@ document.addEventListener('click', function(e) {
     var toggle = document.createElement('button');
     toggle.className = 'breadcrumb-repo-toggle';
     toggle.setAttribute('onclick', 'toggleRepoSelector()');
-    toggle.innerHTML = 'repos <i class="fas fa-chevron-down"></i>';
+    var toggleLabel = currentProject ? currentProject.name : 'repos';
+    toggle.innerHTML = toggleLabel + ' <i class="fas fa-chevron-down"></i>';
     selector.appendChild(toggle);
 
     var dropdown = document.createElement('div');
@@ -393,4 +439,40 @@ document.addEventListener('click', function(e) {
     })
     .then(function(text) { injectBreadcrumb(parseYaml(text)); })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });
-})();
+}
+
+// --- Global event listeners ---
+
+function initEventListeners() {
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.sidebar-nav a')) {
+      if (window.innerWidth <= 768) {
+        closeSidebar();
+      }
+    }
+  });
+
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+      closeSidebar();
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    var selector = document.getElementById('repoSelector');
+    if (selector && !selector.contains(e.target)) {
+      selector.classList.remove('open');
+    }
+  });
+}
+
+// --- Public init ---
+
+function initTitlebar(config) {
+  buildTitlebarDOM(config);
+  initTheme();
+  initCopyButtons();
+  initSearch();
+  initBreadcrumb();
+  initEventListeners();
+}

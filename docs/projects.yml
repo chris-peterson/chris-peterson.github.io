@@ -5,4 +5,5 @@
 
 - name: pwsh-gitlab
   description: GitLab CLI
+  icon: https://chris-peterson.github.io/pwsh-gitlab/favicon.svg
   url: https://chris-peterson.github.io/pwsh-gitlab

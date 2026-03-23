@@ -66,7 +66,10 @@ function initProject(config) {
     document.head.appendChild(link);
   });
 
+  // Stub window.Docsify so flexible-alerts can read the version before core loads.
+  // Docsify core overwrites this with the real object on load.
   var steps = [
+    { code: 'window.Docsify = { version: "4.0.0" };' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify@4' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' },

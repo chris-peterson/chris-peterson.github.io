@@ -4,12 +4,14 @@ var HUB_ORIGIN = 'https://chris-peterson.github.io';
 
 function toggleSidebar() {
   document.body.classList.toggle('sidebar-open');
-  document.getElementById('sidebarOverlay').classList.toggle('visible');
+  var overlay = document.getElementById('sidebarOverlay');
+  if (overlay) overlay.classList.toggle('visible');
 }
 
 function closeSidebar() {
   document.body.classList.remove('sidebar-open');
-  document.getElementById('sidebarOverlay').classList.remove('visible');
+  var overlay = document.getElementById('sidebarOverlay');
+  if (overlay) overlay.classList.remove('visible');
 }
 
 function toggleTheme() {

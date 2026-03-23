@@ -1,5 +1,73 @@
 var HUB_ORIGIN = 'https://chris-peterson.github.io';
 
+var ICONS = {
+  bars: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>',
+  search: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  sun: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+  github: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>',
+  chevronDown: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>'
+};
+
+var PLUGIN_CATALOG = {
+  mermaid: [
+    '<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"><\/script>',
+    '<script>mermaid.initialize({ startOnLoad: false });<\/script>',
+    '<script src="https://cdn.jsdelivr.net/npm/docsify-mermaid@2/dist/docsify-mermaid.js"><\/script>'
+  ],
+  footnotes: [
+    '<script src="https://cdn.jsdelivr.net/npm/@sy-records/docsify-footnotes@2/dist/index.min.js"><\/script>'
+  ]
+};
+
+// --- Public init ---
+
+function initProject(config) {
+  [
+    'https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.min.css',
+    'https://cdn.jsdelivr.net/npm/prism-themes@1/themes/prism-dracula.min.css',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
+    HUB_ORIGIN + '/css/theme.css',
+    HUB_ORIGIN + '/css/titlebar.css'
+  ].forEach(function(href) {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  });
+
+  var tags = [
+    '<script src="https://cdn.jsdelivr.net/npm/docsify@4"><\/script>',
+    '<script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"><\/script>',
+    '<script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"><\/script>',
+    '<script src="https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts"><\/script>'
+  ];
+
+  (config.prism || []).forEach(function(lang) {
+    tags.push('<script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-' + lang + '.min.js"><\/script>');
+  });
+
+  (config.plugins || []).forEach(function(name) {
+    if (PLUGIN_CATALOG[name]) {
+      tags = tags.concat(PLUGIN_CATALOG[name]);
+    }
+  });
+
+  window.__projectConfig = config;
+  tags.push('<script>_initProjectDOM(window.__projectConfig)<\/script>');
+
+  document.write(tags.join('\n'));
+}
+
+function _initProjectDOM(config) {
+  buildTitlebarDOM(config);
+  initTheme();
+  initCopyButtons();
+  initSearch();
+  initBreadcrumb();
+  initEventListeners();
+}
+
 // --- Global toggle functions (referenced by onclick attributes) ---
 
 function toggleSidebar() {
@@ -17,11 +85,10 @@ function closeSidebar() {
 function toggleTheme() {
   var html = document.documentElement;
   var btn = document.getElementById('themeToggle');
-  var icon = btn.querySelector('i');
   var currentScheme = html.style.colorScheme || 'dark';
   var newScheme = currentScheme === 'dark' ? 'light' : 'dark';
   html.style.colorScheme = newScheme;
-  icon.className = newScheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+  btn.innerHTML = newScheme === 'dark' ? ICONS.moon : ICONS.sun;
   localStorage.setItem('theme', newScheme);
 }
 
@@ -47,7 +114,7 @@ function buildTitlebarDOM(config) {
   mobileToggle.id = 'mobileMenuToggle';
   mobileToggle.setAttribute('onclick', 'toggleSidebar()');
   mobileToggle.title = 'Toggle menu';
-  mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  mobileToggle.innerHTML = ICONS.bars;
   titlebar.appendChild(mobileToggle);
 
   var brand = document.createElement('a');
@@ -67,7 +134,7 @@ function buildTitlebarDOM(config) {
   search.className = 'titlebar-search';
   search.id = 'titlebarSearch';
   search.innerHTML =
-    '<div class="titlebar-search-icon" title="Search"><i class="fas fa-search"></i></div>' +
+    '<div class="titlebar-search-icon" title="Search">' + ICONS.search + '</div>' +
     '<input type="text" class="titlebar-search-input" placeholder="Search..." id="titlebarSearchInput">' +
     '<div class="titlebar-search-results" id="titlebarSearchResults"></div>';
   actions.appendChild(search);
@@ -77,7 +144,7 @@ function buildTitlebarDOM(config) {
   themeBtn.id = 'themeToggle';
   themeBtn.setAttribute('onclick', 'toggleTheme()');
   themeBtn.title = 'Toggle theme';
-  themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+  themeBtn.innerHTML = ICONS.moon;
   actions.appendChild(themeBtn);
 
   if (config.github) {
@@ -86,7 +153,7 @@ function buildTitlebarDOM(config) {
     gh.target = '_blank';
     gh.className = 'titlebar-github';
     gh.title = 'View on GitHub';
-    gh.innerHTML = '<i class="fab fa-github"></i>';
+    gh.innerHTML = ICONS.github;
     actions.appendChild(gh);
   }
 
@@ -106,8 +173,7 @@ function initTheme() {
   document.documentElement.style.colorScheme = theme;
   var btn = document.getElementById('themeToggle');
   if (btn) {
-    var icon = btn.querySelector('i');
-    if (icon) icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    btn.innerHTML = theme === 'dark' ? ICONS.moon : ICONS.sun;
   }
 }
 
@@ -409,7 +475,7 @@ function initBreadcrumb() {
     toggle.className = 'breadcrumb-repo-toggle';
     toggle.setAttribute('onclick', 'toggleRepoSelector()');
     var toggleLabel = currentProject ? currentProject.name : 'repos';
-    toggle.innerHTML = toggleLabel + ' <i class="fas fa-chevron-down"></i>';
+    toggle.innerHTML = toggleLabel + ' ' + ICONS.chevronDown;
     selector.appendChild(toggle);
 
     var dropdown = document.createElement('div');
@@ -468,13 +534,3 @@ function initEventListeners() {
   });
 }
 
-// --- Public init ---
-
-function initTitlebar(config) {
-  buildTitlebarDOM(config);
-  initTheme();
-  initCopyButtons();
-  initSearch();
-  initBreadcrumb();
-  initEventListeners();
-}

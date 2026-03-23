@@ -196,13 +196,12 @@
   background: var(--button-bg-hover);
 }
 
-.breadcrumb-repo-toggle i {
-  font-size: 10px;
+.breadcrumb-repo-toggle svg {
   opacity: 0.7;
   transition: transform 0.2s ease;
 }
 
-.breadcrumb-repo-selector.open .breadcrumb-repo-toggle i {
+.breadcrumb-repo-selector.open .breadcrumb-repo-toggle svg {
   transform: rotate(180deg);
 }
 

@@ -52,6 +52,23 @@
   --button-border: light-dark(rgba(0,0,0,0.15), rgba(255,255,255,0.2));
   --success-color: light-dark(#28a745, #50fa7b);
   --theme-icon-color: light-dark(#ffb86c, #f1fa8c);
+  --muted-color: var(--color-comment);
+  --hover-color: var(--color-cyan);
+  --focus-border-color: var(--color-purple);
+  --resize-handle-color: var(--color-purple);
+
+  /* Titlebar */
+  --titlebar-bg: light-dark(rgba(240,240,240,0.85), rgba(33,34,44,0.85));
+  --titlebar-accent-start: var(--color-purple);
+  --titlebar-accent-mid: var(--color-cyan);
+  --titlebar-accent-end: var(--color-pink);
+  --brand-hover-color: var(--color-purple);
+  --toggle-bg: light-dark(rgba(0,0,0,0.08), rgba(255,255,255,0.08));
+  --toggle-bg-hover: light-dark(rgba(0,0,0,0.12), rgba(255,255,255,0.12));
+  --toggle-indicator: light-dark(rgba(255,255,255,0.95), rgba(255,255,255,0.12));
+  --toggle-active-color: var(--theme-icon-color);
+  --toggle-inactive-color: var(--muted-color);
+  --kbd-bg: light-dark(rgba(0,0,0,0.06), rgba(255,255,255,0.06));
 
   /* Sidebar width */
   --sidebar-width: 25vw;

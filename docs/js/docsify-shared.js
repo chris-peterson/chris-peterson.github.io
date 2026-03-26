@@ -6,7 +6,9 @@ var ICONS = {
   moon: '<svg viewBox="0 0 24 24" width="18" height="18" style="fill:var(--theme-icon-color);stroke:var(--theme-icon-color)" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
   sun: '<svg viewBox="0 0 24 24" width="18" height="18" style="fill:var(--theme-icon-color);stroke:var(--theme-icon-color)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
   github: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>',
-  chevronDown: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>'
+  chevronDown: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>',
+  toggleSun: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+  toggleMoon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
 };
 
 var PLUGIN_CATALOG = {
@@ -127,26 +129,12 @@ function closeSidebar() {
 
 function toggleTheme() {
   var html = document.documentElement;
-  var btn = document.getElementById('themeToggle');
+  var toggle = document.getElementById('themeToggle');
   var currentScheme = html.style.colorScheme || 'dark';
   var newScheme = currentScheme === 'dark' ? 'light' : 'dark';
-  var svg = btn.querySelector('svg');
-  if (svg) {
-    svg.style.transform = 'rotate(360deg) scale(0)';
-  }
-  setTimeout(function() {
-    html.style.colorScheme = newScheme;
-    btn.innerHTML = newScheme === 'dark' ? ICONS.moon : ICONS.sun;
-    localStorage.setItem('theme', newScheme);
-    var newSvg = btn.querySelector('svg');
-    if (newSvg) {
-      newSvg.style.transition = 'none';
-      newSvg.style.transform = 'rotate(-360deg) scale(0)';
-      newSvg.offsetHeight;
-      newSvg.style.transition = '';
-      newSvg.style.transform = '';
-    }
-  }, 200);
+  html.style.colorScheme = newScheme;
+  toggle.setAttribute('data-scheme', newScheme);
+  localStorage.setItem('theme', newScheme);
 }
 
 function toggleRepoSelector() {
@@ -180,11 +168,19 @@ function buildTitlebarDOM(config) {
       '<div class="titlebar-spacer"></div>' +
       '<div class="titlebar-actions">' +
         '<div class="titlebar-search" id="titlebarSearch">' +
-          '<div class="titlebar-search-icon" title="Search">' + ICONS.search + '</div>' +
+          '<div class="titlebar-search-trigger" title="Search">' +
+            ICONS.search +
+            '<span class="search-hint">Search</span>' +
+            '<kbd class="search-kbd">/</kbd>' +
+          '</div>' +
           '<input type="text" class="titlebar-search-input" placeholder="Search..." id="titlebarSearchInput">' +
           '<div class="titlebar-search-results" id="titlebarSearchResults"></div>' +
         '</div>' +
-        '<span class="titlebar-theme" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">' + ICONS.moon + '</span>' +
+        '<div class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">' +
+          '<span class="theme-toggle-option theme-toggle-sun">' + ICONS.toggleSun + '</span>' +
+          '<span class="theme-toggle-option theme-toggle-moon">' + ICONS.toggleMoon + '</span>' +
+          '<span class="theme-toggle-indicator"></span>' +
+        '</div>' +
         '<a href="' + config.repo_source + '" target="_blank" class="titlebar-github" title="View on GitHub">' + ICONS.github + '</a>' +
       '</div>' +
     '</div>';
@@ -202,9 +198,9 @@ function initTheme() {
   var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   var theme = saved || (systemPrefersDark ? 'dark' : 'light');
   document.documentElement.style.colorScheme = theme;
-  var btn = document.getElementById('themeToggle');
-  if (btn) {
-    btn.innerHTML = theme === 'dark' ? ICONS.moon : ICONS.sun;
+  var toggle = document.getElementById('themeToggle');
+  if (toggle) {
+    toggle.setAttribute('data-scheme', theme);
   }
 }
 
@@ -235,7 +231,7 @@ function initSearch() {
   var searchContainer = document.getElementById('titlebarSearch');
   if (!searchContainer) return;
 
-  var searchIcon = searchContainer.querySelector('.titlebar-search-icon');
+  var searchTrigger = searchContainer.querySelector('.titlebar-search-trigger');
   var searchInput = document.getElementById('titlebarSearchInput');
   var searchResults = document.getElementById('titlebarSearchResults');
   var searchIndex = [];
@@ -405,7 +401,7 @@ function initSearch() {
     }
   }
 
-  searchIcon.addEventListener('click', function(e) {
+  searchTrigger.addEventListener('click', function(e) {
     e.stopPropagation();
     expandSearch();
   });
@@ -446,6 +442,10 @@ function initSearch() {
       e.preventDefault();
       expandSearch();
       searchInput.select();
+    }
+    if (e.key === '/' && !e.target.matches('input, textarea, [contenteditable]')) {
+      e.preventDefault();
+      expandSearch();
     }
   });
 

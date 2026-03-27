@@ -151,10 +151,11 @@ function buildTitlebarDOM(config) {
   var isHub = config.name === org;
 
   var toggleLabel = isHub ? 'repos' : config.name;
+  var toggleIcon = isHub ? '' : '<img class="breadcrumb-repo-icon" src="favicon.svg" alt="" width="16" height="16"> ';
   var navSection =
     '<div class="breadcrumb-repo-selector" id="repoSelector">' +
       '<button class="breadcrumb-repo-toggle" onclick="toggleRepoSelector()">' +
-        toggleLabel + ' ' + ICONS.chevronDown +
+        toggleIcon + toggleLabel + ' ' + ICONS.chevronDown +
       '</button>' +
       '<div class="breadcrumb-repo-dropdown" id="repoDropdownContainer"></div>' +
     '</div>';

@@ -163,6 +163,12 @@
   position: relative;
 }
 
+.breadcrumb-repo-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
 .breadcrumb-repo-toggle {
   display: flex;
   align-items: center;

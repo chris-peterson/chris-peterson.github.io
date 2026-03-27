@@ -546,32 +546,31 @@ function initProjectCards() {
           container.innerHTML = projects.map(function(project, i) {
             var faviconUrl = project.icon || (project.url + '/favicon.ico');
             var sourceUrl = 'https://github.com/' + org + '/' + project.name;
+            var langLegend = (project.languages && project.languages.length > 0) ?
+              project.languages.map(function(lang) {
+                return '<span class="lang-legend-item"><span class="lang-dot" data-lang="' + lang.name.toLowerCase() + '"></span>' + lang.name + '</span>';
+              }).join('') : '';
+            var langBar = (project.languages && project.languages.length > 0) ?
+              '<div class="lang-bar">' +
+                project.languages.map(function(lang) {
+                  return '<div class="lang-bar-segment" data-lang="' + lang.name.toLowerCase() + '" style="flex:' + lang.pct + '"></div>';
+                }).join('') +
+              '</div>' : '<div class="project-card-accent"></div>';
             return '<div class="project-card" data-href="' + (project.url || '#') + '" style="animation-delay:' + (i * 80) + 'ms">' +
-              '<div class="project-card-accent"></div>' +
               '<div class="project-card-content">' +
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
                 '<div class="project-card-info">' +
                   '<div class="project-card-name">' + project.name + '</div>' +
-                  '<div class="project-card-desc">' + (project.description || '') + '</div>' +
-                  (project.languages && project.languages.length > 0 ?
-                    '<div class="project-card-langs">' +
-                      '<div class="lang-bar">' +
-                        project.languages.map(function(lang) {
-                          return '<div class="lang-bar-segment" data-lang="' + lang.name.toLowerCase() + '" style="width:' + lang.pct + '%"></div>';
-                        }).join('') +
-                      '</div>' +
-                      '<div class="lang-legend">' +
-                        project.languages.map(function(lang) {
-                          return '<span class="lang-legend-item"><span class="lang-dot" data-lang="' + lang.name.toLowerCase() + '"></span>' + lang.name + '</span>';
-                        }).join('') +
-                      '</div>' +
-                    '</div>' : '') +
+                  '<div class="project-card-desc">' + (project.description || '') +
+                    (langLegend ? '<span class="lang-legend">' + langLegend + '</span>' : '') +
+                  '</div>' +
                 '</div>' +
               '</div>' +
               '<div class="project-card-links">' +
                 '<a class="project-card-source" href="' + sourceUrl + '" target="_blank" title="View source">' + ICONS.github + '</a>' +
                 '<svg class="project-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>' +
               '</div>' +
+              langBar +
             '</div>';
           }).join('');
 

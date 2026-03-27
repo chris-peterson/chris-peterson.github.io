@@ -1,41 +1,59 @@
 - name: ClaudeWatch
   description: Claude Code safety plugin
-  tech: Python, YAML
   icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
   url: https://chris-peterson.github.io/ClaudeWatch
+  languages:
+    - name: Shell
+      pct: 70
+    - name: Python
+      pct: 30
 
 - name: pwsh-github
   description: GitHub CLI
-  tech: PowerShell
   icon: https://chris-peterson.github.io/pwsh-github/favicon.svg
   url: https://chris-peterson.github.io/pwsh-github
+  languages:
+    - name: PowerShell
+      pct: 100
 
 - name: pwsh-gitlab
   description: GitLab CLI
-  tech: PowerShell
   icon: https://chris-peterson.github.io/pwsh-gitlab/favicon.svg
   url: https://chris-peterson.github.io/pwsh-gitlab
+  languages:
+    - name: PowerShell
+      pct: 100
 
 - name: spiffy
   description: Structured logging for .NET
-  tech: C#
   icon: https://chris-peterson.github.io/spiffy/favicon.svg
   url: https://chris-peterson.github.io/spiffy
+  languages:
+    - name: C#
+      pct: 90
+    - name: Shell
+      pct: 10
 
 - name: kekiri
   description: BDD testing for .NET
-  tech: C#
   icon: https://chris-peterson.github.io/kekiri/favicon.svg
   url: https://chris-peterson.github.io/kekiri
+  languages:
+    - name: C#
+      pct: 100
 
 - name: assurance
   description: Side-by-side code comparison
-  tech: C#
   icon: https://chris-peterson.github.io/assurance/favicon.svg
   url: https://chris-peterson.github.io/assurance
+  languages:
+    - name: C#
+      pct: 100
 
 - name: gitconfig
   description: Git configuration & workflow
-  tech: Shell
   icon: https://chris-peterson.github.io/gitconfig/favicon.svg
   url: https://chris-peterson.github.io/gitconfig
+  languages:
+    - name: Shell
+      pct: 100

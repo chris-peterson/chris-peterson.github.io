@@ -464,23 +464,36 @@ function initSearch() {
 function parseProjectsYaml(text) {
   var projects = [];
   var current = null;
+  var inLanguages = false;
+  var currentLang = null;
   text.split('\n').forEach(function(line) {
     var nameMatch = line.match(/^- name:\s*(.+)/);
     var descMatch = line.match(/^\s+description:\s*(.+)/);
-    var techMatch = line.match(/^\s+tech:\s*(.+)/);
     var iconMatch = line.match(/^\s+icon:\s*(.+)/);
     var urlMatch = line.match(/^\s+url:\s*(.+)/);
+    var langHeader = line.match(/^\s+languages:\s*$/);
+    var langName = line.match(/^\s+- name:\s*(.+)/);
+    var langPct = line.match(/^\s+pct:\s*(.+)/);
     if (nameMatch) {
-      current = { name: nameMatch[1].trim() };
+      current = { name: nameMatch[1].trim(), languages: [] };
       projects.push(current);
+      inLanguages = false;
     } else if (current && descMatch) {
       current.description = descMatch[1].trim();
-    } else if (current && techMatch) {
-      current.tech = techMatch[1].trim();
+      inLanguages = false;
     } else if (current && iconMatch) {
       current.icon = iconMatch[1].trim();
+      inLanguages = false;
     } else if (current && urlMatch) {
       current.url = urlMatch[1].trim();
+      inLanguages = false;
+    } else if (current && langHeader) {
+      inLanguages = true;
+    } else if (current && inLanguages && langName) {
+      currentLang = { name: langName[1].trim(), pct: 0 };
+      current.languages.push(currentLang);
+    } else if (currentLang && inLanguages && langPct) {
+      currentLang.pct = parseInt(langPct[1].trim(), 10);
     }
   });
   return projects;
@@ -538,13 +551,21 @@ function initProjectCards() {
               '<div class="project-card-content">' +
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
                 '<div class="project-card-info">' +
-                  '<div class="project-card-name">' + project.name +
-                    (project.tech ? project.tech.split(',').map(function(t) {
-                      var trimmed = t.trim();
-                      return ' <span class="project-card-tech" data-tech="' + trimmed.toLowerCase() + '">' + trimmed + '</span>';
-                    }).join('') : '') +
-                  '</div>' +
+                  '<div class="project-card-name">' + project.name + '</div>' +
                   '<div class="project-card-desc">' + (project.description || '') + '</div>' +
+                  (project.languages && project.languages.length > 0 ?
+                    '<div class="project-card-langs">' +
+                      '<div class="lang-bar">' +
+                        project.languages.map(function(lang) {
+                          return '<div class="lang-bar-segment" data-lang="' + lang.name.toLowerCase() + '" style="width:' + lang.pct + '%"></div>';
+                        }).join('') +
+                      '</div>' +
+                      '<div class="lang-legend">' +
+                        project.languages.map(function(lang) {
+                          return '<span class="lang-legend-item"><span class="lang-dot" data-lang="' + lang.name.toLowerCase() + '"></span>' + lang.name + '</span>';
+                        }).join('') +
+                      '</div>' +
+                    '</div>' : '') +
                 '</div>' +
               '</div>' +
               '<div class="project-card-links">' +

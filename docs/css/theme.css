@@ -249,50 +249,55 @@
   letter-spacing: -0.01em;
 }
 
-.project-card-tech {
-  display: inline-block;
-  font-size: 0.6em;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 10px;
-  vertical-align: middle;
-  margin-left: 6px;
-  --badge-color: var(--color-purple);
-  background: light-dark(rgba(124, 58, 237, 0.1), rgba(189, 147, 249, 0.12));
-  color: var(--badge-color);
-  border: 1px solid light-dark(rgba(124, 58, 237, 0.2), rgba(189, 147, 249, 0.2));
-  letter-spacing: 0.02em;
+.project-card-langs {
+  width: 100%;
+  margin-top: 0.5rem;
 }
 
-.project-card-tech[data-tech="python"] {
-  --badge-color: var(--color-green);
-  background: light-dark(rgba(29, 138, 61, 0.1), rgba(80, 250, 123, 0.12));
-  border-color: light-dark(rgba(29, 138, 61, 0.2), rgba(80, 250, 123, 0.2));
+.lang-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  gap: 2px;
 }
 
-.project-card-tech[data-tech="powershell"] {
-  --badge-color: var(--color-cyan);
-  background: light-dark(rgba(13, 127, 166, 0.1), rgba(139, 233, 253, 0.12));
-  border-color: light-dark(rgba(13, 127, 166, 0.2), rgba(139, 233, 253, 0.2));
+.lang-bar-segment {
+  height: 100%;
+  border-radius: 3px;
 }
 
-.project-card-tech[data-tech="c#"] {
-  --badge-color: var(--color-purple);
-  background: light-dark(rgba(124, 58, 237, 0.1), rgba(189, 147, 249, 0.12));
-  border-color: light-dark(rgba(124, 58, 237, 0.2), rgba(189, 147, 249, 0.2));
+.lang-bar-segment[data-lang="c#"]         { background: var(--color-purple); }
+.lang-bar-segment[data-lang="python"]     { background: var(--color-green); }
+.lang-bar-segment[data-lang="powershell"] { background: var(--color-cyan); }
+.lang-bar-segment[data-lang="shell"]      { background: var(--color-orange); }
+
+.lang-legend {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+  flex-wrap: wrap;
 }
 
-.project-card-tech[data-tech="shell"] {
-  --badge-color: var(--color-orange);
-  background: light-dark(rgba(194, 93, 0, 0.1), rgba(255, 184, 108, 0.12));
-  border-color: light-dark(rgba(194, 93, 0, 0.2), rgba(255, 184, 108, 0.2));
+.lang-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75em;
+  color: var(--color-comment);
 }
 
-.project-card-tech[data-tech="yaml"] {
-  --badge-color: var(--color-pink);
-  background: light-dark(rgba(200, 63, 113, 0.1), rgba(255, 121, 198, 0.12));
-  border-color: light-dark(rgba(200, 63, 113, 0.2), rgba(255, 121, 198, 0.2));
+.lang-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
+
+.lang-dot[data-lang="c#"]         { background: var(--color-purple); }
+.lang-dot[data-lang="python"]     { background: var(--color-green); }
+.lang-dot[data-lang="powershell"] { background: var(--color-cyan); }
+.lang-dot[data-lang="shell"]      { background: var(--color-orange); }
 
 .project-card-desc {
   color: var(--color-comment);

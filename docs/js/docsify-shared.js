@@ -30,6 +30,7 @@ function initProject(config) {
   config.site_url = HUB_ORIGIN + '/' + config.name;
   config.repo_source = 'https://github.com/' + org + '/' + config.name;
 
+  var isHub = config.name === org;
   var defaults = {
     loadSidebar: true,
     subMaxLevel: 2,
@@ -38,7 +39,7 @@ function initProject(config) {
     notFoundPage: true,
     relativePath: false,
     alias: { '/.*/_sidebar.md': '/_sidebar.md' },
-    hideSidebar: false,
+    hideSidebar: isHub,
     search: {
       placeholder: 'Search...',
       noData: 'No results',
@@ -74,9 +75,9 @@ function initProject(config) {
     { code: 'window.Docsify = { version: "4.0.0" };' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify@4' },
-    { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' },
+    !isHub && { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' }
-  ];
+  ].filter(Boolean);
 
   (config.code_languages || []).forEach(function(lang) {
     steps.push({ src: 'https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-' + lang + '.min.js' });
@@ -90,7 +91,8 @@ function initProject(config) {
 
   buildTitlebarDOM(config);
   initTheme();
-  initSearch();
+  if (!isHub) initSearch();
+  initProjectCards();
   initEventListeners();
 
   function loadNext(i) {
@@ -167,6 +169,7 @@ function buildTitlebarDOM(config) {
       navSection +
       '<div class="titlebar-spacer"></div>' +
       '<div class="titlebar-actions">' +
+        (isHub ? '' :
         '<div class="titlebar-search" id="titlebarSearch">' +
           '<div class="titlebar-search-trigger" title="Search">' +
             ICONS.search +
@@ -175,7 +178,7 @@ function buildTitlebarDOM(config) {
           '</div>' +
           '<input type="text" class="titlebar-search-input" placeholder="Search..." id="titlebarSearchInput">' +
           '<div class="titlebar-search-results" id="titlebarSearchResults"></div>' +
-        '</div>' +
+        '</div>') +
         '<div class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">' +
           '<span class="theme-toggle-option theme-toggle-sun">' + ICONS.toggleSun + '</span>' +
           '<span class="theme-toggle-option theme-toggle-moon">' + ICONS.toggleMoon + '</span>' +
@@ -458,51 +461,89 @@ function initSearch() {
   }
 }
 
+function parseProjectsYaml(text) {
+  var projects = [];
+  var current = null;
+  text.split('\n').forEach(function(line) {
+    var nameMatch = line.match(/^- name:\s*(.+)/);
+    var descMatch = line.match(/^\s+description:\s*(.+)/);
+    var iconMatch = line.match(/^\s+icon:\s*(.+)/);
+    var urlMatch = line.match(/^\s+url:\s*(.+)/);
+    if (nameMatch) {
+      current = { name: nameMatch[1].trim() };
+      projects.push(current);
+    } else if (current && descMatch) {
+      current.description = descMatch[1].trim();
+    } else if (current && iconMatch) {
+      current.icon = iconMatch[1].trim();
+    } else if (current && urlMatch) {
+      current.url = urlMatch[1].trim();
+    }
+  });
+  return projects;
+}
+
+var _projectsPromise = null;
+
+function loadProjects() {
+  if (!_projectsPromise) {
+    _projectsPromise = fetch(HUB_ORIGIN + '/projects.yml')
+      .then(function(r) {
+        if (!r.ok) throw new Error('projects.yml responded with ' + r.status);
+        return r.text();
+      })
+      .then(function(text) { return parseProjectsYaml(text); });
+  }
+  return _projectsPromise;
+}
+
 function initBreadcrumb() {
-  function parseYaml(text) {
-    var projects = [];
-    var current = null;
-    text.split('\n').forEach(function(line) {
-      var nameMatch = line.match(/^- name:\s*(.+)/);
-      var descMatch = line.match(/^\s+description:\s*(.+)/);
-      var iconMatch = line.match(/^\s+icon:\s*(.+)/);
-      var urlMatch = line.match(/^\s+url:\s*(.+)/);
-      if (nameMatch) {
-        current = { name: nameMatch[1].trim() };
-        projects.push(current);
-      } else if (current && descMatch) {
-        current.description = descMatch[1].trim();
-      } else if (current && iconMatch) {
-        current.icon = iconMatch[1].trim();
-      } else if (current && urlMatch) {
-        current.url = urlMatch[1].trim();
-      }
-    });
-    return projects;
-  }
+  loadProjects()
+    .then(function(projects) {
+      var dropdown = document.getElementById('repoDropdownContainer');
+      if (!dropdown) return;
 
-  function injectBreadcrumb(projects) {
-    var dropdown = document.getElementById('repoDropdownContainer');
-    if (!dropdown) return;
-
-    dropdown.innerHTML = projects.map(function(project) {
-      var faviconUrl = project.icon || (project.url + '/favicon.ico');
-      return '<a class="breadcrumb-repo-item" href="' + (project.url || '#') + '"' +
-        (project.description ? ' title="' + project.description + '"' : '') + '>' +
-        '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="16" height="16"> ' +
-        project.name +
-        '<span class="repo-description">' + (project.description || '') + '</span>' +
-      '</a>';
-    }).join('');
-  }
-
-  fetch(HUB_ORIGIN + '/projects.yml')
-    .then(function(r) {
-      if (!r.ok) throw new Error('projects.yml responded with ' + r.status);
-      return r.text();
+      dropdown.innerHTML = projects.map(function(project) {
+        var faviconUrl = project.icon || (project.url + '/favicon.ico');
+        return '<a class="breadcrumb-repo-item" href="' + (project.url || '#') + '"' +
+          (project.description ? ' title="' + project.description + '"' : '') + '>' +
+          '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="16" height="16"> ' +
+          project.name +
+          '<span class="repo-description">' + (project.description || '') + '</span>' +
+        '</a>';
+      }).join('');
     })
-    .then(function(text) { injectBreadcrumb(parseYaml(text)); })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });
+}
+
+function initProjectCards() {
+  if (!window.$docsify) return;
+
+  window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+    hook.doneEach(function() {
+      var container = document.getElementById('project-cards');
+      if (!container) return;
+
+      loadProjects()
+        .then(function(projects) {
+          container.innerHTML = projects.map(function(project, i) {
+            var faviconUrl = project.icon || (project.url + '/favicon.ico');
+            return '<a class="project-card" href="' + (project.url || '#') + '" style="animation-delay:' + (i * 80) + 'ms">' +
+              '<div class="project-card-accent"></div>' +
+              '<div class="project-card-content">' +
+                '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
+                '<div class="project-card-info">' +
+                  '<div class="project-card-name">' + project.name + '</div>' +
+                  '<div class="project-card-desc">' + (project.description || '') + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<svg class="project-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>' +
+            '</a>';
+          }).join('');
+        })
+        .catch(function(err) { console.error('Failed to render project cards:', err); });
+    });
+  });
 }
 
 // --- Global event listeners ---

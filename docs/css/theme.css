@@ -158,6 +158,116 @@
   font-weight: bold;
 }
 
+/* Project cards */
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#project-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin: 2rem 0;
+}
+
+.project-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  background: var(--color-current-line);
+  border: 1px solid var(--border-subtle);
+  text-decoration: none !important;
+  color: var(--color-foreground) !important;
+  overflow: hidden;
+  animation: cardReveal 0.4s ease both;
+  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  border-color: var(--color-purple);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px light-dark(rgba(124, 58, 237, 0.1), rgba(189, 147, 249, 0.08));
+}
+
+@keyframes accentShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.project-card-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, var(--titlebar-accent-start), var(--titlebar-accent-mid), var(--titlebar-accent-end), var(--titlebar-accent-start));
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.project-card:hover .project-card-accent {
+  animation: accentShift 2s linear infinite;
+}
+
+.project-card:hover .project-card-accent {
+  opacity: 1;
+}
+
+.project-card-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.project-card-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.project-card:hover .project-card-icon {
+  transform: scale(1.1);
+}
+
+.project-card-name {
+  font-weight: 700;
+  font-size: 1.25em;
+  letter-spacing: -0.01em;
+}
+
+.project-card-desc {
+  color: var(--color-comment);
+  font-size: 0.95em;
+  margin-top: 0.25rem;
+}
+
+.project-card-arrow {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-comment);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.project-card:hover .project-card-arrow {
+  color: var(--color-purple);
+  transform: translateX(4px);
+}
+
 
 /* Remove horizontal lines/dividers under headings */
 .markdown-section h1,

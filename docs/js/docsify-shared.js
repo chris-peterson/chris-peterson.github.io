@@ -539,7 +539,7 @@ function initProjectCards() {
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
                 '<div class="project-card-info">' +
                   '<div class="project-card-name">' + project.name +
-                    (project.tech ? ' <span class="project-card-tech">' + project.tech + '</span>' : '') +
+                    (project.tech ? ' <span class="project-card-tech" data-tech="' + project.tech.toLowerCase() + '">' + project.tech + '</span>' : '') +
                   '</div>' +
                   '<div class="project-card-desc">' + (project.description || '') + '</div>' +
                 '</div>' +

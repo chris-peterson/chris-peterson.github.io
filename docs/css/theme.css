@@ -257,10 +257,35 @@
   border-radius: 10px;
   vertical-align: middle;
   margin-left: 6px;
+  --badge-color: var(--color-purple);
   background: light-dark(rgba(124, 58, 237, 0.1), rgba(189, 147, 249, 0.12));
-  color: var(--color-purple);
+  color: var(--badge-color);
   border: 1px solid light-dark(rgba(124, 58, 237, 0.2), rgba(189, 147, 249, 0.2));
   letter-spacing: 0.02em;
+}
+
+.project-card-tech[data-tech="python"] {
+  --badge-color: var(--color-green);
+  background: light-dark(rgba(29, 138, 61, 0.1), rgba(80, 250, 123, 0.12));
+  border-color: light-dark(rgba(29, 138, 61, 0.2), rgba(80, 250, 123, 0.2));
+}
+
+.project-card-tech[data-tech="powershell"] {
+  --badge-color: var(--color-cyan);
+  background: light-dark(rgba(13, 127, 166, 0.1), rgba(139, 233, 253, 0.12));
+  border-color: light-dark(rgba(13, 127, 166, 0.2), rgba(139, 233, 253, 0.2));
+}
+
+.project-card-tech[data-tech="c#"] {
+  --badge-color: var(--color-purple);
+  background: light-dark(rgba(124, 58, 237, 0.1), rgba(189, 147, 249, 0.12));
+  border-color: light-dark(rgba(124, 58, 237, 0.2), rgba(189, 147, 249, 0.2));
+}
+
+.project-card-tech[data-tech="shell"] {
+  --badge-color: var(--color-orange);
+  background: light-dark(rgba(194, 93, 0, 0.1), rgba(255, 184, 108, 0.12));
+  border-color: light-dark(rgba(194, 93, 0, 0.2), rgba(255, 184, 108, 0.2));
 }
 
 .project-card-desc {

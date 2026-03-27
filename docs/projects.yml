@@ -12,3 +12,23 @@
   description: GitLab CLI
   icon: https://chris-peterson.github.io/pwsh-gitlab/favicon.svg
   url: https://chris-peterson.github.io/pwsh-gitlab
+
+- name: spiffy
+  description: Structured logging for .NET
+  icon: https://chris-peterson.github.io/spiffy/favicon.svg
+  url: https://chris-peterson.github.io/spiffy
+
+- name: kekiri
+  description: BDD testing for .NET
+  icon: https://chris-peterson.github.io/kekiri/favicon.svg
+  url: https://chris-peterson.github.io/kekiri
+
+- name: assurance
+  description: Side-by-side code comparison
+  icon: https://chris-peterson.github.io/assurance/favicon.svg
+  url: https://chris-peterson.github.io/assurance
+
+- name: gitconfig
+  description: Git configuration & workflow
+  icon: https://chris-peterson.github.io/gitconfig/favicon.svg
+  url: https://chris-peterson.github.io/gitconfig

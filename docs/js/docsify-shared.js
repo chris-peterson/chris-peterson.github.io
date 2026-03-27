@@ -526,9 +526,11 @@ function initProjectCards() {
 
       loadProjects()
         .then(function(projects) {
+          var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
           container.innerHTML = projects.map(function(project, i) {
             var faviconUrl = project.icon || (project.url + '/favicon.ico');
-            return '<a class="project-card" href="' + (project.url || '#') + '" style="animation-delay:' + (i * 80) + 'ms">' +
+            var sourceUrl = 'https://github.com/' + org + '/' + project.name;
+            return '<div class="project-card" data-href="' + (project.url || '#') + '" style="animation-delay:' + (i * 80) + 'ms">' +
               '<div class="project-card-accent"></div>' +
               '<div class="project-card-content">' +
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
@@ -537,9 +539,20 @@ function initProjectCards() {
                   '<div class="project-card-desc">' + (project.description || '') + '</div>' +
                 '</div>' +
               '</div>' +
-              '<svg class="project-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>' +
-            '</a>';
+              '<div class="project-card-links">' +
+                '<a class="project-card-source" href="' + sourceUrl + '" target="_blank" title="View source">' + ICONS.github + '</a>' +
+                '<svg class="project-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>' +
+              '</div>' +
+            '</div>';
           }).join('');
+
+          container.querySelectorAll('.project-card').forEach(function(card) {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function(e) {
+              if (e.target.closest('.project-card-source')) return;
+              window.location.href = card.dataset.href;
+            });
+          });
         })
         .catch(function(err) { console.error('Failed to render project cards:', err); });
     });

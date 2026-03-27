@@ -249,6 +249,20 @@
   letter-spacing: -0.01em;
 }
 
+.project-card-tech {
+  display: inline-block;
+  font-size: 0.6em;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 10px;
+  vertical-align: middle;
+  margin-left: 6px;
+  background: light-dark(rgba(124, 58, 237, 0.1), rgba(189, 147, 249, 0.12));
+  color: var(--color-purple);
+  border: 1px solid light-dark(rgba(124, 58, 237, 0.2), rgba(189, 147, 249, 0.2));
+  letter-spacing: 0.02em;
+}
+
 .project-card-desc {
   color: var(--color-comment);
   font-size: 0.95em;

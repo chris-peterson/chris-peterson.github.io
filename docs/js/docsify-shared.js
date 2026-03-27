@@ -28,9 +28,8 @@ function initProject(config) {
   window.$docsify = window.$docsify || {};
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
   config.site_url = HUB_ORIGIN + '/' + config.name;
-  config.repo_source = 'https://github.com/' + org + '/' + config.name;
-
   var isHub = config.name === org;
+  config.repo_source = isHub ? 'https://github.com/' + org : 'https://github.com/' + org + '/' + config.name;
   var defaults = {
     loadSidebar: true,
     subMaxLevel: 2,
@@ -468,6 +467,7 @@ function parseProjectsYaml(text) {
   text.split('\n').forEach(function(line) {
     var nameMatch = line.match(/^- name:\s*(.+)/);
     var descMatch = line.match(/^\s+description:\s*(.+)/);
+    var techMatch = line.match(/^\s+tech:\s*(.+)/);
     var iconMatch = line.match(/^\s+icon:\s*(.+)/);
     var urlMatch = line.match(/^\s+url:\s*(.+)/);
     if (nameMatch) {
@@ -475,6 +475,8 @@ function parseProjectsYaml(text) {
       projects.push(current);
     } else if (current && descMatch) {
       current.description = descMatch[1].trim();
+    } else if (current && techMatch) {
+      current.tech = techMatch[1].trim();
     } else if (current && iconMatch) {
       current.icon = iconMatch[1].trim();
     } else if (current && urlMatch) {
@@ -536,7 +538,9 @@ function initProjectCards() {
               '<div class="project-card-content">' +
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
                 '<div class="project-card-info">' +
-                  '<div class="project-card-name">' + project.name + '</div>' +
+                  '<div class="project-card-name">' + project.name +
+                    (project.tech ? ' <span class="project-card-tech">' + project.tech + '</span>' : '') +
+                  '</div>' +
                   '<div class="project-card-desc">' + (project.description || '') + '</div>' +
                 '</div>' +
               '</div>' +

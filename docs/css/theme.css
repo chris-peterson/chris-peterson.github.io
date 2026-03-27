@@ -288,6 +288,12 @@
   border-color: light-dark(rgba(194, 93, 0, 0.2), rgba(255, 184, 108, 0.2));
 }
 
+.project-card-tech[data-tech="yaml"] {
+  --badge-color: var(--color-pink);
+  background: light-dark(rgba(200, 63, 113, 0.1), rgba(255, 121, 198, 0.12));
+  border-color: light-dark(rgba(200, 63, 113, 0.2), rgba(255, 121, 198, 0.2));
+}
+
 .project-card-desc {
   color: var(--color-comment);
   font-size: 0.95em;

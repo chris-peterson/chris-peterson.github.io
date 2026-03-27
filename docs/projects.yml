@@ -1,6 +1,6 @@
 - name: ClaudeWatch
   description: Claude Code safety plugin
-  tech: Python
+  tech: Python, YAML
   icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
   url: https://chris-peterson.github.io/ClaudeWatch
 

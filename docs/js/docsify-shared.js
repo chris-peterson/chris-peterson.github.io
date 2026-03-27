@@ -539,7 +539,10 @@ function initProjectCards() {
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
                 '<div class="project-card-info">' +
                   '<div class="project-card-name">' + project.name +
-                    (project.tech ? ' <span class="project-card-tech" data-tech="' + project.tech.toLowerCase() + '">' + project.tech + '</span>' : '') +
+                    (project.tech ? project.tech.split(',').map(function(t) {
+                      var trimmed = t.trim();
+                      return ' <span class="project-card-tech" data-tech="' + trimmed.toLowerCase() + '">' + trimmed + '</span>';
+                    }).join('') : '') +
                   '</div>' +
                   '<div class="project-card-desc">' + (project.description || '') + '</div>' +
                 '</div>' +

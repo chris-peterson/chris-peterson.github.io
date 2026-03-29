@@ -229,10 +229,13 @@
 }
 
 .breadcrumb-repo-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  row-gap: 2px;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   text-decoration: none;
   color: var(--base-color);
   font-size: 14px;
@@ -247,20 +250,20 @@
 .breadcrumb-repo-item:hover {
   background: var(--button-bg-hover);
   color: var(--hover-color);
-  padding-left: 18px;
 }
 
 .breadcrumb-repo-item .repo-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
-  opacity: 0.7;
+  opacity: 0.8;
+  grid-row: 1 / -1;
 }
 
 .breadcrumb-repo-item .repo-description {
   font-size: 12px;
   color: var(--muted-color);
-  margin-left: auto;
+  grid-column: 2;
 }
 
 .titlebar-site-name {

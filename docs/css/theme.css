@@ -11,13 +11,13 @@
   --color-current-line:  light-dark(#e6e6e6, #44475a);
   --color-foreground:    light-dark(#282a36, #f8f8f2);
   --color-comment:       light-dark(#5a6896, #9099b8);
-  --color-cyan:          light-dark(#0d7fa6, #8be9fd);
-  --color-green:         light-dark(#1d8a3d, #50fa7b);
-  --color-orange:        light-dark(#c25d00, #ffb86c);
-  --color-pink:          light-dark(#c83f71, #ff79c6);
+  --color-cyan:          light-dark(#0891b2, #8be9fd);
+  --color-green:         light-dark(#16a34a, #50fa7b);
+  --color-orange:        light-dark(#ea580c, #ffb86c);
+  --color-pink:          light-dark(#db2777, #ff79c6);
   --color-purple:        light-dark(#7c3aed, #bd93f9);
   --color-red:           light-dark(#dc2626, #ff5555);
-  --color-yellow:        light-dark(#a16207, #f1fa8c);
+  --color-yellow:        light-dark(#ca8a04, #f1fa8c);
 
   /* Docsify themeable variables */
   --theme-color: var(--color-purple);
@@ -271,6 +271,7 @@
 .lang-bar-segment[data-lang="python"]     { background: var(--color-green); }
 .lang-bar-segment[data-lang="powershell"] { background: var(--color-cyan); }
 .lang-bar-segment[data-lang="shell"]      { background: var(--color-orange); }
+.lang-bar-segment[data-lang="dockerfile"] { background: var(--color-pink); }
 
 .lang-legend {
   display: inline-flex;
@@ -297,6 +298,7 @@
 .lang-dot[data-lang="python"]     { background: var(--color-green); }
 .lang-dot[data-lang="powershell"] { background: var(--color-cyan); }
 .lang-dot[data-lang="shell"]      { background: var(--color-orange); }
+.lang-dot[data-lang="dockerfile"] { background: var(--color-pink); }
 
 .project-card-desc {
   color: var(--color-comment);

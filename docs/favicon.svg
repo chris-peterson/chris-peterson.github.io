@@ -4,20 +4,24 @@
       <stop offset="0%" stop-color="#282a36"/>
       <stop offset="100%" stop-color="#1a1b26"/>
     </linearGradient>
-    <linearGradient id="arc-c" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="brace-l" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#ff79c6"/>
-      <stop offset="100%" stop-color="#bd93f9"/>
+      <stop offset="40%" stop-color="#bd93f9"/>
+      <stop offset="100%" stop-color="#8be9fd"/>
     </linearGradient>
-    <linearGradient id="arc-p" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#bd93f9"/>
+    <linearGradient id="brace-r" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8be9fd"/>
+      <stop offset="60%" stop-color="#bd93f9"/>
       <stop offset="100%" stop-color="#ff79c6"/>
     </linearGradient>
   </defs>
   <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <!-- C: open semi-circle, offset left from the spine -->
-  <path d="M29 14 A18 18 0 1 0 29 50" stroke="url(#arc-c)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-  <!-- Vertical spine in Dracula purple -->
-  <line x1="34" y1="14" x2="34" y2="50" stroke="#bd93f9" stroke-width="3.5" stroke-linecap="round"/>
-  <!-- P: semi-circle on the right, on top -->
-  <path d="M34 14 A13 9 0 1 1 36 32.5" stroke="url(#arc-p)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <!-- Left brace { -->
+  <path d="M22 14 Q16 14 16 22 L16 27 Q16 32 12 32 Q16 32 16 37 L16 42 Q16 50 22 50"
+        fill="none" stroke="url(#brace-l)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Right brace } -->
+  <path d="M42 14 Q48 14 48 22 L48 27 Q48 32 52 32 Q48 32 48 37 L48 42 Q48 50 42 50"
+        fill="none" stroke="url(#brace-r)" stroke-width="3" stroke-linecap="round"/>
+  <!-- CP initials — geometric/monospace style -->
+  <text x="32" y="37" text-anchor="middle" font-family="'SF Mono', 'Fira Code', 'JetBrains Mono', Menlo, monospace" font-size="16" font-weight="600" letter-spacing="1" fill="#f8f8f2">CP</text>
 </svg>

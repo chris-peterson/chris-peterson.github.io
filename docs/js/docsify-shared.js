@@ -70,22 +70,31 @@ function initProject(config) {
 
   // Stub window.Docsify so flexible-alerts can read the version before core loads.
   // Docsify core overwrites this with the real object on load.
+  // Plugin catalog items must load BEFORE docsify core so their hooks are
+  // registered in time for the initial page render.
   var steps = [
     { code: 'window.Docsify = { version: "4.0.0" };' },
-    { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' },
-    { src: 'https://cdn.jsdelivr.net/npm/docsify@4' },
-    !isHub && { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' },
-    { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' }
-  ].filter(Boolean);
-
-  (config.code_languages || []).forEach(function(lang) {
-    steps.push({ src: 'https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-' + lang + '.min.js' });
-  });
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' }
+  ];
 
   (config.plugins || []).forEach(function(name) {
     if (PLUGIN_CATALOG[name]) {
       steps = steps.concat(PLUGIN_CATALOG[name]);
     }
+  });
+
+  if ((config.plugins || []).indexOf('mermaid') !== -1) {
+    window.$docsify.mermaidConfig = { querySelector: '.mermaid' };
+  }
+
+  steps = steps.concat([
+    { src: 'https://cdn.jsdelivr.net/npm/docsify@4' },
+    !isHub && { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' },
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' }
+  ].filter(Boolean));
+
+  (config.code_languages || []).forEach(function(lang) {
+    steps.push({ src: 'https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-' + lang + '.min.js' });
   });
 
   buildTitlebarDOM(config);
@@ -104,7 +113,7 @@ function initProject(config) {
     if (step.src) {
       var el = document.createElement('script');
       el.src = step.src;
-      el.onload = function() { loadNext(i + 1); };
+      el.onload = el.onerror = function() { loadNext(i + 1); };
       document.body.appendChild(el);
     } else if (step.code) {
       new Function(step.code)();

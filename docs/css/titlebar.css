@@ -266,6 +266,20 @@
   grid-column: 2;
 }
 
+.breadcrumb-repo-item--child {
+  padding-left: 28px;
+}
+
+.breadcrumb-repo-group-label {
+  padding: 8px 16px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted-color);
+  border-bottom: none;
+}
+
 .titlebar-site-name {
   font-size: 16px;
   font-weight: 700;

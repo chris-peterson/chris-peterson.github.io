@@ -8,21 +8,32 @@
     - name: Python
       pct: 30
 
-- name: pwsh-github
-  description: GitHub CLI
-  icon: https://chris-peterson.github.io/pwsh-github/favicon.svg
-  url: https://chris-peterson.github.io/pwsh-github
-  languages:
-    - name: PowerShell
-      pct: 100
+- group: forge
+  description: Unified CLI for code forges
+  children:
+    - name: pwsh-forge
+      description: Forge dispatch layer
+      icon: https://chris-peterson.github.io/pwsh-forge/favicon.svg
+      url: https://chris-peterson.github.io/pwsh-forge
+      languages:
+        - name: PowerShell
+          pct: 100
 
-- name: pwsh-gitlab
-  description: GitLab CLI
-  icon: https://chris-peterson.github.io/pwsh-gitlab/favicon.svg
-  url: https://chris-peterson.github.io/pwsh-gitlab
-  languages:
-    - name: PowerShell
-      pct: 100
+    - name: pwsh-github
+      description: GitHub provider
+      icon: https://chris-peterson.github.io/pwsh-github/favicon.svg
+      url: https://chris-peterson.github.io/pwsh-github
+      languages:
+        - name: PowerShell
+          pct: 100
+
+    - name: pwsh-gitlab
+      description: GitLab provider
+      icon: https://chris-peterson.github.io/pwsh-gitlab/favicon.svg
+      url: https://chris-peterson.github.io/pwsh-gitlab
+      languages:
+        - name: PowerShell
+          pct: 100
 
 - name: spiffy
   description: Structured logging for .NET

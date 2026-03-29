@@ -473,19 +473,40 @@ function initSearch() {
 function parseProjectsYaml(text) {
   var projects = [];
   var current = null;
+  var currentGroup = null;
+  var inChildren = false;
   var inLanguages = false;
   var currentLang = null;
   text.split('\n').forEach(function(line) {
-    var nameMatch = line.match(/^- name:\s*(.+)/);
+    var groupMatch = line.match(/^- group:\s*(.+)/);
+    var topNameMatch = line.match(/^- name:\s*(.+)/);
+    var childrenMatch = line.match(/^\s+children:\s*$/);
+    var childNameMatch = line.match(/^\s+- name:\s*(.+)/);
     var descMatch = line.match(/^\s+description:\s*(.+)/);
     var iconMatch = line.match(/^\s+icon:\s*(.+)/);
     var urlMatch = line.match(/^\s+url:\s*(.+)/);
     var langHeader = line.match(/^\s+languages:\s*$/);
     var langName = line.match(/^\s+- name:\s*(.+)/);
     var langPct = line.match(/^\s+pct:\s*(.+)/);
-    if (nameMatch) {
-      current = { name: nameMatch[1].trim(), languages: [] };
+
+    if (groupMatch) {
+      currentGroup = { group: groupMatch[1].trim(), children: [] };
+      projects.push(currentGroup);
+      current = currentGroup;
+      inChildren = false;
+      inLanguages = false;
+    } else if (topNameMatch) {
+      current = { name: topNameMatch[1].trim(), languages: [] };
       projects.push(current);
+      currentGroup = null;
+      inChildren = false;
+      inLanguages = false;
+    } else if (currentGroup && childrenMatch) {
+      inChildren = true;
+      inLanguages = false;
+    } else if (inChildren && childNameMatch && !inLanguages) {
+      current = { name: childNameMatch[1].trim(), languages: [] };
+      currentGroup.children.push(current);
       inLanguages = false;
     } else if (current && descMatch) {
       current.description = descMatch[1].trim();
@@ -508,6 +529,18 @@ function parseProjectsYaml(text) {
   return projects;
 }
 
+function flattenProjects(projects) {
+  var flat = [];
+  projects.forEach(function(item) {
+    if (item.group && item.children) {
+      item.children.forEach(function(child) { flat.push(child); });
+    } else {
+      flat.push(item);
+    }
+  });
+  return flat;
+}
+
 var _projectsPromise = null;
 
 function loadProjects() {
@@ -528,17 +561,30 @@ function initBreadcrumb() {
       var dropdown = document.getElementById('repoDropdownContainer');
       if (!dropdown) return;
 
-      dropdown.innerHTML = projects.map(function(project) {
-        var faviconUrl = project.icon || (project.url + '/favicon.ico');
-        return '<a class="breadcrumb-repo-item" href="' + (project.url || '#') + '"' +
-          (project.description ? ' title="' + project.description + '"' : '') + '>' +
-          '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="16" height="16"> ' +
-          project.name +
-          '<span class="repo-description">' + (project.description || '') + '</span>' +
-        '</a>';
-      }).join('');
+      var html = '';
+      projects.forEach(function(item) {
+        if (item.group && item.children) {
+          html += '<div class="breadcrumb-repo-group-label">' + item.group + '</div>';
+          item.children.forEach(function(child) {
+            html += renderDropdownItem(child, true);
+          });
+        } else {
+          html += renderDropdownItem(item, false);
+        }
+      });
+      dropdown.innerHTML = html;
     })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });
+}
+
+function renderDropdownItem(project, indented) {
+  var faviconUrl = project.icon || (project.url + '/favicon.ico');
+  return '<a class="breadcrumb-repo-item' + (indented ? ' breadcrumb-repo-item--child' : '') + '" href="' + (project.url || '#') + '"' +
+    (project.description ? ' title="' + project.description + '"' : '') + '>' +
+    '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="20" height="20"> ' +
+    project.name +
+    '<span class="repo-description">' + (project.description || '') + '</span>' +
+  '</a>';
 }
 
 function initProjectCards() {
@@ -552,7 +598,9 @@ function initProjectCards() {
       loadProjects()
         .then(function(projects) {
           var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
-          container.innerHTML = projects.map(function(project, i) {
+          var cardIndex = 0;
+
+          function renderCard(project) {
             var faviconUrl = project.icon || (project.url + '/favicon.ico');
             var sourceUrl = 'https://github.com/' + org + '/' + project.name;
             var langLegend = (project.languages && project.languages.length > 0) ?
@@ -565,7 +613,7 @@ function initProjectCards() {
                   return '<div class="lang-bar-segment" data-lang="' + lang.name.toLowerCase() + '" style="flex:' + lang.pct + '"></div>';
                 }).join('') +
               '</div>' : '<div class="project-card-accent"></div>';
-            return '<div class="project-card" data-href="' + (project.url || '#') + '" style="animation-delay:' + (i * 80) + 'ms">' +
+            var html = '<div class="project-card" data-href="' + (project.url || '#') + '" style="animation-delay:' + (cardIndex * 80) + 'ms">' +
               '<div class="project-card-content">' +
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
                 '<div class="project-card-info">' +
@@ -581,6 +629,22 @@ function initProjectCards() {
               '</div>' +
               langBar +
             '</div>';
+            cardIndex++;
+            return html;
+          }
+
+          container.innerHTML = projects.map(function(item) {
+            if (item.group && item.children) {
+              return '<div class="project-group" style="animation-delay:' + (cardIndex * 80) + 'ms">' +
+                '<div class="project-group-label">' + item.group +
+                  (item.description ? '<span class="project-group-desc">' + item.description + '</span>' : '') +
+                '</div>' +
+                '<div class="project-group-children">' +
+                  item.children.map(function(child) { return renderCard(child); }).join('') +
+                '</div>' +
+              '</div>';
+            }
+            return renderCard(item);
           }).join('');
 
           container.querySelectorAll('.project-card').forEach(function(card) {

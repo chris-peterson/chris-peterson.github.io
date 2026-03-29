@@ -300,6 +300,37 @@
 .lang-dot[data-lang="shell"]      { background: var(--color-orange); }
 .lang-dot[data-lang="dockerfile"] { background: var(--color-pink); }
 
+/* Project groups */
+.project-group {
+  animation: cardReveal 0.4s ease both;
+}
+
+.project-group-label {
+  font-weight: 700;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-comment);
+  padding: 0.5rem 0.25rem;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.project-group-desc {
+  font-weight: 400;
+  font-size: 0.9em;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.project-group-children {
+  display: grid;
+  gap: 0.75rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--border-subtle);
+}
+
 .project-card-desc {
   color: var(--color-comment);
   font-size: 0.95em;

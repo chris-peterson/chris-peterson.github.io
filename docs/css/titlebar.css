@@ -204,6 +204,7 @@
   top: calc(100% + 8px);
   left: 0;
   min-width: 200px;
+  white-space: nowrap;
   background: var(--sidebar-background);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
@@ -302,6 +303,7 @@
   left: 100%;
   top: 0;
   min-width: 240px;
+  white-space: nowrap;
   background: var(--sidebar-background);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;

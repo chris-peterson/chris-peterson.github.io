@@ -472,71 +472,74 @@ function initSearch() {
 
 function parseProjectsYaml(text) {
   var projects = [];
+  var groupStack = [{ children: projects, indent: -1 }];
   var current = null;
-  var currentGroup = null;
-  var inChildren = false;
   var inLanguages = false;
+  var langIndent = -1;
   var currentLang = null;
+
+  function activeContainer() {
+    return groupStack[groupStack.length - 1].children;
+  }
+
   text.split('\n').forEach(function(line) {
     var indent = line.length - line.replace(/^ */, '').length;
     var stripped = line.trim();
+    if (!stripped || stripped.charAt(0) === '#') return;
 
-    // top-level: "- group:" or "- name:"
-    if (indent === 0 && stripped.indexOf('- group:') === 0) {
-      currentGroup = { group: stripped.substring(9).trim(), children: [] };
-      projects.push(currentGroup);
-      current = currentGroup;
-      inChildren = false;
-      inLanguages = false;
-      return;
-    }
-    if (indent === 0 && stripped.indexOf('- name:') === 0) {
-      current = { name: stripped.substring(7).trim(), languages: [] };
-      projects.push(current);
-      currentGroup = null;
-      inChildren = false;
-      inLanguages = false;
-      return;
-    }
-
-    // group-level (indent 2): "children:" or "description:"
-    if (indent === 2 && currentGroup) {
-      if (stripped === 'children:') {
-        inChildren = true;
-        inLanguages = false;
-        return;
+    // language entries — handle before anything else
+    if (inLanguages && indent > langIndent) {
+      if (stripped.indexOf('- name:') === 0) {
+        currentLang = { name: stripped.substring(7).trim(), pct: 0 };
+        current.languages.push(currentLang);
+      } else if (currentLang && stripped.indexOf('pct:') === 0) {
+        currentLang.pct = parseInt(stripped.substring(4).trim(), 10);
       }
+      return;
+    }
+
+    // if we get here, we've left the languages block
+    inLanguages = false;
+
+    // pop group stack when indent decreases
+    while (groupStack.length > 1 && indent <= groupStack[groupStack.length - 1].indent) {
+      groupStack.pop();
+    }
+
+    // "- group:"
+    if (stripped.indexOf('- group:') === 0) {
+      var group = { group: stripped.substring(8).trim(), children: [] };
+      activeContainer().push(group);
+      current = group;
+      return;
+    }
+
+    // "children:"
+    if (stripped === 'children:' && current && current.children) {
+      groupStack.push({ children: current.children, indent: indent });
+      current = null;
+      return;
+    }
+
+    // "- name:"
+    if (stripped.indexOf('- name:') === 0) {
+      current = { name: stripped.substring(7).trim(), languages: [] };
+      activeContainer().push(current);
+      return;
+    }
+
+    // fields on current item/group
+    if (current) {
       if (stripped.indexOf('description:') === 0) {
-        currentGroup.description = stripped.substring(12).trim();
-        return;
-      }
-    }
-
-    // child item (indent 4): "- name:" inside children
-    if (indent === 4 && inChildren && stripped.indexOf('- name:') === 0) {
-      current = { name: stripped.substring(7).trim(), languages: [] };
-      currentGroup.children.push(current);
-      inLanguages = false;
-      return;
-    }
-
-    // item fields — works for both top-level items (indent 2) and child items (indent 6)
-    if (current && current.languages !== undefined) {
-      if (stripped.indexOf('description:') === 0 && !inLanguages) {
         current.description = stripped.substring(12).trim();
       } else if (stripped.indexOf('icon:') === 0) {
         current.icon = stripped.substring(5).trim();
-        inLanguages = false;
       } else if (stripped.indexOf('url:') === 0) {
         current.url = stripped.substring(4).trim();
-        inLanguages = false;
       } else if (stripped === 'languages:') {
         inLanguages = true;
-      } else if (inLanguages && stripped.indexOf('- name:') === 0) {
-        currentLang = { name: stripped.substring(7).trim(), pct: 0 };
-        current.languages.push(currentLang);
-      } else if (inLanguages && currentLang && stripped.indexOf('pct:') === 0) {
-        currentLang.pct = parseInt(stripped.substring(4).trim(), 10);
+        langIndent = indent;
+        currentLang = null;
       }
     }
   });
@@ -547,7 +550,7 @@ function flattenProjects(projects) {
   var flat = [];
   projects.forEach(function(item) {
     if (item.group && item.children) {
-      item.children.forEach(function(child) { flat.push(child); });
+      flattenProjects(item.children).forEach(function(child) { flat.push(child); });
     } else {
       flat.push(item);
     }
@@ -575,18 +578,19 @@ function initBreadcrumb() {
       var dropdown = document.getElementById('repoDropdownContainer');
       if (!dropdown) return;
 
-      var html = '';
-      projects.forEach(function(item) {
-        if (item.group && item.children) {
-          html += '<div class="breadcrumb-repo-group-label">' + item.group + '</div>';
-          item.children.forEach(function(child) {
-            html += renderDropdownItem(child, true);
-          });
-        } else {
-          html += renderDropdownItem(item, false);
-        }
-      });
-      dropdown.innerHTML = html;
+      function renderDropdownItems(items, depth) {
+        var html = '';
+        items.forEach(function(item) {
+          if (item.group && item.children) {
+            html += '<div class="breadcrumb-repo-group-label' + (depth > 0 ? ' breadcrumb-repo-group-label--nested' : '') + '">' + item.group + '</div>';
+            html += renderDropdownItems(item.children, depth + 1);
+          } else {
+            html += renderDropdownItem(item, depth > 0);
+          }
+        });
+        return html;
+      }
+      dropdown.innerHTML = renderDropdownItems(projects, 0);
     })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });
 }
@@ -647,19 +651,23 @@ function initProjectCards() {
             return html;
           }
 
-          container.innerHTML = projects.map(function(item) {
-            if (item.group && item.children) {
-              return '<div class="project-group" style="animation-delay:' + (cardIndex * 80) + 'ms">' +
-                '<div class="project-group-label">' + item.group +
-                  (item.description ? '<span class="project-group-desc">' + item.description + '</span>' : '') +
-                '</div>' +
-                '<div class="project-group-children">' +
-                  item.children.map(function(child) { return renderCard(child); }).join('') +
-                '</div>' +
-              '</div>';
-            }
-            return renderCard(item);
-          }).join('');
+          function renderItems(items) {
+            return items.map(function(item) {
+              if (item.group && item.children) {
+                return '<div class="project-group" style="animation-delay:' + (cardIndex * 80) + 'ms">' +
+                  '<div class="project-group-label">' + item.group +
+                    (item.description ? '<span class="project-group-desc">' + item.description + '</span>' : '') +
+                  '</div>' +
+                  '<div class="project-group-children">' +
+                    renderItems(item.children) +
+                  '</div>' +
+                '</div>';
+              }
+              return renderCard(item);
+            }).join('');
+          }
+
+          container.innerHTML = renderItems(projects);
 
           container.querySelectorAll('.project-card').forEach(function(card) {
             card.style.cursor = 'pointer';

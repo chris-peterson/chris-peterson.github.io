@@ -11,6 +11,22 @@
 - group: .NET
   description: NuGet packages
   children:
+    - name: assurance
+      description: Side-by-side code comparison
+      icon: https://chris-peterson.github.io/assurance/favicon.svg
+      url: https://chris-peterson.github.io/assurance
+      languages:
+        - name: C#
+          pct: 100
+
+    - name: kekiri
+      description: BDD testing
+      icon: https://chris-peterson.github.io/kekiri/favicon.svg
+      url: https://chris-peterson.github.io/kekiri
+      languages:
+        - name: C#
+          pct: 100
+
     - name: spiffy
       description: Structured logging
       icon: https://chris-peterson.github.io/spiffy/favicon.svg
@@ -21,24 +37,16 @@
         - name: Shell
           pct: 10
 
-    - name: kekiri
-      description: BDD testing
-      icon: https://chris-peterson.github.io/kekiri/favicon.svg
-      url: https://chris-peterson.github.io/kekiri
-      languages:
-        - name: C#
-          pct: 100
-
-    - name: assurance
-      description: Side-by-side code comparison
-      icon: https://chris-peterson.github.io/assurance/favicon.svg
-      url: https://chris-peterson.github.io/assurance
-      languages:
-        - name: C#
-          pct: 100
-
 - group: PowerShell Modules
   children:
+    - name: pwsh-fmd
+      description: Format object to Markdown table
+      icon: https://chris-peterson.github.io/pwsh-fmd/favicon.svg
+      url: https://chris-peterson.github.io/pwsh-fmd
+      languages:
+        - name: PowerShell
+          pct: 100
+
     - group: forge
       description: Unified CLI for code forges
       children:
@@ -65,14 +73,6 @@
           languages:
             - name: PowerShell
               pct: 100
-
-    - name: pwsh-fmd
-      description: Format object to Markdown table
-      icon: https://chris-peterson.github.io/pwsh-fmd/favicon.svg
-      url: https://chris-peterson.github.io/pwsh-fmd
-      languages:
-        - name: PowerShell
-          pct: 100
 
 - group: GitHub Actions
   description: Reusable workflow actions

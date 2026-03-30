@@ -72,25 +72,28 @@
     - name: Shell
       pct: 100
 
-- name: publish-powershell
-  description: GitHub Action for publishing PowerShell modules
-  icon: https://chris-peterson.github.io/publish-powershell/favicon.svg
-  url: https://chris-peterson.github.io/publish-powershell
-  languages:
-    - name: PowerShell
-      pct: 85
-    - name: Dockerfile
-      pct: 15
+- group: GitHub Actions
+  description: Reusable workflow actions
+  children:
+    - name: publish-powershell
+      description: Publish PowerShell modules
+      icon: https://chris-peterson.github.io/publish-powershell/favicon.svg
+      url: https://chris-peterson.github.io/publish-powershell
+      languages:
+        - name: PowerShell
+          pct: 85
+        - name: Dockerfile
+          pct: 15
 
-- name: virgo
-  description: Version your artifacts
-  icon: https://chris-peterson.github.io/virgo/favicon.svg
-  url: https://chris-peterson.github.io/virgo
-  languages:
-    - name: Shell
-      pct: 55
-    - name: Dockerfile
-      pct: 45
+    - name: virgo
+      description: Version your artifacts
+      icon: https://chris-peterson.github.io/virgo/favicon.svg
+      url: https://chris-peterson.github.io/virgo
+      languages:
+        - name: Shell
+          pct: 55
+        - name: Dockerfile
+          pct: 45
 
 - name: pwsh-fmd
   description: Format PowerShell object to Markdown table

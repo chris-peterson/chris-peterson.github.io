@@ -579,27 +579,8 @@ function initBreadcrumb() {
       var dropdown = document.getElementById('repoDropdownContainer');
       if (!dropdown) return;
 
-      function renderDropdownItems(items) {
-        var html = '';
-        items.forEach(function(item) {
-          if (item.group && item.children) {
-            html += '<div class="breadcrumb-repo-group">' +
-              '<div class="breadcrumb-repo-group-trigger">' +
-                '<span class="breadcrumb-repo-group-name">' + item.group + '</span>' +
-                (item.description ? '<span class="breadcrumb-repo-group-desc">' + item.description + '</span>' : '') +
-                '<span class="breadcrumb-repo-group-chevron">' + ICONS.chevronRight + '</span>' +
-              '</div>' +
-              '<div class="breadcrumb-repo-submenu">' +
-                renderDropdownItems(item.children) +
-              '</div>' +
-            '</div>';
-          } else {
-            html += renderDropdownItem(item);
-          }
-        });
-        return html;
-      }
-      dropdown.innerHTML = renderDropdownItems(projects);
+      var flat = flattenProjects(projects);
+      dropdown.innerHTML = flat.map(renderDropdownItem).join('');
     })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });
 }

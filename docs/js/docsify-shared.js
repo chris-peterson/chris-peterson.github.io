@@ -478,52 +478,66 @@ function parseProjectsYaml(text) {
   var inLanguages = false;
   var currentLang = null;
   text.split('\n').forEach(function(line) {
-    var groupMatch = line.match(/^- group:\s*(.+)/);
-    var topNameMatch = line.match(/^- name:\s*(.+)/);
-    var childrenMatch = line.match(/^\s+children:\s*$/);
-    var childNameMatch = line.match(/^\s+- name:\s*(.+)/);
-    var descMatch = line.match(/^\s+description:\s*(.+)/);
-    var iconMatch = line.match(/^\s+icon:\s*(.+)/);
-    var urlMatch = line.match(/^\s+url:\s*(.+)/);
-    var langHeader = line.match(/^\s+languages:\s*$/);
-    var langName = line.match(/^\s+- name:\s*(.+)/);
-    var langPct = line.match(/^\s+pct:\s*(.+)/);
+    var indent = line.length - line.replace(/^ */, '').length;
+    var stripped = line.trim();
 
-    if (groupMatch) {
-      currentGroup = { group: groupMatch[1].trim(), children: [] };
+    // top-level: "- group:" or "- name:"
+    if (indent === 0 && stripped.indexOf('- group:') === 0) {
+      currentGroup = { group: stripped.substring(9).trim(), children: [] };
       projects.push(currentGroup);
       current = currentGroup;
       inChildren = false;
       inLanguages = false;
-    } else if (topNameMatch) {
-      current = { name: topNameMatch[1].trim(), languages: [] };
+      return;
+    }
+    if (indent === 0 && stripped.indexOf('- name:') === 0) {
+      current = { name: stripped.substring(7).trim(), languages: [] };
       projects.push(current);
       currentGroup = null;
       inChildren = false;
       inLanguages = false;
-    } else if (currentGroup && childrenMatch) {
-      inChildren = true;
-      inLanguages = false;
-    } else if (inChildren && childNameMatch && !inLanguages) {
-      current = { name: childNameMatch[1].trim(), languages: [] };
+      return;
+    }
+
+    // group-level (indent 2): "children:" or "description:"
+    if (indent === 2 && currentGroup) {
+      if (stripped === 'children:') {
+        inChildren = true;
+        inLanguages = false;
+        return;
+      }
+      if (stripped.indexOf('description:') === 0) {
+        currentGroup.description = stripped.substring(12).trim();
+        return;
+      }
+    }
+
+    // child item (indent 4): "- name:" inside children
+    if (indent === 4 && inChildren && stripped.indexOf('- name:') === 0) {
+      current = { name: stripped.substring(7).trim(), languages: [] };
       currentGroup.children.push(current);
       inLanguages = false;
-    } else if (current && descMatch) {
-      current.description = descMatch[1].trim();
-      inLanguages = false;
-    } else if (current && iconMatch) {
-      current.icon = iconMatch[1].trim();
-      inLanguages = false;
-    } else if (current && urlMatch) {
-      current.url = urlMatch[1].trim();
-      inLanguages = false;
-    } else if (current && langHeader) {
-      inLanguages = true;
-    } else if (current && inLanguages && langName) {
-      currentLang = { name: langName[1].trim(), pct: 0 };
-      current.languages.push(currentLang);
-    } else if (currentLang && inLanguages && langPct) {
-      currentLang.pct = parseInt(langPct[1].trim(), 10);
+      return;
+    }
+
+    // item fields — works for both top-level items (indent 2) and child items (indent 6)
+    if (current && current.languages !== undefined) {
+      if (stripped.indexOf('description:') === 0 && !inLanguages) {
+        current.description = stripped.substring(12).trim();
+      } else if (stripped.indexOf('icon:') === 0) {
+        current.icon = stripped.substring(5).trim();
+        inLanguages = false;
+      } else if (stripped.indexOf('url:') === 0) {
+        current.url = stripped.substring(4).trim();
+        inLanguages = false;
+      } else if (stripped === 'languages:') {
+        inLanguages = true;
+      } else if (inLanguages && stripped.indexOf('- name:') === 0) {
+        currentLang = { name: stripped.substring(7).trim(), pct: 0 };
+        current.languages.push(currentLang);
+      } else if (inLanguages && currentLang && stripped.indexOf('pct:') === 0) {
+        currentLang.pct = parseInt(stripped.substring(4).trim(), 10);
+      }
     }
   });
   return projects;

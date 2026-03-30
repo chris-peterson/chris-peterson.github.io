@@ -35,31 +35,34 @@
         - name: PowerShell
           pct: 100
 
-- name: spiffy
-  description: Structured logging for .NET
-  icon: https://chris-peterson.github.io/spiffy/favicon.svg
-  url: https://chris-peterson.github.io/spiffy
-  languages:
-    - name: C#
-      pct: 90
-    - name: Shell
-      pct: 10
+- group: .NET
+  description: NuGet packages
+  children:
+    - name: spiffy
+      description: Structured logging
+      icon: https://chris-peterson.github.io/spiffy/favicon.svg
+      url: https://chris-peterson.github.io/spiffy
+      languages:
+        - name: C#
+          pct: 90
+        - name: Shell
+          pct: 10
 
-- name: kekiri
-  description: BDD testing for .NET
-  icon: https://chris-peterson.github.io/kekiri/favicon.svg
-  url: https://chris-peterson.github.io/kekiri
-  languages:
-    - name: C#
-      pct: 100
+    - name: kekiri
+      description: BDD testing
+      icon: https://chris-peterson.github.io/kekiri/favicon.svg
+      url: https://chris-peterson.github.io/kekiri
+      languages:
+        - name: C#
+          pct: 100
 
-- name: assurance
-  description: Side-by-side code comparison
-  icon: https://chris-peterson.github.io/assurance/favicon.svg
-  url: https://chris-peterson.github.io/assurance
-  languages:
-    - name: C#
-      pct: 100
+    - name: assurance
+      description: Side-by-side code comparison
+      icon: https://chris-peterson.github.io/assurance/favicon.svg
+      url: https://chris-peterson.github.io/assurance
+      languages:
+        - name: C#
+          pct: 100
 
 - name: gitconfig
   description: Git configuration & workflow

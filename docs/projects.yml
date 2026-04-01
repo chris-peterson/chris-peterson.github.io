@@ -97,6 +97,14 @@
         - name: Dockerfile
           pct: 45
 
+- name: tack
+  description: Route tracker for AI-assisted development
+  icon: https://chris-peterson.github.io/tack/favicon.svg
+  url: https://chris-peterson.github.io/tack
+  languages:
+    - name: TypeScript
+      pct: 100
+
 - group: Misc
   children:
     - name: gitconfig

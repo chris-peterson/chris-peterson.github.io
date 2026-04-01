@@ -1,12 +1,23 @@
-- name: ClaudeWatch
-  description: Claude Code safety plugin
-  icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
-  url: https://chris-peterson.github.io/ClaudeWatch
-  languages:
-    - name: Shell
-      pct: 70
-    - name: Python
-      pct: 30
+- group: AI Tools
+  description: AI-assisted development
+  children:
+    - name: ClaudeWatch
+      description: Claude Code safety plugin
+      icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
+      url: https://chris-peterson.github.io/ClaudeWatch
+      languages:
+        - name: Shell
+          pct: 70
+        - name: Python
+          pct: 30
+
+    - name: tack
+      description: Route tracker for AI-assisted development
+      icon: https://chris-peterson.github.io/tack/favicon.svg
+      url: https://chris-peterson.github.io/tack
+      languages:
+        - name: TypeScript
+          pct: 100
 
 - group: .NET
   description: NuGet packages
@@ -96,14 +107,6 @@
           pct: 55
         - name: Dockerfile
           pct: 45
-
-- name: tack
-  description: Route tracker for AI-assisted development
-  icon: https://chris-peterson.github.io/tack/favicon.svg
-  url: https://chris-peterson.github.io/tack
-  languages:
-    - name: TypeScript
-      pct: 100
 
 - group: Misc
   children:

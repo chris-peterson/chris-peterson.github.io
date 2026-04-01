@@ -15,7 +15,7 @@ var ICONS = {
 var PLUGIN_CATALOG = {
   mermaid: [
     { src: 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js' },
-    { code: 'mermaid.initialize({ startOnLoad: false });' },
+    { code: 'mermaid.initialize({ startOnLoad: false, theme: (document.documentElement.style.colorScheme === "light" ? "default" : "dark") });' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify-mermaid@2/dist/docsify-mermaid.js' }
   ],
   footnotes: [
@@ -86,6 +86,15 @@ function initProject(config) {
 
   if ((config.plugins || []).indexOf('mermaid') !== -1) {
     window.$docsify.mermaidConfig = { querySelector: '.mermaid' };
+    window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+      hook.doneEach(function() {
+        document.querySelectorAll('.mermaid').forEach(function(el) {
+          if (!el.getAttribute('data-source') && el.textContent && !el.querySelector('svg')) {
+            el.setAttribute('data-source', el.textContent.trim());
+          }
+        });
+      });
+    });
   }
 
   steps = steps.concat([
@@ -146,6 +155,16 @@ function toggleTheme() {
   html.style.colorScheme = newScheme;
   toggle.setAttribute('data-scheme', newScheme);
   localStorage.setItem('theme', newScheme);
+
+  if (typeof mermaid !== 'undefined') {
+    var mermaidTheme = newScheme === 'light' ? 'default' : 'dark';
+    mermaid.initialize({ startOnLoad: false, theme: mermaidTheme });
+    document.querySelectorAll('.mermaid[data-source]').forEach(function(el) {
+      el.removeAttribute('data-processed');
+      el.innerHTML = el.getAttribute('data-source');
+    });
+    mermaid.run({ querySelector: '.mermaid' });
+  }
 }
 
 function toggleRepoSelector() {

@@ -55,9 +55,9 @@
 
 /* Sidebar resize handle */
 .sidebar-resize-handle {
-  position: absolute;
+  position: fixed;
   top: 0;
-  right: 0;
+  left: var(--sidebar-width);
   width: 4px;
   height: 100%;
   cursor: col-resize;

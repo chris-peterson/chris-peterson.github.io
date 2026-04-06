@@ -30,6 +30,7 @@ function initProject(config) {
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
   config.site_url = HUB_ORIGIN + '/' + config.name;
   var isHub = config.name === org;
+  var sidebarMode = isHub && new URLSearchParams(window.location.search).get('mode') === 'sidebar';
   config.repo_source = isHub ? 'https://github.com/' + org : 'https://github.com/' + org + '/' + config.name;
   var defaults = {
     loadSidebar: true,
@@ -39,7 +40,7 @@ function initProject(config) {
     notFoundPage: true,
     relativePath: false,
     alias: { '/.*/_sidebar.md': '/_sidebar.md' },
-    hideSidebar: isHub,
+    hideSidebar: isHub && !sidebarMode,
     search: {
       placeholder: 'Search...',
       noData: 'No results',
@@ -109,8 +110,9 @@ function initProject(config) {
 
   buildTitlebarDOM(config);
   initTheme();
-  if (!isHub) initSearch();
+  if (!isHub || sidebarMode) initSearch();
   initProjectCards();
+  if (sidebarMode) initSidebarProjects();
   initEventListeners();
 
   function loadNext(i) {
@@ -614,6 +616,34 @@ function renderDropdownItem(project) {
   '</a>';
 }
 
+function initSidebarProjects() {
+  if (!window.$docsify) return;
+
+  window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+    hook.doneEach(function() {
+      var nav = document.querySelector('.sidebar-nav');
+      if (!nav || nav.dataset.projectsLoaded) return;
+      nav.dataset.projectsLoaded = 'true';
+
+      loadProjects().then(function(projects) {
+        function renderNav(items) {
+          return '<ul>' + items.map(function(item) {
+            if (item.group && item.children) {
+              return '<li><p>' + item.group + '</p>' + renderNav(item.children) + '</li>';
+            }
+            var faviconUrl = item.icon || (item.url + '/favicon.ico');
+            return '<li><a href="' + (item.url || '#') + '">' +
+              '<img src="' + faviconUrl + '" alt="" width="16" height="16" style="vertical-align:middle;margin-right:6px">' +
+              item.name + '</a></li>';
+          }).join('') + '</ul>';
+        }
+
+        nav.innerHTML = renderNav(projects);
+      });
+    });
+  });
+}
+
 function initProjectCards() {
   if (!window.$docsify) return;
 
@@ -727,7 +757,7 @@ function initSidebarResize() {
 
   var handle = document.createElement('div');
   handle.className = 'sidebar-resize-handle';
-  sidebar.appendChild(handle);
+  sidebar.parentNode.insertBefore(handle, sidebar.nextSibling);
 
   var dragging = false;
 

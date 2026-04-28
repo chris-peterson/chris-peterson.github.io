@@ -272,6 +272,7 @@
 .lang-bar-segment[data-lang="powershell"] { background: var(--color-cyan); }
 .lang-bar-segment[data-lang="shell"]      { background: var(--color-orange); }
 .lang-bar-segment[data-lang="dockerfile"] { background: var(--color-pink); }
+.lang-bar-segment[data-lang="typescript"] { background: var(--color-yellow); }
 
 .lang-legend {
   display: inline-flex;
@@ -299,6 +300,7 @@
 .lang-dot[data-lang="powershell"] { background: var(--color-cyan); }
 .lang-dot[data-lang="shell"]      { background: var(--color-orange); }
 .lang-dot[data-lang="dockerfile"] { background: var(--color-pink); }
+.lang-dot[data-lang="typescript"] { background: var(--color-yellow); }
 
 /* Project groups */
 .project-group {

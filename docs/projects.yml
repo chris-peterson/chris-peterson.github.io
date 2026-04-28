@@ -1,6 +1,16 @@
 - group: AI Tools
   description: AI-assisted development
   children:
+    - name: beacon
+      description: At-a-glance Claude Code session awareness
+      icon: https://chris-peterson.github.io/beacon/favicon.svg
+      url: https://chris-peterson.github.io/beacon
+      languages:
+        - name: Python
+          pct: 80
+        - name: Shell
+          pct: 20
+
     - name: ClaudeWatch
       description: Claude Code safety plugin
       icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg

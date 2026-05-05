@@ -21,6 +21,14 @@
         - name: Python
           pct: 30
 
+    - name: logbook
+      description: Coding session retros committed to git
+      icon: https://chris-peterson.github.io/logbook/favicon.svg
+      url: https://chris-peterson.github.io/logbook
+      languages:
+        - name: Python
+          pct: 100
+
     - name: tack
       description: Route tracker for AI-assisted development
       icon: https://chris-peterson.github.io/tack/favicon.svg

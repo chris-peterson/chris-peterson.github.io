@@ -600,7 +600,9 @@ function initBreadcrumb() {
       var dropdown = document.getElementById('repoDropdownContainer');
       if (!dropdown) return;
 
-      var flat = flattenProjects(projects);
+      var flat = flattenProjects(projects).sort(function(a, b) {
+        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+      });
       dropdown.innerHTML = flat.map(renderDropdownItem).join('');
     })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });

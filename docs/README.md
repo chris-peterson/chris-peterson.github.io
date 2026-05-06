@@ -2,4 +2,6 @@
 
 Hi, I'm Chris. I've been writing software for the last couple of decades.
 
+> **Currently focused on:** AI tooling — particularly AI-accelerated SDLC workflow.
+
 <div id="project-cards"></div>

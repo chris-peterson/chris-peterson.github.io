@@ -536,8 +536,9 @@ function parseProjectsYaml(text) {
       return;
     }
 
-    // "children:"
-    if (stripped === 'children:' && current && current.children) {
+    // "children:" — supported on groups and on regular project items
+    if (stripped === 'children:' && current) {
+      if (!current.children) current.children = [];
       groupStack.push({ children: current.children, indent: indent });
       current = null;
       return;
@@ -575,6 +576,9 @@ function flattenProjects(projects) {
       flattenProjects(item.children).forEach(function(child) { flat.push(child); });
     } else {
       flat.push(item);
+      if (item.children && item.children.length) {
+        flattenProjects(item.children).forEach(function(child) { flat.push(child); });
+      }
     }
   });
   return flat;
@@ -582,9 +586,19 @@ function flattenProjects(projects) {
 
 var _projectsPromise = null;
 
+// Hub-relative paths in projects.yml load from localhost during dev, from the hub on the hub site,
+// and from the hub when consumed cross-origin from a sub-project site.
+function resolveHubPath(path) {
+  if (!path) return '';
+  if (/^[a-z]+:\/\//i.test(path)) return path;
+  if (path.charAt(0) !== '/') return path;
+  var origin = window.location.origin === HUB_ORIGIN || window.location.hostname === 'localhost' ? '' : HUB_ORIGIN;
+  return origin + path;
+}
+
 function loadProjects() {
   if (!_projectsPromise) {
-    _projectsPromise = fetch(HUB_ORIGIN + '/projects.yml')
+    _projectsPromise = fetch(resolveHubPath('/projects.yml'))
       .then(function(r) {
         if (!r.ok) throw new Error('projects.yml responded with ' + r.status);
         return r.text();
@@ -599,23 +613,31 @@ function initBreadcrumb() {
     .then(function(projects) {
       var dropdown = document.getElementById('repoDropdownContainer');
       if (!dropdown) return;
-
-      var flat = flattenProjects(projects).sort(function(a, b) {
-        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
-      });
-      dropdown.innerHTML = flat.map(renderDropdownItem).join('');
+      dropdown.innerHTML = renderDropdownTree(projects, 0);
     })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });
 }
 
-function renderDropdownItem(project) {
-  var faviconUrl = project.icon || (project.url + '/favicon.ico');
-  return '<a class="breadcrumb-repo-item" href="' + (project.url || '#') + '"' +
-    (project.description ? ' title="' + project.description + '"' : '') + '>' +
-    '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="20" height="20"> ' +
-    project.name +
-    '<span class="repo-description">' + (project.description || '') + '</span>' +
-  '</a>';
+function renderDropdownTree(items, depth) {
+  return items.map(function(item) {
+    if (item.group && item.children) {
+      return '<div class="breadcrumb-repo-group">' +
+        '<div class="breadcrumb-repo-group-label">' + item.group + '</div>' +
+        renderDropdownTree(item.children, depth + 1) +
+      '</div>';
+    }
+    var faviconUrl = resolveHubPath(item.icon || (item.url + '/favicon.ico'));
+    var classes = 'breadcrumb-repo-item' + (depth > 1 ? ' breadcrumb-repo-item-nested' : '');
+    var html = '<a class="' + classes + '" href="' + (item.url || '#') + '"' +
+      (item.description ? ' title="' + item.description + '"' : '') + '>' +
+      '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="20" height="20"> ' +
+      item.name +
+    '</a>';
+    if (item.children && item.children.length) {
+      html += renderDropdownTree(item.children, depth + 1);
+    }
+    return html;
+  }).join('');
 }
 
 function initSidebarProjects() {
@@ -633,10 +655,11 @@ function initSidebarProjects() {
             if (item.group && item.children) {
               return '<li><p>' + item.group + '</p>' + renderNav(item.children) + '</li>';
             }
-            var faviconUrl = item.icon || (item.url + '/favicon.ico');
+            var faviconUrl = resolveHubPath(item.icon || (item.url + '/favicon.ico'));
+            var nested = (item.children && item.children.length) ? renderNav(item.children) : '';
             return '<li><a href="' + (item.url || '#') + '">' +
               '<img src="' + faviconUrl + '" alt="" width="16" height="16" style="vertical-align:middle;margin-right:6px">' +
-              item.name + '</a></li>';
+              item.name + '</a>' + nested + '</li>';
           }).join('') + '</ul>';
         }
 
@@ -660,31 +683,21 @@ function initProjectCards() {
           var cardIndex = 0;
 
           function renderCard(project) {
-            var faviconUrl = project.icon || (project.url + '/favicon.ico');
-            var sourceUrl = 'https://github.com/' + org + '/' + project.name;
-            var langLegend = (project.languages && project.languages.length > 0) ?
-              project.languages.map(function(lang) {
-                return '<span class="lang-legend-item"><span class="lang-dot" data-lang="' + lang.name.toLowerCase() + '"></span>' + lang.name + '</span>';
-              }).join('') : '';
+            var faviconUrl = resolveHubPath(project.icon || (project.url + '/favicon.ico'));
             var langBar = (project.languages && project.languages.length > 0) ?
               '<div class="lang-bar">' +
                 project.languages.map(function(lang) {
                   return '<div class="lang-bar-segment" data-lang="' + lang.name.toLowerCase() + '" style="flex:' + lang.pct + '"></div>';
                 }).join('') +
-              '</div>' : '<div class="project-card-accent"></div>';
-            var html = '<div class="project-card" data-href="' + (project.url || '#') + '" style="animation-delay:' + (cardIndex * 80) + 'ms">' +
+              '</div>' : '';
+            var hasChildren = !!(project.children && project.children.length);
+            var html = '<div class="project-card' + (hasChildren ? ' has-children' : '') + '" data-href="' + (project.url || '#') + '" style="animation-delay:' + (cardIndex * 60) + 'ms">' +
               '<div class="project-card-content">' +
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
                 '<div class="project-card-info">' +
                   '<div class="project-card-name">' + project.name + '</div>' +
-                  '<div class="project-card-desc">' + (project.description || '') +
-                    (langLegend ? '<span class="lang-legend">' + langLegend + '</span>' : '') +
-                  '</div>' +
+                  (project.description ? '<div class="project-card-desc">' + project.description + '</div>' : '') +
                 '</div>' +
-              '</div>' +
-              '<div class="project-card-links">' +
-                '<a class="project-card-source" href="' + sourceUrl + '" target="_blank" title="View source">' + ICONS.github + '</a>' +
-                '<svg class="project-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>' +
               '</div>' +
               langBar +
             '</div>';
@@ -695,26 +708,29 @@ function initProjectCards() {
           function renderItems(items) {
             return items.map(function(item) {
               if (item.group && item.children) {
-                return '<div class="project-group" style="animation-delay:' + (cardIndex * 80) + 'ms">' +
-                  '<div class="project-group-label">' + item.group +
+                return '<section class="project-group" style="animation-delay:' + (cardIndex * 60) + 'ms">' +
+                  '<header class="project-group-label">' +
+                    '<span class="project-group-name">' + item.group + '</span>' +
                     (item.description ? '<span class="project-group-desc">' + item.description + '</span>' : '') +
-                  '</div>' +
+                  '</header>' +
                   '<div class="project-group-children">' +
                     renderItems(item.children) +
                   '</div>' +
-                '</div>';
+                '</section>';
               }
-              return renderCard(item);
+              var card = renderCard(item);
+              if (item.children && item.children.length) {
+                card += '<div class="project-card-children">' + renderItems(item.children) + '</div>';
+              }
+              return card;
             }).join('');
           }
 
           container.innerHTML = renderItems(projects);
 
           container.querySelectorAll('.project-card').forEach(function(card) {
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', function(e) {
-              if (e.target.closest('.project-card-source')) return;
-              window.location.href = card.dataset.href;
+            card.addEventListener('click', function() {
+              if (card.dataset.href) window.location.href = card.dataset.href;
             });
           });
         })

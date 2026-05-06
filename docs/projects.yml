@@ -1,41 +1,73 @@
 - group: AI Tools
   description: AI-assisted development
   children:
-    - name: beacon
-      description: At-a-glance Claude Code session awareness
-      icon: https://chris-peterson.github.io/beacon/favicon.svg
-      url: https://chris-peterson.github.io/beacon
-      languages:
-        - name: Python
-          pct: 80
-        - name: Shell
-          pct: 20
+    - name: claude-marketplace
+      description: Plugins, skills, and tooling for Claude Code
+      icon: https://chris-peterson.github.io/claude-marketplace/favicon.svg
+      url: https://chris-peterson.github.io/claude-marketplace/#/
+      children:
+        - name: beacon
+          description: At-a-glance Claude Code session awareness
+          icon: https://chris-peterson.github.io/beacon/favicon.svg
+          url: https://chris-peterson.github.io/beacon
+          languages:
+            - name: Python
+              pct: 80
+            - name: Shell
+              pct: 20
 
-    - name: ClaudeWatch
-      description: Claude Code safety plugin
-      icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
-      url: https://chris-peterson.github.io/ClaudeWatch
-      languages:
-        - name: Shell
-          pct: 70
-        - name: Python
-          pct: 30
+        - name: ClaudeWatch
+          description: Claude Code safety plugin
+          icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
+          url: https://chris-peterson.github.io/ClaudeWatch
+          languages:
+            - name: Shell
+              pct: 70
+            - name: Python
+              pct: 30
 
-    - name: logbook
-      description: Coding session retros committed to git
-      icon: https://chris-peterson.github.io/logbook/favicon.svg
-      url: https://chris-peterson.github.io/logbook
+        - name: logbook
+          description: Coding session retros committed to git
+          icon: https://chris-peterson.github.io/logbook/favicon.svg
+          url: https://chris-peterson.github.io/logbook
+          languages:
+            - name: Python
+              pct: 100
+
+        - name: tack
+          description: Route tracker for AI-assisted development
+          icon: https://chris-peterson.github.io/tack/favicon.svg
+          url: https://chris-peterson.github.io/tack
+          languages:
+            - name: TypeScript
+              pct: 100
+
+- group: PowerShell Modules
+  description: Modules for automating workflows
+  children:
+    - name: pwsh-forge
+      description: Unified CLI for code forges
+      icon: https://chris-peterson.github.io/pwsh-forge/favicon.svg
+      url: https://chris-peterson.github.io/pwsh-forge
       languages:
-        - name: Python
+        - name: PowerShell
           pct: 100
+      children:
+        - name: pwsh-github
+          description: GitHub provider
+          icon: https://chris-peterson.github.io/pwsh-github/favicon.svg
+          url: https://chris-peterson.github.io/pwsh-github
+          languages:
+            - name: PowerShell
+              pct: 100
 
-    - name: tack
-      description: Route tracker for AI-assisted development
-      icon: https://chris-peterson.github.io/tack/favicon.svg
-      url: https://chris-peterson.github.io/tack
-      languages:
-        - name: TypeScript
-          pct: 100
+        - name: pwsh-gitlab
+          description: GitLab provider
+          icon: https://chris-peterson.github.io/pwsh-gitlab/favicon.svg
+          url: https://chris-peterson.github.io/pwsh-gitlab
+          languages:
+            - name: PowerShell
+              pct: 100
 
 - group: .NET
   description: NuGet packages
@@ -66,42 +98,13 @@
         - name: Shell
           pct: 10
 
-- group: PowerShell Modules
-  children:
-    - name: pwsh-fmd
-      description: Format object to Markdown table
-      icon: https://chris-peterson.github.io/pwsh-fmd/favicon.svg
-      url: https://chris-peterson.github.io/pwsh-fmd
+    - name: XmlTransform
+      description: XDT-style XML configuration transformation
+      icon: /icons/xmltransform.svg
+      url: https://github.com/Novakov/xmltransform
       languages:
-        - name: PowerShell
+        - name: C#
           pct: 100
-
-    - group: forge
-      description: Unified CLI for code forges
-      children:
-        - name: pwsh-forge
-          description: Forge dispatch layer
-          icon: https://chris-peterson.github.io/pwsh-forge/favicon.svg
-          url: https://chris-peterson.github.io/pwsh-forge
-          languages:
-            - name: PowerShell
-              pct: 100
-
-        - name: pwsh-github
-          description: GitHub provider
-          icon: https://chris-peterson.github.io/pwsh-github/favicon.svg
-          url: https://chris-peterson.github.io/pwsh-github
-          languages:
-            - name: PowerShell
-              pct: 100
-
-        - name: pwsh-gitlab
-          description: GitLab provider
-          icon: https://chris-peterson.github.io/pwsh-gitlab/favicon.svg
-          url: https://chris-peterson.github.io/pwsh-gitlab
-          languages:
-            - name: PowerShell
-              pct: 100
 
 - group: GitHub Actions
   description: Reusable workflow actions
@@ -126,22 +129,3 @@
         - name: Dockerfile
           pct: 45
 
-- group: Misc
-  children:
-    - name: gitconfig
-      description: Git configuration & workflow
-      icon: https://chris-peterson.github.io/gitconfig/favicon.svg
-      url: https://chris-peterson.github.io/gitconfig
-      languages:
-        - name: Shell
-          pct: 100
-
-    - name: rmq-cli
-      description: RabbitMQ administration Docker image
-      icon: https://chris-peterson.github.io/rmq-cli/favicon.svg
-      url: https://chris-peterson.github.io/rmq-cli
-      languages:
-        - name: Shell
-          pct: 50
-        - name: Dockerfile
-          pct: 50

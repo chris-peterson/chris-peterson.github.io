@@ -11,6 +11,8 @@
   --color-current-line:  light-dark(#e6e6e6, #44475a);
   --color-foreground:    light-dark(#282a36, #f8f8f2);
   --color-comment:       light-dark(#5a6896, #9099b8);
+  /* Meets WCAG AA 4.5:1 against --color-current-line. */
+  --color-comment-strong: light-dark(#4a587c, #c3c9e0);
   --color-cyan:          light-dark(#0891b2, #8be9fd);
   --color-green:         light-dark(#16a34a, #50fa7b);
   --color-orange:        light-dark(#ea580c, #ffb86c);
@@ -195,19 +197,8 @@
   flex-wrap: wrap;
   gap: 14px;
   margin: 0 0 1.1rem;
-  padding: 0 0 0.6rem;
+  padding: 0 0 0.55rem;
   border-bottom: 1px solid var(--border-subtle);
-  position: relative;
-}
-
-.project-group-label::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -1px;
-  width: 36px;
-  height: 1px;
-  background: var(--color-purple);
 }
 
 .project-group-name {
@@ -262,7 +253,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.95rem 1.25rem 1.05rem;
+  /* Extra bottom padding reserves space for the expanded language stripe on hover,
+     so descriptions remain visible without layout shift. */
+  padding: 0.95rem 1.25rem 1.5rem;
   border-radius: 8px;
   background: var(--color-current-line);
   border: 1px solid var(--border-subtle);
@@ -271,12 +264,11 @@
   cursor: pointer;
   overflow: hidden;
   animation: cardReveal 0.4s ease both;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .project-card:hover {
-  border-color: var(--color-purple);
-  background: light-dark(rgba(124, 58, 237, 0.04), rgba(189, 147, 249, 0.06));
+  border-color: var(--color-comment);
 }
 
 .project-card-content {
@@ -311,33 +303,63 @@
   transition: color 0.2s ease;
 }
 
-.project-card:hover .project-card-name { color: var(--color-purple); }
+.project-card:hover .project-card-name { color: var(--color-foreground); }
 
 .project-card-desc {
-  color: var(--color-comment);
+  color: var(--color-comment-strong);
   font-size: 0.88em;
   margin-top: 0.15rem;
   line-height: 1.45;
 }
 
-/* Language stripe — the only chromatic accent per card */
+/* Language stripe — the only chromatic accent per card.
+   At rest: thin chromatic band. On card hover: expands and reveals
+   per-segment labels in place of the (faded) description. */
 .lang-bar {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 4px;
   display: flex;
+  transition: height 0.22s ease;
 }
 
-.lang-bar-segment { height: 100%; }
+.project-card:hover .lang-bar { height: 18px; }
 
-.lang-bar-segment[data-lang="c#"]         { background: var(--color-purple); }
-.lang-bar-segment[data-lang="python"]     { background: var(--color-green); }
-.lang-bar-segment[data-lang="powershell"] { background: var(--color-cyan); }
-.lang-bar-segment[data-lang="shell"]      { background: var(--color-orange); }
-.lang-bar-segment[data-lang="dockerfile"] { background: var(--color-pink); }
-.lang-bar-segment[data-lang="typescript"] { background: var(--color-yellow); }
+.lang-bar-segment {
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Segments below the narrow-threshold are emitted without data-label, so attr() falls back to "" and nothing renders */
+.lang-bar-segment[data-label]::after {
+  content: attr(data-label);
+  font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-background);
+  white-space: nowrap;
+  padding: 0 0.5rem;
+  opacity: 0;
+  transition: opacity 0.16s ease 0.06s;
+  pointer-events: none;
+}
+
+.project-card:hover .lang-bar-segment[data-label]::after { opacity: 1; }
+
+[data-lang="c#"]         { background: var(--color-purple); }
+[data-lang="python"]     { background: var(--color-green); }
+[data-lang="powershell"] { background: var(--color-cyan); }
+[data-lang="shell"]      { background: var(--color-orange); }
+[data-lang="dockerfile"] { background: var(--color-pink); }
+[data-lang="typescript"] { background: var(--color-yellow); }
+[data-lang="markdown"]   { background: var(--color-red); }
 
 /* Children of a parent project — nested 2-up, collapsible */
 .project-card-children {
@@ -346,7 +368,7 @@
   gap: 0.6rem;
   margin: 0.6rem 0 0;
   padding: 0.5rem 0 0.25rem 1.25rem;
-  border-left: 2px solid var(--color-purple);
+  border-left: 1px solid var(--border-subtle);
   animation: cardReveal 0.3s ease both;
 }
 

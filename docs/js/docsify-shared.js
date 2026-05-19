@@ -687,7 +687,14 @@ function initProjectCards() {
             var langBar = (project.languages && project.languages.length > 0) ?
               '<div class="lang-bar">' +
                 project.languages.map(function(lang) {
-                  return '<div class="lang-bar-segment" data-lang="' + lang.name.toLowerCase() + '" style="flex:' + lang.pct + '"></div>';
+                  var fullLabel = lang.name + ' ' + lang.pct + '%';
+                  // Tiered label: full name+% for wide segments, just % for narrow ones, nothing for slivers.
+                  var inlineLabel = lang.pct >= 22 ? fullLabel
+                                    : lang.pct >= 4 ? (lang.pct + '%')
+                                    : '';
+                  return '<div class="lang-bar-segment" data-lang="' + lang.name.toLowerCase() + '"' +
+                    (inlineLabel ? ' data-label="' + inlineLabel + '"' : '') +
+                    ' style="flex:' + lang.pct + '" aria-label="' + fullLabel + '"></div>';
                 }).join('') +
               '</div>' : '';
             var hasChildren = !!(project.children && project.children.length);

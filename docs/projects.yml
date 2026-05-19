@@ -16,16 +16,6 @@
             - name: Shell
               pct: 20
 
-        - name: ClaudeWatch
-          description: Claude Code safety plugin
-          icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
-          url: https://chris-peterson.github.io/ClaudeWatch
-          languages:
-            - name: Shell
-              pct: 70
-            - name: Python
-              pct: 30
-
         - name: logbook
           description: Coding session retros committed to git
           icon: https://chris-peterson.github.io/logbook/favicon.svg
@@ -51,6 +41,16 @@
           languages:
             - name: TypeScript
               pct: 100
+
+        - name: ClaudeWatch
+          description: Claude Code safety plugin
+          icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
+          url: https://chris-peterson.github.io/ClaudeWatch
+          languages:
+            - name: Shell
+              pct: 70
+            - name: Python
+              pct: 30
 
 - group: PowerShell Modules
   description: Modules for automating workflows

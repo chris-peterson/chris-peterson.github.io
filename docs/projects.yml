@@ -34,6 +34,16 @@
             - name: Python
               pct: 100
 
+        - name: sextant
+          description: AI-assisted SPEC-driven development
+          icon: https://chris-peterson.github.io/sextant/favicon.svg
+          url: https://chris-peterson.github.io/sextant
+          languages:
+            - name: Markdown
+              pct: 95
+            - name: Shell
+              pct: 5
+
         - name: tack
           description: Route tracker for AI-assisted development
           icon: https://chris-peterson.github.io/tack/favicon.svg

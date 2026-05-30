@@ -24,6 +24,18 @@
             - name: Python
               pct: 100
 
+        - name: moor
+          description: Diff viewer for reviewing AI-generated code
+          icon: https://chris-peterson.github.io/moor/favicon.svg
+          url: https://chris-peterson.github.io/moor
+          languages:
+            - name: JavaScript
+              pct: 91
+            - name: Shell
+              pct: 7
+            - name: CSS
+              pct: 2
+
         - name: sextant
           description: AI-assisted SPEC-driven development
           icon: https://chris-peterson.github.io/sextant/favicon.svg

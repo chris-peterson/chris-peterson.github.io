@@ -12,9 +12,9 @@
           url: https://chris-peterson.github.io/beacon
           languages:
             - name: Python
-              pct: 80
+              pct: 90
             - name: Shell
-              pct: 20
+              pct: 10
 
         - name: logbook
           description: Coding session retros committed to git
@@ -22,7 +22,9 @@
           url: https://chris-peterson.github.io/logbook
           languages:
             - name: Python
-              pct: 100
+              pct: 95
+            - name: Shell
+              pct: 5
 
         - name: moor
           description: Diff viewer for reviewing AI-generated code
@@ -30,11 +32,9 @@
           url: https://chris-peterson.github.io/moor
           languages:
             - name: JavaScript
-              pct: 91
+              pct: 90
             - name: Shell
-              pct: 7
-            - name: CSS
-              pct: 2
+              pct: 10
 
         - name: sextant
           description: AI-assisted SPEC-driven development
@@ -43,6 +43,7 @@
           languages:
             - name: Markdown
               pct: 95
+              source: manual
             - name: Shell
               pct: 5
 
@@ -52,7 +53,11 @@
           url: https://chris-peterson.github.io/tack
           languages:
             - name: TypeScript
-              pct: 100
+              pct: 80
+            - name: JavaScript
+              pct: 15
+            - name: Shell
+              pct: 5
 
         - name: ClaudeWatch
           description: Claude Code safety plugin
@@ -60,9 +65,9 @@
           url: https://chris-peterson.github.io/ClaudeWatch
           languages:
             - name: Shell
-              pct: 70
+              pct: 80
             - name: Python
-              pct: 30
+              pct: 20
 
 - group: PowerShell Modules
   description: Modules for automating workflows
@@ -116,9 +121,9 @@
       url: https://chris-peterson.github.io/spiffy
       languages:
         - name: C#
-          pct: 90
+          pct: 95
         - name: Shell
-          pct: 10
+          pct: 5
 
     - name: XmlTransform
       description: XDT-style XML configuration transformation
@@ -137,9 +142,9 @@
       url: https://chris-peterson.github.io/publish-powershell
       languages:
         - name: PowerShell
-          pct: 85
+          pct: 95
         - name: Dockerfile
-          pct: 15
+          pct: 5
 
     - name: virgo
       description: Version your artifacts

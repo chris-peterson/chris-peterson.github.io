@@ -334,6 +334,9 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  /* Fallback for languages without a data-lang accent below, so a refresh that
+     introduces a new language never renders an invisible segment. */
+  background: var(--color-comment);
 }
 
 /* Segments below the narrow-threshold are emitted without data-label, so attr() falls back to "" and nothing renders */
@@ -359,7 +362,8 @@
 [data-lang="shell"]      { background: var(--color-orange); }
 [data-lang="dockerfile"] { background: var(--color-pink); }
 [data-lang="typescript"] { background: var(--color-yellow); }
-[data-lang="markdown"]   { background: var(--color-red); }
+[data-lang="javascript"] { background: var(--color-red); }
+[data-lang="markdown"]   { background: var(--color-comment); }
 
 /* Children of a parent project — nested 2-up, collapsible */
 .project-card-children {

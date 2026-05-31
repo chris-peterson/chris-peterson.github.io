@@ -6,6 +6,17 @@
       icon: https://chris-peterson.github.io/claude-marketplace/favicon.svg
       url: https://chris-peterson.github.io/claude-marketplace/#/
       children:
+        - name: anchor
+          description: Git/forge skills that drive reviewed work into git
+          icon: https://chris-peterson.github.io/anchor/favicon.svg
+          url: https://chris-peterson.github.io/anchor
+          languages:
+            - name: Markdown
+              pct: 90
+              source: manual
+            - name: Shell
+              pct: 10
+
         - name: beacon
           description: At-a-glance Claude Code session awareness
           icon: https://chris-peterson.github.io/beacon/favicon.svg

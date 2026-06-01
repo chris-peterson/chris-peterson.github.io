@@ -435,8 +435,19 @@ pre[data-lang]::after {
   background: transparent !important;
 }
 
+.docsify-copy-code-button.copied {
+  opacity: 1;
+}
+
 .docsify-copy-code-button.copied::after {
   font-weight: 900;
   content: '\f00c';
   color: var(--success-color) !important;
+  animation: copy-code-pop 0.3s ease;
+}
+
+@keyframes copy-code-pop {
+  0% { transform: scale(0.6); }
+  55% { transform: scale(1.25); }
+  100% { transform: scale(1); }
 }

@@ -239,26 +239,16 @@ function initTheme() {
 }
 
 function initCopyButtons() {
-  function setupCopyButtons() {
-    document.querySelectorAll('.docsify-copy-code-button').forEach(function(btn) {
-      if (btn.dataset.customized) return;
-      btn.dataset.customized = 'true';
-      btn.addEventListener('click', function() {
-        btn.classList.add('copied');
-        setTimeout(function() {
-          btn.classList.remove('copied');
-        }, 1500);
-      });
-    });
-  }
-
-  if (window.$docsify) {
-    window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
-      hook.doneEach(function() {
-        setTimeout(setupCopyButtons, 100);
-      });
-    });
-  }
+  // Delegated listener on document: catches clicks on any copy-code button,
+  // current or future, without depending on docsify init/hook timing (a
+  // doneEach hook registered here runs too late and never fires). Adds a
+  // transient `copied` class that the theme renders as a green check.
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest ? e.target.closest('.docsify-copy-code-button') : null;
+    if (!btn) return;
+    btn.classList.add('copied');
+    setTimeout(function() { btn.classList.remove('copied'); }, 1500);
+  });
 }
 
 function initSearch() {

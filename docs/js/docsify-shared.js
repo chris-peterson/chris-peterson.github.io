@@ -76,7 +76,8 @@ function initProject(config) {
   // registered in time for the initial page render.
   var steps = [
     { code: 'window.Docsify = { version: "4.0.0" };' },
-    { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' }
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' },
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' }
   ];
 
   (config.plugins || []).forEach(function(name) {
@@ -100,8 +101,7 @@ function initProject(config) {
 
   steps = steps.concat([
     { src: 'https://cdn.jsdelivr.net/npm/docsify@4' },
-    !isHub && { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' },
-    { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' }
+    !isHub && { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' }
   ].filter(Boolean));
 
   (config.code_languages || []).forEach(function(lang) {

@@ -80,6 +80,17 @@
             - name: Python
               pct: 20
 
+        - name: shipshape
+          description: Keep your Claude Code plugins up to date
+          icon: https://chris-peterson.github.io/shipshape/favicon.svg
+          url: https://chris-peterson.github.io/shipshape
+          languages:
+            - name: Markdown
+              pct: 70
+              source: manual
+            - name: Shell
+              pct: 30
+
 - group: PowerShell Modules
   description: Modules for automating workflows
   children:

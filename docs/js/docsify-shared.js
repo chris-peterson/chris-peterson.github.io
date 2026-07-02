@@ -107,17 +107,25 @@ function initProject(config) {
         var m = (location.hash || '').match(/[?&]id=([^&]+)/);
         if (!m) return;
         var id = decodeURIComponent(m[1]);
-        var tries = 0;
+        var tries = 0, lastY = -1, stableFor = 0;
         (function settle() {
           var pending = Array.prototype.slice
             .call(document.querySelectorAll('.mermaid'))
             .some(function(x) { return !x.querySelector('svg'); });
           var el = document.getElementById(id);
+          var y = window.pageYOffset;
+          // Correct only once mermaid has rendered (layout final) AND docsify's
+          // own scroll tween has settled (scrollY unchanged a few frames) --
+          // otherwise the tween finishes after us and overrides the correction.
           if (el && !pending) {
-            window.scrollTo(0, el.getBoundingClientRect().top + window.pageYOffset - (window.$docsify.topMargin || 0));
-            return;
+            stableFor = (y === lastY) ? stableFor + 1 : 0;
+            if (stableFor >= 3) {
+              window.scrollTo(0, el.getBoundingClientRect().top + window.pageYOffset - (window.$docsify.topMargin || 0));
+              return;
+            }
           }
-          if (tries++ < 60) requestAnimationFrame(settle);
+          lastY = y;
+          if (tries++ < 180) requestAnimationFrame(settle);
         })();
       });
     });

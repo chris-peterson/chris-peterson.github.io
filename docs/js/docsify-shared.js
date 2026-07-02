@@ -151,6 +151,23 @@ function initProject(config) {
     if (i >= steps.length) {
       initCopyButtons();
       initBreadcrumb();
+      // docsify doesn't re-scroll when only ?id= changes on the same page path,
+      // so same-page anchor clicks (sidebar sub-headings, heading permalinks)
+      // land nowhere. Handle hashchange ourselves: if the target is already in
+      // the DOM, scroll to it with the titlebar offset. On cross-page nav the
+      // target isn't rendered yet at hashchange time, so getElementById returns
+      // null and docsify's own render + scroll (+ the mermaid re-scroll) wins.
+      window.addEventListener('hashchange', function() {
+        var mm = (location.hash || '').match(/[?&]id=([^&]+)/);
+        if (!mm) return;
+        var target = document.getElementById(decodeURIComponent(mm[1]));
+        if (target) {
+          window.scrollTo({
+            top: target.getBoundingClientRect().top + window.pageYOffset - (window.$docsify.topMargin || 0),
+            behavior: 'smooth'
+          });
+        }
+      });
       return;
     }
     var step = steps[i];

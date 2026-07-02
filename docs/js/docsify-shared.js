@@ -36,6 +36,7 @@ function initProject(config) {
     loadSidebar: true,
     subMaxLevel: 2,
     auto2top: true,
+    topMargin: 64, // titlebar is position:fixed at 52px; keeps deep-linked anchors below it
     coverpage: false,
     notFoundPage: true,
     relativePath: false,

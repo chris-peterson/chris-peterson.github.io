@@ -97,6 +97,29 @@ function initProject(config) {
           }
         });
       });
+      // Deep-link re-scroll: docsify snapshots the target's position before
+      // mermaid renders, so a ?id= anchor below a diagram lands short (the
+      // diagram expands above it after the snapshot; topMargin can't help
+      // because the target moved). Once every .mermaid has produced an <svg>
+      // (layout settled), scroll to the target once with the topMargin offset.
+      // One-shot after async render -- not a per-reflow observer.
+      hook.doneEach(function() {
+        var m = (location.hash || '').match(/[?&]id=([^&]+)/);
+        if (!m) return;
+        var id = decodeURIComponent(m[1]);
+        var tries = 0;
+        (function settle() {
+          var pending = Array.prototype.slice
+            .call(document.querySelectorAll('.mermaid'))
+            .some(function(x) { return !x.querySelector('svg'); });
+          var el = document.getElementById(id);
+          if (el && !pending) {
+            window.scrollTo(0, el.getBoundingClientRect().top + window.pageYOffset - (window.$docsify.topMargin || 0));
+            return;
+          }
+          if (tries++ < 60) requestAnimationFrame(settle);
+        })();
+      });
     });
   }
 

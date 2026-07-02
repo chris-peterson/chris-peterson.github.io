@@ -15,7 +15,9 @@ var ICONS = {
 var PLUGIN_CATALOG = {
   mermaid: [
     { src: 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js' },
-    { code: 'mermaid.initialize({ startOnLoad: false, theme: (document.documentElement.style.colorScheme === "light" ? "default" : "dark") });' },
+    { fn: function () {
+        mermaid.initialize({ startOnLoad: false, theme: document.documentElement.style.colorScheme === 'light' ? 'default' : 'dark' });
+      } },
     { src: 'https://cdn.jsdelivr.net/npm/docsify-mermaid@2/dist/docsify-mermaid.js' }
   ],
   footnotes: [
@@ -76,7 +78,7 @@ function initProject(config) {
   // Plugin catalog items must load BEFORE docsify core so their hooks are
   // registered in time for the initial page render.
   var steps = [
-    { code: 'window.Docsify = { version: "4.0.0" };' },
+    { fn: function () { window.Docsify = { version: '4.0.0' }; } },
     { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' },
     { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' }
   ];
@@ -176,8 +178,8 @@ function initProject(config) {
       el.src = step.src;
       el.onload = el.onerror = function() { loadNext(i + 1); };
       document.body.appendChild(el);
-    } else if (step.code) {
-      new Function(step.code)();
+    } else if (step.fn) {
+      step.fn();
       loadNext(i + 1);
     }
   }

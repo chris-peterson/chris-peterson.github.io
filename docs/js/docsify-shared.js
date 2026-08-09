@@ -823,7 +823,11 @@ function initSidebarResize() {
 
   var handle = document.createElement('div');
   handle.className = 'sidebar-resize-handle';
-  sidebar.parentNode.insertBefore(handle, sidebar.nextSibling);
+  // Append rather than insert after the sidebar: docsify-themeable offsets the
+  // content with `.sidebar + .content`, so anything between the two drops the
+  // offset and the fixed sidebar overlays the text. The handle is
+  // position: fixed, so its place in the DOM costs it nothing.
+  sidebar.parentNode.appendChild(handle);
 
   var dragging = false;
 

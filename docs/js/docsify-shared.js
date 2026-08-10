@@ -146,6 +146,7 @@ function initProject(config) {
   initTheme();
   if (!isHub || sidebarMode) initSearch();
   initProjectCards();
+  initLangTooltip();
   if (sidebarMode) initSidebarProjects();
   initEventListeners();
 
@@ -735,7 +736,7 @@ function initProjectCards() {
                                     : '';
                   return '<div class="lang-bar-segment" data-lang="' + lang.name.toLowerCase() + '"' +
                     (inlineLabel ? ' data-label="' + inlineLabel + '"' : '') +
-                    ' style="flex:' + lang.pct + '" aria-label="' + fullLabel + '"></div>';
+                    ' style="flex:' + lang.pct + '" role="img" aria-label="' + fullLabel + '"></div>';
                 }).join('') +
               '</div>' : '';
             var hasChildren = !!(project.children && project.children.length);
@@ -785,6 +786,63 @@ function initProjectCards() {
         .catch(function(err) { console.error('Failed to render project cards:', err); });
     });
   });
+}
+
+// A narrow language segment has room for a bare percentage at best, so the
+// language itself is only reachable by pointing at it. The tooltip lives on
+// <body> because .project-card clips its overflow.
+function initLangTooltip() {
+  var GAP = 8;
+  var tip = document.createElement('div');
+  tip.className = 'lang-tooltip';
+  // The segment carries the same string as its own aria-label, so announcing the
+  // tooltip too would just repeat it.
+  tip.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(tip);
+
+  var active = null;
+
+  function hide() {
+    active = null;
+    tip.classList.remove('visible');
+  }
+
+  function show(segment) {
+    active = segment;
+    tip.textContent = segment.getAttribute('aria-label');
+    tip.classList.add('visible');
+
+    var box = segment.getBoundingClientRect();
+    var edge = tip.offsetWidth / 2 + GAP;
+    var center = Math.min(Math.max(box.left + box.width / 2, edge), window.innerWidth - edge);
+    // The stripe is still mid-expansion when the pointer first lands on it, so its
+    // measured top sits too low. Its bottom is pinned to the card, so derive the
+    // settled top from that and the height CSS is animating towards.
+    var barTop = box.bottom - parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lang-bar-expanded'));
+    var above = barTop - tip.offsetHeight - GAP;
+    // The titlebar is fixed and sits above the tooltip, so anything tucked under it
+    // is invisible — treat its lower edge as the ceiling, not the viewport's.
+    var titlebar = document.getElementById('titlebar');
+    var ceiling = (titlebar ? titlebar.getBoundingClientRect().bottom : 0) + GAP;
+    var below = above < ceiling;
+    tip.classList.toggle('below', below);
+    tip.style.left = center + 'px';
+    tip.style.top = (below ? box.bottom + GAP : above) + 'px';
+  }
+
+  document.addEventListener('mouseover', function(e) {
+    var segment = e.target.closest('.lang-bar-segment');
+    if (segment) show(segment);
+    else if (active) hide();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && active) hide();
+  });
+
+  // Capture phase so a scroll inside any container repositions-by-hiding, not just
+  // one on the window.
+  window.addEventListener('scroll', function() { if (active) hide(); }, true);
 }
 
 // --- Global event listeners ---

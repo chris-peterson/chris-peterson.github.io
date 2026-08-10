@@ -23,9 +23,11 @@
           url: https://chris-peterson.github.io/beacon
           languages:
             - name: Python
-              pct: 90
+              pct: 80
+            - name: HTML
+              pct: 15
             - name: Shell
-              pct: 10
+              pct: 5
 
         - name: logbook
           description: Coding session retros committed to git
@@ -33,9 +35,9 @@
           url: https://chris-peterson.github.io/logbook
           languages:
             - name: Python
-              pct: 95
+              pct: 90
             - name: Shell
-              pct: 5
+              pct: 10
 
         - name: moor
           description: Diff viewer for reviewing AI-generated code
@@ -43,9 +45,9 @@
           url: https://chris-peterson.github.io/moor
           languages:
             - name: JavaScript
-              pct: 90
+              pct: 95
             - name: Shell
-              pct: 10
+              pct: 5
 
         - name: sextant
           description: AI-assisted SPEC-driven development
@@ -64,9 +66,9 @@
           url: https://chris-peterson.github.io/tack
           languages:
             - name: TypeScript
-              pct: 80
+              pct: 85
             - name: JavaScript
-              pct: 15
+              pct: 10
             - name: Shell
               pct: 5
 
@@ -76,9 +78,9 @@
           url: https://chris-peterson.github.io/ClaudeWatch
           languages:
             - name: Shell
-              pct: 80
+              pct: 65
             - name: Python
-              pct: 20
+              pct: 35
 
         - name: shipshape
           description: Keep your Claude Code plugins up to date
@@ -90,6 +92,24 @@
               source: manual
             - name: Shell
               pct: 30
+
+        - name: cleat
+          description: One AGENTS.md every coding agent reads
+          icon: https://chris-peterson.github.io/cleat/favicon.svg
+          url: https://chris-peterson.github.io/cleat
+          languages:
+            - name: Shell
+              pct: 55
+            - name: Python
+              pct: 45
+
+    - name: shipyard
+      description: Shared build tooling for Claude Code plugins
+      icon: https://chris-peterson.github.io/shipyard/favicon.svg
+      url: https://chris-peterson.github.io/shipyard
+      languages:
+        - name: Python
+          pct: 100
 
 - group: PowerShell Modules
   description: Modules for automating workflows

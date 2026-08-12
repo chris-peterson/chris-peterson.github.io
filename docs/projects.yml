@@ -2,6 +2,7 @@
   description: AI-assisted development
   children:
     - name: claude-marketplace
+      label: bridge.ai
       description: Plugins, skills, and tooling for Claude Code
       icon: https://chris-peterson.github.io/claude-marketplace/favicon.svg
       url: https://chris-peterson.github.io/claude-marketplace/#/

@@ -163,6 +163,25 @@
   position: relative;
 }
 
+/* A project's ancestors from projects.yml, between the org and the repo. Plain
+   links rather than the repo toggle's button chrome, so the current repo stays
+   the emphasized node. */
+.breadcrumb-ancestor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-color);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-ancestor:hover {
+  color: var(--base-color);
+  text-decoration: none;
+}
+
 .breadcrumb-repo-icon {
   width: 16px;
   height: 16px;

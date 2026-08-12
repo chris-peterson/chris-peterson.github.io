@@ -153,7 +153,7 @@ function initProject(config) {
   function loadNext(i) {
     if (i >= steps.length) {
       initCopyButtons();
-      initBreadcrumb();
+      initBreadcrumb(config);
       // docsify doesn't re-scroll when only ?id= changes on the same page path,
       // so same-page anchor clicks (sidebar sub-headings, heading permalinks)
       // land nowhere. Handle hashchange ourselves: if the target is already in
@@ -597,6 +597,10 @@ function parseProjectsYaml(text) {
     if (current) {
       if (stripped.indexOf('description:') === 0) {
         current.description = stripped.substring(12).trim();
+      } else if (stripped.indexOf('label:') === 0) {
+        // What the breadcrumb calls this project, when the repo name isn't the
+        // name people use for it (claude-marketplace is bridge.ai to a reader).
+        current.label = stripped.substring(6).trim();
       } else if (stripped.indexOf('icon:') === 0) {
         current.icon = stripped.substring(5).trim();
       } else if (stripped.indexOf('url:') === 0) {
@@ -650,14 +654,52 @@ function loadProjects() {
   return _projectsPromise;
 }
 
-function initBreadcrumb() {
+function initBreadcrumb(config) {
   loadProjects()
     .then(function(projects) {
       var dropdown = document.getElementById('repoDropdownContainer');
       if (!dropdown) return;
       dropdown.innerHTML = renderDropdownTree(projects, 0);
+      renderAncestry(projects, config);
     })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });
+}
+
+// projects.yml already nests a project under the thing it belongs to — a plugin
+// under the marketplace, a module under its suite. Show that in the breadcrumb
+// (chris-peterson / bridge.ai / anchor) so membership is stated once, where a
+// reader looks for it, instead of as a badge on each page.
+function ancestorsOf(items, name, trail) {
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var here = item.group ? trail : trail.concat([item]);
+    if (!item.group && item.name === name) return trail;
+    if (item.children) {
+      var found = ancestorsOf(item.children, name, here);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function renderAncestry(projects, config) {
+  var selector = document.getElementById('repoSelector');
+  if (!selector || !config || !config.name) return;
+  var ancestors = ancestorsOf(projects, config.name, []);
+  if (!ancestors || !ancestors.length) return;
+  ancestors.forEach(function(a) {
+    var node = document.createElement('a');
+    node.className = 'breadcrumb-ancestor';
+    node.href = a.url || '#';
+    var icon = resolveHubPath(a.icon || (a.url + '/favicon.svg'));
+    node.innerHTML = '<img class="breadcrumb-repo-icon" src="' + icon + '" alt="" width="16" height="16"> ' +
+      (a.label || a.name);
+    var slash = document.createElement('span');
+    slash.className = 'breadcrumb-separator';
+    slash.textContent = '/';
+    selector.parentNode.insertBefore(node, selector);
+    selector.parentNode.insertBefore(slash, selector);
+  });
 }
 
 function renderDropdownTree(items, depth) {

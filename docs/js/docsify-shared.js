@@ -27,6 +27,19 @@ var PLUGIN_CATALOG = {
 
 // --- Public init ---
 
+// Where the shared assets (theme CSS, projects.yml) come from: relative on the
+// hub itself and on a dev server, the hub's origin from a project sub-site.
+//
+// Loopback has three spellings and a dev server may be on any of them, so this
+// tests all of them rather than `hostname === 'localhost'`: served from
+// 127.0.0.1, a local edit to theme.css would silently load the deployed one
+// instead, and the page looks untouched with nothing to say why.
+function localAssetOrigin() {
+  var loopback = ['localhost', '127.0.0.1', '[::1]', '::1'];
+  return window.location.origin === HUB_ORIGIN ||
+    loopback.indexOf(window.location.hostname) !== -1 ? '' : HUB_ORIGIN;
+}
+
 function initProject(config) {
   window.$docsify = window.$docsify || {};
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
@@ -59,7 +72,7 @@ function initProject(config) {
     }
   });
 
-  var cssOrigin = window.location.origin === HUB_ORIGIN || window.location.hostname === 'localhost' ? '' : HUB_ORIGIN;
+  var cssOrigin = localAssetOrigin();
   [
     'https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.min.css',
     'https://cdn.jsdelivr.net/npm/prism-themes@1/themes/prism-dracula.min.css',
@@ -632,13 +645,13 @@ function flattenProjects(projects) {
 
 var _projectsPromise = null;
 
-// Hub-relative paths in projects.yml load from localhost during dev, from the hub on the hub site,
+// Hub-relative paths in projects.yml load locally during dev, from the hub on the hub site,
 // and from the hub when consumed cross-origin from a sub-project site.
 function resolveHubPath(path) {
   if (!path) return '';
   if (/^[a-z]+:\/\//i.test(path)) return path;
   if (path.charAt(0) !== '/') return path;
-  var origin = window.location.origin === HUB_ORIGIN || window.location.hostname === 'localhost' ? '' : HUB_ORIGIN;
+  var origin = localAssetOrigin();
   return origin + path;
 }
 

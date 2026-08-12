@@ -33,7 +33,10 @@
   --link-color--hover: var(--color-pink);
   --code-inline-background: var(--color-current-line);
   --code-inline-color: var(--color-green);
-  --code-theme-background: light-dark(#f5f5f5, #282a36);
+  /* A step off --color-background, not equal to it: in dark these were the same
+     #282a36, so a code block was an invisible panel and its padding read as void
+     rather than as a block with room around its text. */
+  --code-theme-background: light-dark(#eeeeea, #1e1f28);
   --code-theme-text: var(--color-foreground);
   --blockquote-border-color: var(--color-purple);
   --blockquote-background: var(--color-current-line);
@@ -72,8 +75,21 @@
   --toggle-inactive-color: var(--muted-color);
   --kbd-bg: light-dark(rgba(0,0,0,0.06), rgba(255,255,255,0.06));
 
-  /* Sidebar width */
-  --sidebar-width: 25vw;
+  /* Sidebar width. Proportional so it keeps its share on a laptop, capped so a
+     wide display doesn't spend 500px on a nav list — past the cap the width the
+     page gains goes to the content. Dragging the handle still overrides it. */
+  --sidebar-width: min(25vw, 340px);
+
+  /* Vertical rhythm, over docsify-themeable's defaults. The pages here run to
+     tables and code as much as prose, and the defaults spread them over more
+     scrolling than the content earns. Most of the air was inside the blocks
+     rather than between them: a 28px heading sat in a 48px line box, and a code
+     block carried 27px above its first line, so a heading and the code under it
+     read as separated by ~50px of white where the margin says 15. */
+  --heading-margin: 1.85rem 0 0;
+  --heading-h2-margin: 1.85rem 0 0.9rem;
+  --heading-h3-margin: 1.5rem 0 0.75rem;
+  --code-block-padding: 1em 1.25em;
 
   /* Height the project-card language stripe expands to on hover. The tooltip
      reads it to place itself, so the two can't drift apart. */
@@ -424,10 +440,34 @@
 }
 
 
+/* Past the width where the measure stops being the constraint, the slack turns
+   into gutter — on a 2000px display the sidebar sat 380px from the text it
+   belongs to. Widen the column there so the extra width reaches the tables and
+   code that want it, and cap the prose inside it: a paragraph running the full
+   1100px is 139 characters a line, which is not a reading measure. */
+@media (min-width: 1600px) {
+  :root { --content-max-width: 76em; }
+
+  .markdown-section > p,
+  .markdown-section > ul,
+  .markdown-section > ol,
+  .markdown-section > blockquote,
+  .markdown-section > .ph-lede { max-width: 50em; }
+}
+
 /* Remove horizontal lines/dividers under headings */
 .markdown-section h1,
 .markdown-section h2 {
   border-bottom: none !important;
+}
+
+/* Headings inherit the body's 1.7, which on a 28px h2 is 20px of leading baked
+   into the heading before its margins are counted. Display sizes need less. */
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3,
+.markdown-section h4 {
+  line-height: 1.25;
 }
 
 .markdown-section hr {

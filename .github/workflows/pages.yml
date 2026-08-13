@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-    paths: [docs/**]
+    paths: [docs/**, scripts/refresh-blog.py]
   workflow_dispatch:
 
 permissions:
@@ -23,6 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      # The deployed post list comes from the files in docs/blog/, not from
+      # whoever last remembered to run the recipe. A post with no date prefix or
+      # no heading fails the deploy rather than shipping a half-built index.
+      - name: Refresh the blog index
+        run: python3 scripts/refresh-blog.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

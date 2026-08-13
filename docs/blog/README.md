@@ -1,7 +1,9 @@
 # Blog
 
-Notes on AI-assisted software development, and what the work actually looks like day to day.
+I've been programming since 2003; I still learn new things every day.
 
 ## Posts
 
-- **2026-08-12** — [Run the retro before the context is gone](/blog/2026-08-12-retro-in-context.md)
+<!-- generated from blog/*; the deploy regenerates it, `just refresh-blog` locally -->
+- **2026-08-13** — [Launching Blog](/blog/2026-08-13-first.md)
+<!-- /generated -->

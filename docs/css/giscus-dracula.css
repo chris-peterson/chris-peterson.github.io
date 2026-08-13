@@ -1,0 +1,105 @@
+/*
+ * Dracula theme for the giscus widget, passed as data-theme so the comments
+ * iframe uses the site's palette instead of GitHub's.
+ *
+ * giscus scopes a theme to `main` and reads GitHub's primer variable names;
+ * the values here are the same Dracula palette as css/theme.css. The canvas is
+ * transparent so the widget sits on the page background rather than painting a
+ * near-miss of it.
+ *
+ * Structure derived from giscus' own dark theme, MIT-licensed:
+ * https://github.com/primer/primitives/blob/main/LICENSE
+ */
+
+main {
+  --color-prettylights-syntax-comment: #9099b8;
+  --color-prettylights-syntax-constant: #bd93f9;
+  --color-prettylights-syntax-entity: #50fa7b;
+  --color-prettylights-syntax-storage-modifier-import: #f8f8f2;
+  --color-prettylights-syntax-entity-tag: #ff79c6;
+  --color-prettylights-syntax-keyword: #ff79c6;
+  --color-prettylights-syntax-string: #f1fa8c;
+  --color-prettylights-syntax-variable: #ffb86c;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #ff5555;
+  --color-prettylights-syntax-invalid-illegal-text: #f8f8f2;
+  --color-prettylights-syntax-invalid-illegal-bg: #6b1f1f;
+  --color-prettylights-syntax-carriage-return-text: #f8f8f2;
+  --color-prettylights-syntax-carriage-return-bg: #8b2b2b;
+  --color-prettylights-syntax-string-regexp: #50fa7b;
+  --color-prettylights-syntax-markup-list: #f1fa8c;
+  --color-prettylights-syntax-markup-heading: #bd93f9;
+  --color-prettylights-syntax-markup-italic: #f8f8f2;
+  --color-prettylights-syntax-markup-bold: #f8f8f2;
+  --color-prettylights-syntax-markup-deleted-text: #ffd7d7;
+  --color-prettylights-syntax-markup-deleted-bg: #4a1c1c;
+  --color-prettylights-syntax-markup-inserted-text: #c8ffd8;
+  --color-prettylights-syntax-markup-inserted-bg: #14361f;
+  --color-prettylights-syntax-markup-changed-text: #ffe3c0;
+  --color-prettylights-syntax-markup-changed-bg: #4a3115;
+  --color-prettylights-syntax-markup-ignored-text: #f8f8f2;
+  --color-prettylights-syntax-markup-ignored-bg: #3b3f57;
+  --color-prettylights-syntax-meta-diff-range: #bd93f9;
+  --color-prettylights-syntax-brackethighlighter-angle: #9099b8;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #6272a4;
+  --color-prettylights-syntax-constant-other-reference-link: #8be9fd;
+  --color-btn-text: #f8f8f2;
+  --color-btn-bg: #44475a;
+  --color-btn-border: rgb(248 248 242 / 12%);
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-inset-shadow: 0 0 transparent;
+  --color-btn-hover-bg: #565973;
+  --color-btn-hover-border: #9099b8;
+  --color-btn-active-bg: #3c3f52;
+  --color-btn-active-border: #6272a4;
+  --color-btn-selected-bg: #21222c;
+  --color-btn-primary-text: #282a36;
+  --color-btn-primary-bg: #50fa7b;
+  --color-btn-primary-border: rgb(40 42 54 / 15%);
+  --color-btn-primary-shadow: 0 0 transparent;
+  --color-btn-primary-inset-shadow: 0 0 transparent;
+  --color-btn-primary-hover-bg: #6dfb90;
+  --color-btn-primary-hover-border: rgb(40 42 54 / 15%);
+  --color-btn-primary-selected-bg: #3fe069;
+  --color-btn-primary-selected-shadow: 0 0 transparent;
+  --color-btn-primary-disabled-text: rgb(40 42 54 / 60%);
+  --color-btn-primary-disabled-bg: rgb(80 250 123 / 45%);
+  --color-btn-primary-disabled-border: rgb(40 42 54 / 15%);
+  --color-action-list-item-default-hover-bg: rgb(189 147 249 / 14%);
+  --color-segmented-control-bg: rgb(68 71 90 / 45%);
+  --color-segmented-control-button-bg: #282a36;
+  --color-segmented-control-button-selected-border: #bd93f9;
+  --color-fg-default: #f8f8f2;
+  --color-fg-muted: #9099b8;
+  --color-fg-subtle: #6272a4;
+  --color-canvas-default: transparent;
+  --color-canvas-overlay: #21222c;
+  --color-canvas-inset: #21222c;
+  --color-canvas-subtle: rgb(68 71 90 / 40%);
+  --color-border-default: rgb(248 248 242 / 16%);
+  --color-border-muted: rgb(248 248 242 / 10%);
+  --color-neutral-muted: rgb(98 114 164 / 40%);
+  --color-accent-fg: #8be9fd;
+  --color-accent-emphasis: #bd93f9;
+  --color-accent-muted: rgb(139 233 253 / 40%);
+  --color-accent-subtle: rgb(139 233 253 / 12%);
+  --color-success-fg: #50fa7b;
+  --color-attention-fg: #f1fa8c;
+  --color-attention-muted: rgb(241 250 140 / 40%);
+  --color-attention-subtle: rgb(241 250 140 / 15%);
+  --color-danger-fg: #ff5555;
+  --color-danger-muted: rgb(255 85 85 / 40%);
+  --color-danger-subtle: rgb(255 85 85 / 12%);
+  --color-primer-shadow-inset: 0 0 transparent;
+
+  /*! Extensions from @primer/css/alerts/flash.scss */
+  --color-social-reaction-bg-hover: #44475a;
+  --color-social-reaction-bg-reacted-hover: rgb(189 147 249 / 28%);
+}
+
+main .pagination-loader-container {
+  background-image: url("https://github.com/images/modules/pulls/progressive-disclosure-line-dark.svg");
+}
+
+main .gsc-loading-image {
+  background-image: url("https://github.githubassets.com/images/mona-loading-dark.gif");
+}

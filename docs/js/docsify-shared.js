@@ -1,5 +1,16 @@
 var HUB_ORIGIN = 'https://chris-peterson.github.io';
 
+var GISCUS_ORIGIN = 'https://giscus.app';
+
+// The widget renders inside an iframe served by giscus.app, so a theme it loads
+// has to be fetchable from there — a dev server on loopback isn't. These stay on
+// the hub's origin for that reason, unlike everything else that goes through
+// localAssetOrigin(): a local edit to them shows up only once it's deployed.
+var GISCUS_THEMES = {
+  dark: HUB_ORIGIN + '/css/giscus-dracula.css',
+  light: HUB_ORIGIN + '/css/giscus-alucard.css'
+};
+
 var ICONS = {
   bars: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>',
   search: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
@@ -159,6 +170,7 @@ function initProject(config) {
   initTheme();
   if (!isHub || sidebarMode) initSearch();
   initProjectCards();
+  initComments(config.comments);
   initLangTooltip();
   if (sidebarMode) initSidebarProjects();
   initEventListeners();
@@ -222,6 +234,7 @@ function toggleTheme() {
   html.style.colorScheme = newScheme;
   toggle.setAttribute('data-scheme', newScheme);
   localStorage.setItem('theme', newScheme);
+  syncCommentsTheme(newScheme);
 
   if (typeof mermaid !== 'undefined') {
     var mermaidTheme = newScheme === 'light' ? 'default' : 'dark';
@@ -841,6 +854,103 @@ function initProjectCards() {
         .catch(function(err) { console.error('Failed to render project cards:', err); });
     });
   });
+}
+
+// '#/blog/a-post.md?id=a-heading' -> '/blog/a-post'. The route is what a
+// discussion is keyed on, so it has to survive both spellings of a link (with
+// and without the .md) and any heading anchor on the end.
+function currentRoute() {
+  var route = (window.location.hash || '#/').replace(/^#/, '').split('?')[0];
+  return route.replace(/\.md$/, '') || '/';
+}
+
+function currentScheme() {
+  return document.documentElement.style.colorScheme === 'light' ? 'light' : 'dark';
+}
+
+// Comments and reactions come from GitHub Discussions via giscus, on the pages
+// named by `comments.paths`. Each route gets its own discussion, created on the
+// first comment or reaction.
+function initComments(comments) {
+  if (!comments || !window.$docsify) return;
+
+  window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+    hook.doneEach(function() { mountComments(comments); });
+  });
+}
+
+function mountComments(comments) {
+  var content = document.querySelector('.markdown-section');
+  if (!content) return;
+
+  var route = currentRoute();
+  // A section's own index (/blog/) lists what's in it; the discussion belongs on
+  // the page being discussed, so a route has to be *under* one of the paths.
+  var wanted = (comments.paths || ['/']).some(function(path) {
+    return route.indexOf(path) === 0 && route !== path;
+  });
+
+  var existing = content.querySelector('.page-comments');
+  if (existing && existing.dataset.route === route) return; // already mounted; leave the iframe alone
+  if (existing) existing.remove();
+  if (!wanted) return;
+
+  var section = document.createElement('section');
+  section.className = 'page-comments';
+  section.dataset.route = route;
+  section.innerHTML = '<h2 class="page-comments-heading">Comments</h2>';
+
+  var container = document.createElement('div');
+  container.className = 'giscus';
+  // client.js hands giscus the page URL with the fragment stripped, then puts
+  // this id back on the end as an anchor — and giscus keeps a `#/`-prefixed
+  // anchor intact, reading it as an SPA route rather than an in-page target.
+  // Naming the container after the route is what returns a reader to the post
+  // they signed in from, and what a new discussion links back to.
+  container.id = route;
+  section.appendChild(container);
+  content.appendChild(section);
+
+  // The link a new discussion carries back to the page. client.js reads it from
+  // this meta tag, and falls back to the page URL with the fragment stripped —
+  // which on a hash-routed site is every post pointing at the site root.
+  var backlink = document.querySelector('meta[name="giscus:backlink"]') ||
+    document.head.appendChild(document.createElement('meta'));
+  backlink.name = 'giscus:backlink';
+  backlink.content = window.location.origin + window.location.pathname + '#' + route;
+
+  var script = document.createElement('script');
+  script.src = GISCUS_ORIGIN + '/client.js';
+  script.async = true;
+  script.crossOrigin = 'anonymous';
+  var settings = {
+    repo: comments.repo,
+    repoId: comments.repoId,
+    category: comments.category,
+    categoryId: comments.categoryId,
+    // Titles get reworded; a route doesn't, so the discussion stays attached to
+    // the page across an edit. `strict` matches on a hash of the title rather
+    // than GitHub's fuzzy search, which pairs dated post slugs by their prefix.
+    mapping: 'specific',
+    term: route.replace(/^\//, ''),
+    strict: '1',
+    reactionsEnabled: '1',
+    emitMetadata: '0',
+    inputPosition: 'top',
+    theme: GISCUS_THEMES[currentScheme()],
+    lang: 'en',
+    loading: 'lazy'
+  };
+  Object.keys(settings).forEach(function(key) { script.dataset[key] = settings[key]; });
+  section.appendChild(script);
+}
+
+// The widget is cross-origin, so the day/night toggle can't restyle it — it can
+// only ask it to load the other theme.
+function syncCommentsTheme(scheme) {
+  var frame = document.querySelector('iframe.giscus-frame');
+  if (!frame || !frame.contentWindow) return;
+  frame.contentWindow.postMessage({ giscus: { setConfig: { theme: GISCUS_THEMES[scheme] } } }, GISCUS_ORIGIN);
 }
 
 // A narrow language segment has room for a bare percentage at best, so the

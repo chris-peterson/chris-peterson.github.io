@@ -534,3 +534,20 @@ pre[data-lang]::after {
   55% { transform: scale(1.25); }
   100% { transform: scale(1); }
 }
+
+/* Comments (giscus). The rule is what separates the discussion from the article
+   — `hr` is hidden site-wide, and the giscus themes draw on a transparent
+   canvas, so without it the widget reads as more of the post. */
+.page-comments {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* The heading is injected rather than written in the markdown, so it labels the
+   section without competing with the post's own h2s. */
+.markdown-section .page-comments-heading {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+  color: var(--muted-color);
+}

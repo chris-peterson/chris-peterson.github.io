@@ -42,6 +42,14 @@ The site is a [Docsify](https://docsify.js.org/) SPA using Dracula/Alucard themi
 <sup><span style="display:inline-block;width:12px;height:12px;background:#bd93f9;border-radius:2px"></span> Hub repo (this repo) · <span style="display:inline-block;width:12px;height:12px;background:#8be9fd;border-radius:2px"></span> Hosted repo (project-specific content)</sup>
 
 
+## Comments
+
+Blog posts carry comments and reactions from this repo's GitHub Discussions, through [giscus](https://giscus.app). A post's route is its discussion — `/blog/a-post` looks for a discussion titled `blog/a-post` in the General category, and the first comment or reaction creates it. Titles get reworded and routes don't, which is why the route is the key.
+
+Which pages get the widget, and which repo holds the discussions, is the `comments` block in `docs/index.html`; `giscus.json` limits which origins may load those discussions. The widget follows the day/night toggle via `docs/css/giscus-dracula.css` and `giscus-alucard.css` — giscus fetches those from the deployed site, so an edit to them shows up only once it's pushed.
+
+Discussions and the [giscus app](https://github.com/apps/giscus) both have to stay enabled on the repo; without the app, the widget renders but can't post.
+
 ## Local Testing
 
 ```bash

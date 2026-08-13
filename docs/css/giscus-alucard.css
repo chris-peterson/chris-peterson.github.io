@@ -1,0 +1,101 @@
+/*
+ * Alucard (light) theme for the giscus widget — the light half of
+ * giscus-dracula.css, matching the light values css/theme.css picks with
+ * light-dark(). See that file for the reasoning; this one only swaps values.
+ *
+ * Structure derived from giscus' own light theme, MIT-licensed:
+ * https://github.com/primer/primitives/blob/main/LICENSE
+ */
+
+main {
+  --color-prettylights-syntax-comment: #5a6896;
+  --color-prettylights-syntax-constant: #7c3aed;
+  --color-prettylights-syntax-entity: #16a34a;
+  --color-prettylights-syntax-storage-modifier-import: #282a36;
+  --color-prettylights-syntax-entity-tag: #db2777;
+  --color-prettylights-syntax-keyword: #db2777;
+  --color-prettylights-syntax-string: #16a34a;
+  --color-prettylights-syntax-variable: #ea580c;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #dc2626;
+  --color-prettylights-syntax-invalid-illegal-text: #f8f8f2;
+  --color-prettylights-syntax-invalid-illegal-bg: #b91c1c;
+  --color-prettylights-syntax-carriage-return-text: #f8f8f2;
+  --color-prettylights-syntax-carriage-return-bg: #dc2626;
+  --color-prettylights-syntax-string-regexp: #16a34a;
+  --color-prettylights-syntax-markup-list: #ca8a04;
+  --color-prettylights-syntax-markup-heading: #7c3aed;
+  --color-prettylights-syntax-markup-italic: #282a36;
+  --color-prettylights-syntax-markup-bold: #282a36;
+  --color-prettylights-syntax-markup-deleted-text: #7f1d1d;
+  --color-prettylights-syntax-markup-deleted-bg: #fee2e2;
+  --color-prettylights-syntax-markup-inserted-text: #14532d;
+  --color-prettylights-syntax-markup-inserted-bg: #dcfce7;
+  --color-prettylights-syntax-markup-changed-text: #7c2d12;
+  --color-prettylights-syntax-markup-changed-bg: #ffedd5;
+  --color-prettylights-syntax-markup-ignored-text: #f8f8f2;
+  --color-prettylights-syntax-markup-ignored-bg: #7c3aed;
+  --color-prettylights-syntax-meta-diff-range: #7c3aed;
+  --color-prettylights-syntax-brackethighlighter-angle: #5a6896;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #9aa0b8;
+  --color-prettylights-syntax-constant-other-reference-link: #0891b2;
+  --color-btn-text: #282a36;
+  --color-btn-bg: #ffffff;
+  --color-btn-border: rgb(40 42 54 / 18%);
+  --color-btn-shadow: 0 1px 0 rgb(40 42 54 / 4%);
+  --color-btn-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 25%);
+  --color-btn-hover-bg: #eeeeea;
+  --color-btn-hover-border: rgb(40 42 54 / 25%);
+  --color-btn-active-bg: #e6e6e6;
+  --color-btn-active-border: rgb(40 42 54 / 25%);
+  --color-btn-selected-bg: #e6e6e6;
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-bg: #16a34a;
+  --color-btn-primary-border: rgb(40 42 54 / 15%);
+  --color-btn-primary-shadow: 0 1px 0 rgb(40 42 54 / 10%);
+  --color-btn-primary-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 3%);
+  --color-btn-primary-hover-bg: #15803d;
+  --color-btn-primary-hover-border: rgb(40 42 54 / 15%);
+  --color-btn-primary-selected-bg: #15803d;
+  --color-btn-primary-selected-shadow: inset 0 1px 0 rgb(0 45 17 / 20%);
+  --color-btn-primary-disabled-text: rgb(255 255 255 / 80%);
+  --color-btn-primary-disabled-bg: rgb(22 163 74 / 50%);
+  --color-btn-primary-disabled-border: rgb(40 42 54 / 15%);
+  --color-action-list-item-default-hover-bg: rgb(124 58 237 / 10%);
+  --color-segmented-control-bg: #e6e6e6;
+  --color-segmented-control-button-bg: #ffffff;
+  --color-segmented-control-button-selected-border: #7c3aed;
+  --color-fg-default: #282a36;
+  --color-fg-muted: #5a6896;
+  --color-fg-subtle: #767d99;
+  --color-canvas-default: transparent;
+  --color-canvas-overlay: #ffffff;
+  --color-canvas-inset: #eeeeea;
+  --color-canvas-subtle: rgb(40 42 54 / 5%);
+  --color-border-default: rgb(40 42 54 / 15%);
+  --color-border-muted: rgb(40 42 54 / 10%);
+  --color-neutral-muted: rgb(40 42 54 / 12%);
+  --color-accent-fg: #0891b2;
+  --color-accent-emphasis: #7c3aed;
+  --color-accent-muted: rgb(8 145 178 / 40%);
+  --color-accent-subtle: rgb(8 145 178 / 10%);
+  --color-success-fg: #16a34a;
+  --color-attention-fg: #ca8a04;
+  --color-attention-muted: rgb(202 138 4 / 40%);
+  --color-attention-subtle: rgb(202 138 4 / 15%);
+  --color-danger-fg: #dc2626;
+  --color-danger-muted: rgb(220 38 38 / 40%);
+  --color-danger-subtle: rgb(220 38 38 / 10%);
+  --color-primer-shadow-inset: inset 0 1px 0 rgb(40 42 54 / 8%);
+
+  /*! Extensions from @primer/css/alerts/flash.scss */
+  --color-social-reaction-bg-hover: #e6e6e6;
+  --color-social-reaction-bg-reacted-hover: rgb(124 58 237 / 18%);
+}
+
+main .pagination-loader-container {
+  background-image: url("https://github.com/images/modules/pulls/progressive-disclosure-line.svg");
+}
+
+main .gsc-loading-image {
+  background-image: url("https://github.githubassets.com/images/mona-loading-default.gif");
+}

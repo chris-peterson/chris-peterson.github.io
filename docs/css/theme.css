@@ -535,6 +535,40 @@ pre[data-lang]::after {
   100% { transform: scale(1); }
 }
 
+/* The line over a post's title: its date, and the way back to the index. Small
+   and letter-spaced against the title so it reads as a masthead rather than as
+   the post's first sentence. */
+.markdown-section .post-kicker {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-color);
+}
+
+.markdown-section .post-kicker a {
+  color: var(--muted-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.markdown-section .post-kicker a:hover {
+  color: var(--theme-color);
+  text-decoration: none;
+}
+
+.post-kicker-sep {
+  opacity: 0.4;
+}
+
+.markdown-section .post-kicker + h1 {
+  margin-top: 0;
+}
+
 /* Comments (giscus). The rule is what separates the discussion from the article
    — `hr` is hidden site-wide, and the giscus themes draw on a transparent
    canvas, so without it the widget reads as more of the post. */

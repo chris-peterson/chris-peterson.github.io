@@ -20,8 +20,18 @@ var ICONS = {
   chevronDown: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>',
   chevronRight: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>',
   toggleSun: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
-  toggleMoon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+  toggleMoon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  blog: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a1 1 0 0 1 1-1h13v18H6a1 1 0 0 1-1-1z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>'
 };
+
+// The blog lives on the hub, under this route. The titlebar link, the sidebar
+// nav, and each post's chrome key off it.
+var BLOG_ROOT = '/blog/';
+
+var POST_ROUTE = new RegExp('^' + BLOG_ROOT + '(\\d{4})-(\\d{2})-(\\d{2})-');
+
+var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+  'August', 'September', 'October', 'November', 'December'];
 
 var PLUGIN_CATALOG = {
   mermaid: [
@@ -66,8 +76,17 @@ function initProject(config) {
     coverpage: false,
     notFoundPage: true,
     relativePath: false,
-    alias: { '/.*/_sidebar.md': '/_sidebar.md' },
-    hideSidebar: isHub && !sidebarMode,
+    // Nested pages share the root sidebar. The blog keeps its own generated
+    // post list, which it opts out with by aliasing to itself: docsify takes the
+    // first matching key and stops once a rewrite leaves the path alone.
+    alias: {
+      '/blog/_sidebar.md': '/blog/_sidebar.md',
+      '/.*/_sidebar.md': '/_sidebar.md'
+    },
+    // The hub's sidebar earns its width on some routes and not others, so CSS
+    // decides per route (initBlogChrome). docsify's own flag would rip the
+    // sidebar out of the DOM on first render, with no way back for the next one.
+    hideSidebar: false,
     search: {
       placeholder: 'Search...',
       noData: 'No results',
@@ -171,6 +190,7 @@ function initProject(config) {
   if (!isHub || sidebarMode) initSearch();
   initProjectCards();
   initComments(config.comments);
+  initBlogChrome(isHub, sidebarMode);
   initLangTooltip();
   if (sidebarMode) initSidebarProjects();
   initEventListeners();
@@ -278,6 +298,10 @@ function buildTitlebarDOM(config) {
       navSection +
       '<div class="titlebar-spacer"></div>' +
       '<div class="titlebar-actions">' +
+        '<a href="' + (isHub ? '#' + BLOG_ROOT : HUB_ORIGIN + '/#' + BLOG_ROOT) + '"' +
+          ' class="titlebar-nav-link" id="titlebarBlog" title="Blog">' +
+          ICONS.blog + '<span class="titlebar-nav-label">Blog</span>' +
+        '</a>' +
         (isHub ? '' :
         '<div class="titlebar-search" id="titlebarSearch">' +
           '<div class="titlebar-search-trigger" title="Search">' +
@@ -951,6 +975,65 @@ function syncCommentsTheme(scheme) {
   var frame = document.querySelector('iframe.giscus-frame');
   if (!frame || !frame.contentWindow) return;
   frame.contentWindow.postMessage({ giscus: { setConfig: { theme: GISCUS_THEMES[scheme] } } }, GISCUS_ORIGIN);
+}
+
+// What surrounds the blog rather than sits inside it: the titlebar link's active
+// state, whether the hub's sidebar is worth its width on this route, and the
+// kicker over each post. All three follow the route, so a post file holds
+// nothing but the post.
+function initBlogChrome(isHub, sidebarMode) {
+  if (!window.$docsify) return;
+
+  window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+    hook.doneEach(function() {
+      var route = currentRoute();
+      var inBlog = route.indexOf(BLOG_ROOT) === 0;
+
+      var link = document.getElementById('titlebarBlog');
+      if (link) link.classList.toggle('active', inBlog);
+
+      // The hub's sidebar has the post list to show in the blog and the project
+      // tree in ?mode=sidebar. Elsewhere it has nothing to say, so the page
+      // takes the width back rather than running beside an empty rail.
+      if (isHub) {
+        document.body.classList.toggle('sidebar-hidden', !(inBlog || sidebarMode));
+      }
+
+      renderPostKicker(route);
+    });
+  });
+}
+
+// '/blog/2026-08-23-too-much' -> ['2026-08-23', 'August 23, 2026']. Assembled
+// from the parts rather than through Date, which reads a date-only string as UTC
+// midnight and so prints the day before anywhere west of it.
+function postDate(route) {
+  var parts = route.match(POST_ROUTE);
+  if (!parts) return null;
+  return [
+    parts[1] + '-' + parts[2] + '-' + parts[3],
+    MONTHS[+parts[2] - 1] + ' ' + +parts[3] + ', ' + parts[1]
+  ];
+}
+
+function renderPostKicker(route) {
+  var content = document.querySelector('.markdown-section');
+  if (!content) return;
+
+  var existing = content.querySelector('.post-kicker');
+  if (existing) existing.remove();
+
+  var date = postDate(route);
+  var heading = content.querySelector('h1');
+  if (!date || !heading) return;
+
+  var kicker = document.createElement('p');
+  kicker.className = 'post-kicker';
+  kicker.innerHTML =
+    '<a href="#' + BLOG_ROOT + '">← Blog</a>' +
+    '<span class="post-kicker-sep">·</span>' +
+    '<time datetime="' + date[0] + '">' + date[1] + '</time>';
+  heading.parentNode.insertBefore(kicker, heading);
 }
 
 // A narrow language segment has room for a bare percentage at best, so the

@@ -53,6 +53,20 @@
   transition: width 0.2s ease;
 }
 
+/* Routes where the sidebar has nothing to list: the rail, its handle, and the
+   button that opens it all go, and the page takes the width. */
+body.sidebar-hidden .sidebar,
+body.sidebar-hidden .sidebar-resize-handle,
+body.sidebar-hidden .mobile-menu-toggle {
+  display: none !important;
+}
+
+/* The theme indents the content by the rail's width (`.sidebar + .content`), and
+   the rail is gone. */
+body.sidebar-hidden .content {
+  margin-left: 0 !important;
+}
+
 /* Sidebar resize handle */
 .sidebar-resize-handle {
   position: fixed;
@@ -360,6 +374,36 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* ── Nav links ──────────────────────────────────────── */
+
+.titlebar-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  color: var(--muted-color);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.titlebar-nav-link:hover {
+  background: var(--button-bg);
+  color: var(--base-color);
+  text-decoration: none;
+}
+
+.titlebar-nav-link.active {
+  background: var(--button-bg);
+  color: var(--theme-color);
+}
+
+.titlebar-nav-link svg {
+  opacity: 0.75;
 }
 
 /* ── Search ─────────────────────────────────────────── */
@@ -690,7 +734,12 @@ section.content {
   }
 
   .search-hint,
-  .search-kbd {
+  .search-kbd,
+  .titlebar-nav-label {
     display: none;
+  }
+
+  .titlebar-nav-link {
+    padding: 5px 7px;
   }
 }

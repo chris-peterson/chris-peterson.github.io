@@ -30,26 +30,6 @@
             - name: Shell
               pct: 5
 
-        - name: logbook
-          description: Coding session retros committed to git
-          icon: https://chris-peterson.github.io/logbook/favicon.svg
-          url: https://chris-peterson.github.io/logbook
-          languages:
-            - name: Python
-              pct: 90
-            - name: Shell
-              pct: 10
-
-        - name: moor
-          description: Diff viewer for reviewing AI-generated code
-          icon: https://chris-peterson.github.io/moor/favicon.svg
-          url: https://chris-peterson.github.io/moor
-          languages:
-            - name: JavaScript
-              pct: 95
-            - name: Shell
-              pct: 5
-
         - name: sextant
           description: AI-assisted SPEC-driven development
           icon: https://chris-peterson.github.io/sextant/favicon.svg

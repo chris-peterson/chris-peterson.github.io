@@ -8,7 +8,18 @@ https://chris-peterson.github.io | [source](https://github.com/chris-peterson/ch
 
 The site is a [Docsify](https://docsify.js.org/) SPA using Dracula/Alucard theming with a day/night toggle. The `docs/` directory is deployed to GitHub Pages via GitHub Actions, and the only thing the deploy builds is the blog index.
 
-**Hub pattern** -- this site serves shared assets (theme CSS, titlebar, docsify-shared.js) that project sub-sites consume. The `projects.yml` manifest drives the breadcrumb repo selector across all sites.
+**Hub pattern** -- this site serves shared assets that the other sites consume. The `projects.yml` manifest drives the breadcrumb repo selector across all of them, and a project's `label` is what every surface calls it where that differs from the repo name (`claude-marketplace` is `bridge.ai` in the breadcrumb, the nav, and its card).
+
+| Asset | Who loads it |
+| --- | --- |
+| `docs/css/tokens.css` | Everyone. The Dracula/Alucard palette, the three typefaces, and the titlebar's colors -- one definition of what the family looks like. |
+| `docs/css/theme.css` | Docsify sites. Imports the tokens, then the docs skin on top. |
+| `docs/css/titlebar.css` | Everyone. |
+| `docs/js/docsify-shared.js` | Everyone. `initProject()` boots a docsify site; `initTitlebar()` puts the bar on a page that isn't one. |
+
+**bridge.ai** is hand-built rather than a docsify site. It loads `tokens.css`, `titlebar.css`, and `initTitlebar({ name: 'claude-marketplace' })` by absolute path from this origin, which is what gives it the same titlebar as the project sites. A shared asset it depends on has to deploy here first.
+
+**Type system** -- `theme.css` loads Fraunces for headings, Spline Sans for body, and JetBrains Mono for code, the same three families [bridge.ai](https://chris-peterson.github.io/claude-marketplace/#/) sets. Every sub-site loads that file, so the families are set once here for all of them.
 
 <table>
   <tr>

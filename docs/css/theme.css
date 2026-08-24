@@ -1,106 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500;600;700&family=Spline+Sans:wght@400;500;600;700&display=swap');
+@import url('tokens.css');
+
 /*
- * Dracula (dark) & Alucard (light) themes using light-dark()
- * https://draculatheme.com/contribute
- * Format: light-dark(alucard-value, dracula-value)
+ * The docsify skin: everything the shared tokens in tokens.css are spent on.
+ * A project sub-site loads this file; bridge.ai loads the tokens alone.
  */
-:root {
-  color-scheme: dark;
 
-  /* Palette colors - light-dark(alucard, dracula) */
-  --color-background:    light-dark(#f8f8f2, #282a36);
-  --color-current-line:  light-dark(#e6e6e6, #44475a);
-  --color-foreground:    light-dark(#282a36, #f8f8f2);
-  --color-comment:       light-dark(#5a6896, #9099b8);
-  /* Meets WCAG AA 4.5:1 against --color-current-line. */
-  --color-comment-strong: light-dark(#4a587c, #c3c9e0);
-  --color-cyan:          light-dark(#0891b2, #8be9fd);
-  --color-green:         light-dark(#16a34a, #50fa7b);
-  --color-orange:        light-dark(#ea580c, #ffb86c);
-  --color-pink:          light-dark(#db2777, #ff79c6);
-  --color-purple:        light-dark(#7c3aed, #bd93f9);
-  --color-red:           light-dark(#dc2626, #ff5555);
-  --color-yellow:        light-dark(#ca8a04, #f1fa8c);
-
-  /* Docsify themeable variables */
-  --theme-color: var(--color-purple);
-  --base-background-color: var(--color-background);
-  --base-color: var(--color-foreground);
-  --sidebar-background: light-dark(#f0f0f0, #21222c);
-  --sidebar-nav-link-color: var(--color-foreground);
-  --sidebar-nav-link-color--active: var(--color-purple);
-  --sidebar-nav-link-border-color--active: var(--color-purple);
-  --link-color: var(--color-cyan);
-  --link-color--hover: var(--color-pink);
-  --code-inline-background: var(--color-current-line);
-  --code-inline-color: var(--color-green);
-  /* A step off --color-background, not equal to it: in dark these were the same
-     #282a36, so a code block was an invisible panel and its padding read as void
-     rather than as a block with room around its text. */
-  --code-theme-background: light-dark(#eeeeea, #1e1f28);
-  --code-theme-text: var(--color-foreground);
-  --blockquote-border-color: var(--color-purple);
-  --blockquote-background: var(--color-current-line);
-  --heading-color: var(--color-foreground);
-  --search-background: light-dark(#fff, #44475a);
-  --search-input-background-color: light-dark(#fff, #44475a);
-  --search-input-color: var(--color-foreground);
-  --search-input-placeholder-color: var(--color-comment);
-  --search-result-heading-color: var(--color-foreground);
-  --search-result-item-color: var(--color-foreground);
-  --search-result-keyword-background: light-dark(rgba(124, 58, 237, 0.2), rgba(189, 147, 249, 0.3));
-  --search-result-keyword-color: var(--color-pink);
-
-  /* UI element colors */
-  --border-subtle: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.1));
-  --button-bg: light-dark(rgba(0,0,0,0.05), rgba(255,255,255,0.1));
-  --button-bg-hover: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.2));
-  --button-border: light-dark(rgba(0,0,0,0.15), rgba(255,255,255,0.2));
-  --success-color: light-dark(#28a745, #50fa7b);
-  --theme-icon-color: light-dark(#ffb86c, #f1fa8c);
-  --muted-color: var(--color-comment);
-  --hover-color: var(--color-cyan);
-  --focus-border-color: var(--color-purple);
-  --resize-handle-color: var(--color-purple);
-
-  /* Titlebar */
-  --titlebar-bg: light-dark(rgba(240,240,240,0.85), rgba(33,34,44,0.85));
-  --titlebar-accent-start: var(--color-purple);
-  --titlebar-accent-mid: var(--color-cyan);
-  --titlebar-accent-end: var(--color-pink);
-  --brand-hover-color: var(--color-purple);
-  --toggle-bg: light-dark(rgba(0,0,0,0.08), rgba(255,255,255,0.08));
-  --toggle-bg-hover: light-dark(rgba(0,0,0,0.12), rgba(255,255,255,0.12));
-  --toggle-indicator: light-dark(rgba(255,255,255,0.95), rgba(255,255,255,0.12));
-  --toggle-active-color: var(--theme-icon-color);
-  --toggle-inactive-color: var(--muted-color);
-  --kbd-bg: light-dark(rgba(0,0,0,0.06), rgba(255,255,255,0.06));
-
-  /* Sidebar width. Proportional so it keeps its share on a laptop, capped so a
-     wide display doesn't spend 500px on a nav list — past the cap the width the
-     page gains goes to the content. Dragging the handle still overrides it. */
-  --sidebar-width: min(25vw, 340px);
-
-  /* Vertical rhythm, over docsify-themeable's defaults. The pages here run to
-     tables and code as much as prose, and the defaults spread them over more
-     scrolling than the content earns. Most of the air was inside the blocks
-     rather than between them: a 28px heading sat in a 48px line box, and a code
-     block carried 27px above its first line, so a heading and the code under it
-     read as separated by ~50px of white where the margin says 15. */
-  --heading-margin: 1.85rem 0 0;
-  --heading-h2-margin: 1.85rem 0 0.9rem;
-  --heading-h3-margin: 1.5rem 0 0.75rem;
-  --code-block-padding: 1em 1.25em;
-
-  /* Height the project-card language stripe expands to on hover. The tooltip
-     reads it to place itself, so the two can't drift apart. */
-  --lang-bar-expanded: 18px;
-
-  /* Table styling */
-  --table-cell-border-color: var(--border-subtle);
-  --table-head-background: light-dark(#e8e8e8, #44475a);
-  --table-row-odd-background: light-dark(#fff, #282a36);
-  --table-row-even-background: light-dark(#f8f8f8, #21222c);
-}
 
 /* Alucard (light) syntax highlighting overrides */
 @media (prefers-color-scheme: light) {
@@ -190,20 +95,10 @@
 }
 
 #project-cards {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 0.75rem;
-  row-gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
   margin: 2.5rem 0;
-}
-
-/* Section groups span the full row so their internal grid stays self-contained */
-#project-cards > .project-group {
-  grid-column: 1 / -1;
-}
-
-@media (max-width: 720px) {
-  #project-cards { grid-template-columns: 1fr; }
 }
 
 /* Section header for each top-level group */
@@ -222,7 +117,7 @@
 }
 
 .project-group-name {
-  font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 0.78em;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -237,14 +132,12 @@
   letter-spacing: 0;
 }
 
-/* Two-up grid for everything inside a group */
 .project-group-children {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(238px, 1fr));
+  gap: 0.7rem;
 }
 
-/* A parent card, its children container, and any nested group all span the full row */
 .project-group-children > .project-card.has-children,
 .project-group-children > .project-card-children,
 .project-group-children > .project-group {
@@ -263,9 +156,7 @@
   color: var(--color-comment);
 }
 
-@media (max-width: 720px) {
-  .project-group-children { grid-template-columns: 1fr; }
-}
+
 
 /* Card */
 .project-card {
@@ -275,7 +166,7 @@
   gap: 1rem;
   /* Extra bottom padding reserves space for the expanded language stripe on hover,
      so descriptions remain visible without layout shift. */
-  padding: 0.95rem 1.25rem 1.5rem;
+  padding: 0.8rem 0.95rem 1.35rem;
   border-radius: 8px;
   background: var(--color-current-line);
   border: 1px solid var(--border-subtle);
@@ -293,15 +184,15 @@
 
 .project-card-content {
   display: flex;
-  align-items: center;
-  gap: 0.9rem;
+  align-items: flex-start;
+  gap: 0.7rem;
   flex: 1;
   min-width: 0;
 }
 
 .project-card-icon {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
   opacity: 0.9;
   transition: opacity 0.2s ease;
@@ -315,7 +206,7 @@
 }
 
 .project-card-name {
-  font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-weight: 600;
   font-size: 1em;
   letter-spacing: -0.01em;
@@ -327,9 +218,9 @@
 
 .project-card-desc {
   color: var(--color-comment-strong);
-  font-size: 0.88em;
-  margin-top: 0.15rem;
-  line-height: 1.45;
+  font-size: 0.82em;
+  margin-top: 0.2rem;
+  line-height: 1.4;
 }
 
 /* Language stripe — the only chromatic accent per card.
@@ -362,7 +253,7 @@
 /* Segments below the narrow-threshold are emitted without data-label, so attr() falls back to "" and nothing renders */
 .lang-bar-segment[data-label]::after {
   content: attr(data-label);
-  font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 0.68em;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -386,7 +277,7 @@
   border-radius: 5px;
   background: var(--color-foreground);
   color: var(--color-background);
-  font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -424,19 +315,19 @@
 [data-lang="javascript"] { background: var(--color-red); }
 [data-lang="markdown"]   { background: var(--color-comment); }
 
-/* Children of a parent project — nested 2-up, collapsible */
+/* A parent and the projects it holds close into one panel. An indent alone left
+   the question open at the bottom edge, where the group's next sibling picked up
+   right where the children stopped and read as one more of them. */
 .project-card-children {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
-  margin: 0.6rem 0 0;
-  padding: 0.5rem 0 0.25rem 1.25rem;
-  border-left: 1px solid var(--border-subtle);
+  grid-template-columns: repeat(auto-fill, minmax(214px, 1fr));
+  gap: 0.55rem;
+  margin: 0 0 0.55rem;
+  padding: 0.6rem;
+  border: 1px solid var(--border-subtle);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
   animation: cardReveal 0.3s ease both;
-}
-
-@media (max-width: 720px) {
-  .project-card-children { grid-template-columns: 1fr; }
 }
 
 
@@ -584,4 +475,260 @@ pre[data-lang]::after {
   margin: 0 0 1rem;
   font-size: 1.15rem;
   color: var(--muted-color);
+}
+
+/* ─────────────────────────────────────────────────
+   Typography
+   ───────────────────────────────────────────────── */
+
+body,
+.markdown-section,
+.sidebar {
+  font-family: var(--font-body);
+}
+
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3,
+.markdown-section h4,
+.markdown-section h5,
+.markdown-section h6 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+/* Fraunces is a display face: at h1 it wants the weight and the tighter track
+   that make the size look deliberate rather than merely large. */
+.markdown-section h1 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+code,
+kbd,
+pre,
+.markdown-section code,
+.markdown-section pre,
+.markdown-section pre code {
+  font-family: var(--font-mono);
+}
+
+/* ─────────────────────────────────────────────────
+   Hub landing page
+   ───────────────────────────────────────────────── */
+
+/* Depth behind the index, on the landing route only: two washes in the two
+   colors the titlebar already gradients through, and a grain over the top so
+   large flat areas have a surface. Sub-site docs pages stay plain. */
+body.hub-home {
+  background-image:
+    radial-gradient(1150px 820px at 84% -14%, light-dark(rgba(124,58,237,0.07), rgba(189,147,249,0.11)), transparent 62%),
+    radial-gradient(880px 720px at -6% 4%, light-dark(rgba(8,145,178,0.06), rgba(139,233,253,0.09)), transparent 58%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+body.hub-home::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Grain on a light ground reads as dirt well before it reads as texture. */
+@media (prefers-color-scheme: light) {
+  :root:not([style*="color-scheme: dark"]) body.hub-home::after { opacity: 0.022; }
+}
+
+:root[style*="color-scheme: light"] body.hub-home::after { opacity: 0.022; }
+
+/* The title sits over a field of the project names, colored by family, running
+   off the right edge. The field is atmosphere: the title is what you read. */
+body.hub-home .hub-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 140px;
+  margin: 0.4rem 0 2.6rem;
+}
+
+body.hub-home .hub-head h1 {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: var(--color-foreground);
+}
+
+/* Bleeds past the content column to the viewport edge, so the set reads as
+   continuing rather than as a framed list. */
+.hub-hero {
+  position: absolute;
+  inset: 0 calc(-1 * max(0px, (100vw - 100%) / 2)) 0 30%;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 0.5rem 1.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 26%, #000 58%, transparent 96%);
+  mask-image: linear-gradient(90deg, transparent, #000 26%, #000 58%, transparent 96%);
+}
+
+@media (max-width: 720px) {
+  body.hub-home .hub-head { min-height: 112px; }
+  .hub-hero { inset: 0 -28px 0 26%; font-size: 0.72rem; }
+}
+
+/* ─────────────────────────────────────────────────
+   Project archive — group headers and card polish
+   ───────────────────────────────────────────────── */
+
+.project-group-label {
+  gap: 0.85rem;
+  margin-bottom: 1.35rem;
+  padding-bottom: 0.7rem;
+  border-bottom: none;
+  background-image: var(--tick-rule);
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: bottom left;
+}
+
+.project-group-name {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--color-foreground);
+}
+
+.project-group-desc {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-color);
+}
+
+.project-group-children > .project-group .project-group-name {
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  color: var(--color-foreground);
+}
+
+.project-card {
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.project-card:hover {
+  border-color: var(--color-comment);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -20px light-dark(rgba(40,42,54,0.55), rgba(0,0,0,0.8));
+}
+
+/* A project that contains others is a heading for the block beneath it, so it
+   gets the display face and the room that says so. */
+.project-card.has-children .project-card-name {
+  font-family: var(--font-display);
+  font-size: 1.22rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.project-card.has-children {
+  padding: 0.7rem 0.95rem 0.8rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px 10px 0 0;
+  background: var(--color-current-line);
+  box-shadow: none;
+}
+
+/* The affordance a tile gets from being a filled block, which a header spanning
+   the width doesn't read as on its own. */
+.project-card.has-children::after {
+  content: "→";
+  flex: none;
+  margin-left: 0.75rem;
+  font-size: 1.05rem;
+  line-height: 1;
+  color: var(--muted-color);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.project-card.has-children:hover::after {
+  color: var(--color-cyan);
+  transform: translateX(3px);
+}
+
+.project-card.has-children .project-card-name {
+  transition: color 0.2s ease;
+}
+
+.project-card.has-children:hover .project-card-name {
+  color: var(--color-cyan);
+}
+
+.project-card.has-children:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--color-cyan);
+}
+
+.project-card.has-children .project-card-content {
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.8rem;
+}
+
+/* Name and description sit on one line: a header states what the group is, and
+   the tiles under it carry the detail. */
+.project-card.has-children .project-card-info {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.7rem;
+  flex: 1;
+}
+
+.project-card.has-children .project-card-desc {
+  margin-top: 0;
+  font-size: 0.86em;
+}
+
+.project-card.has-children .project-card-icon {
+  width: 26px;
+  height: 26px;
+  position: relative;
+  top: 0.28em;
+}
+
+/* The stripe is the header's underline rather than a tile's bottom edge. */
+.project-card.has-children .lang-bar,
+.project-card.has-children:hover .lang-bar {
+  height: 2px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.project-card.has-children .lang-bar-segment[data-label]::after {
+  display: none;
 }

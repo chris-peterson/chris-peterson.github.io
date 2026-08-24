@@ -1,0 +1,124 @@
+/*
+ * The design tokens every site in the family shares: the Dracula/Alucard
+ * palette, the three typefaces, and the titlebar's own colors.
+ *
+ * Split out of theme.css so a page that isn't a docsify site can take the
+ * tokens and the titlebar without the docs skin that sits on top of them.
+ * bridge.ai loads this file and titlebar.css; theme.css imports it.
+ *
+ * Format: light-dark(alucard-value, dracula-value)
+ * https://draculatheme.com/contribute
+ */
+:root {
+  color-scheme: dark;
+
+  /* Palette colors - light-dark(alucard, dracula) */
+  --color-background:    light-dark(#f8f8f2, #282a36);
+  --color-current-line:  light-dark(#e6e6e6, #44475a);
+  --color-foreground:    light-dark(#282a36, #f8f8f2);
+  --color-comment:       light-dark(#5a6896, #9099b8);
+  /* Meets WCAG AA 4.5:1 against --color-current-line. */
+  --color-comment-strong: light-dark(#4a587c, #c3c9e0);
+  --color-cyan:          light-dark(#0891b2, #8be9fd);
+  --color-green:         light-dark(#16a34a, #50fa7b);
+  --color-orange:        light-dark(#ea580c, #ffb86c);
+  --color-pink:          light-dark(#db2777, #ff79c6);
+  --color-purple:        light-dark(#7c3aed, #bd93f9);
+  --color-red:           light-dark(#dc2626, #ff5555);
+  --color-yellow:        light-dark(#ca8a04, #f1fa8c);
+
+  /* Typography. The same three families bridge.ai sets, so a reader moving
+     between the hub, a project's docs, and bridge.ai stays in one voice.
+     Every site loads this file, so setting them here sets them everywhere. */
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-body: 'Spline Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Docsify themeable variables */
+  --base-font-family: var(--font-body);
+  --heading-font-family: var(--font-display);
+  --mono-font-family: var(--font-mono);
+  --code-font-family: var(--font-mono);
+  --code-font-size: 0.86em;
+  --theme-color: var(--color-purple);
+  --base-background-color: var(--color-background);
+  --base-color: var(--color-foreground);
+  --sidebar-background: light-dark(#f0f0f0, #21222c);
+  --sidebar-nav-link-color: var(--color-foreground);
+  --sidebar-nav-link-color--active: var(--color-purple);
+  --sidebar-nav-link-border-color--active: var(--color-purple);
+  --link-color: var(--color-cyan);
+  --link-color--hover: var(--color-pink);
+  --code-inline-background: var(--color-current-line);
+  --code-inline-color: var(--color-green);
+  /* A step off --color-background, not equal to it: in dark these were the same
+     #282a36, so a code block was an invisible panel and its padding read as void
+     rather than as a block with room around its text. */
+  --code-theme-background: light-dark(#eeeeea, #1e1f28);
+  --code-theme-text: var(--color-foreground);
+  --blockquote-border-color: var(--color-purple);
+  --blockquote-background: var(--color-current-line);
+  --heading-color: var(--color-foreground);
+  --search-background: light-dark(#fff, #44475a);
+  --search-input-background-color: light-dark(#fff, #44475a);
+  --search-input-color: var(--color-foreground);
+  --search-input-placeholder-color: var(--color-comment);
+  --search-result-heading-color: var(--color-foreground);
+  --search-result-item-color: var(--color-foreground);
+  --search-result-keyword-background: light-dark(rgba(124, 58, 237, 0.2), rgba(189, 147, 249, 0.3));
+  --search-result-keyword-color: var(--color-pink);
+
+  /* UI element colors */
+  --border-subtle: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.1));
+  /* A rule of ticks rather than a solid line, the way bridge.ai closes a
+     section. Ticks need more contrast than a solid rule to read as a line. */
+  --tick-rule: repeating-linear-gradient(90deg, light-dark(rgba(0,0,0,0.28), rgba(139,233,253,0.3)) 0 1px, transparent 1px 9px);
+  --button-bg: light-dark(rgba(0,0,0,0.05), rgba(255,255,255,0.1));
+  --button-bg-hover: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.2));
+  --button-border: light-dark(rgba(0,0,0,0.15), rgba(255,255,255,0.2));
+  --success-color: light-dark(#28a745, #50fa7b);
+  --theme-icon-color: light-dark(#ffb86c, #f1fa8c);
+  --muted-color: var(--color-comment);
+  --hover-color: var(--color-cyan);
+  --focus-border-color: var(--color-purple);
+  --resize-handle-color: var(--color-purple);
+
+  /* Titlebar */
+  --titlebar-bg: light-dark(rgba(240,240,240,0.85), rgba(33,34,44,0.85));
+  --titlebar-accent-start: var(--color-purple);
+  --titlebar-accent-mid: var(--color-cyan);
+  --titlebar-accent-end: var(--color-pink);
+  --brand-hover-color: var(--color-purple);
+  --toggle-bg: light-dark(rgba(0,0,0,0.08), rgba(255,255,255,0.08));
+  --toggle-bg-hover: light-dark(rgba(0,0,0,0.12), rgba(255,255,255,0.12));
+  --toggle-indicator: light-dark(rgba(255,255,255,0.95), rgba(255,255,255,0.12));
+  --toggle-active-color: var(--theme-icon-color);
+  --toggle-inactive-color: var(--muted-color);
+  --kbd-bg: light-dark(rgba(0,0,0,0.06), rgba(255,255,255,0.06));
+
+  /* Sidebar width. Proportional so it keeps its share on a laptop, capped so a
+     wide display doesn't spend 500px on a nav list — past the cap the width the
+     page gains goes to the content. Dragging the handle still overrides it. */
+  --sidebar-width: min(25vw, 340px);
+
+  /* Vertical rhythm, over docsify-themeable's defaults. The pages here run to
+     tables and code as much as prose, and the defaults spread them over more
+     scrolling than the content earns. Most of the air was inside the blocks
+     rather than between them: a 28px heading sat in a 48px line box, and a code
+     block carried 27px above its first line, so a heading and the code under it
+     read as separated by ~50px of white where the margin says 15. */
+  --heading-margin: 1.85rem 0 0;
+  --heading-h2-margin: 1.85rem 0 0.9rem;
+  --heading-h3-margin: 1.5rem 0 0.75rem;
+  --code-block-padding: 1em 1.25em;
+
+  /* Height the project-card language stripe expands to on hover. The tooltip
+     reads it to place itself, so the two can't drift apart. */
+  --lang-bar-expanded: 18px;
+
+  /* Table styling */
+  --table-cell-border-color: var(--border-subtle);
+  --table-head-background: light-dark(#e8e8e8, #44475a);
+  --table-row-odd-background: light-dark(#fff, #282a36);
+  --table-row-even-background: light-dark(#f8f8f8, #21222c);
+}

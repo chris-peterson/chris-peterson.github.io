@@ -3,12 +3,33 @@
   children:
     - name: claude-marketplace
       label: bridge.ai
-      description: Plugins, skills, and tooling for Claude Code
+      description: Claude Code plugins for AI-assisted development
       icon: https://chris-peterson.github.io/claude-marketplace/favicon.svg
       url: https://chris-peterson.github.io/claude-marketplace/#/
       children:
+        - name: ClaudeWatch
+          description: Screens dangerous shell commands before they run
+          icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
+          url: https://chris-peterson.github.io/ClaudeWatch
+          languages:
+            - name: Shell
+              pct: 65
+            - name: Python
+              pct: 35
+
+        - name: shipshape
+          description: Keeps Claude Code and your installed plugins current
+          icon: https://chris-peterson.github.io/shipshape/favicon.svg
+          url: https://chris-peterson.github.io/shipshape
+          languages:
+            - name: Markdown
+              pct: 70
+              source: manual
+            - name: Shell
+              pct: 30
+
         - name: anchor
-          description: Git/forge skills that drive reviewed work into git
+          description: Consistency across issues, reviews, commits, and releases
           icon: https://chris-peterson.github.io/anchor/favicon.svg
           url: https://chris-peterson.github.io/anchor
           languages:
@@ -19,7 +40,7 @@
               pct: 10
 
         - name: beacon
-          description: At-a-glance Claude Code session awareness
+          description: At-a-glance awareness across concurrent Claude Code sessions
           icon: https://chris-peterson.github.io/beacon/favicon.svg
           url: https://chris-peterson.github.io/beacon
           languages:
@@ -30,19 +51,8 @@
             - name: Shell
               pct: 5
 
-        - name: sextant
-          description: AI-assisted SPEC-driven development
-          icon: https://chris-peterson.github.io/sextant/favicon.svg
-          url: https://chris-peterson.github.io/sextant
-          languages:
-            - name: Markdown
-              pct: 95
-              source: manual
-            - name: Shell
-              pct: 5
-
         - name: tack
-          description: Route tracker for AI-assisted development
+          description: Remembers what you were working on between sessions
           icon: https://chris-peterson.github.io/tack/favicon.svg
           url: https://chris-peterson.github.io/tack
           languages:
@@ -53,29 +63,8 @@
             - name: Shell
               pct: 5
 
-        - name: ClaudeWatch
-          description: Claude Code safety plugin
-          icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
-          url: https://chris-peterson.github.io/ClaudeWatch
-          languages:
-            - name: Shell
-              pct: 65
-            - name: Python
-              pct: 35
-
-        - name: shipshape
-          description: Keep your Claude Code plugins up to date
-          icon: https://chris-peterson.github.io/shipshape/favicon.svg
-          url: https://chris-peterson.github.io/shipshape
-          languages:
-            - name: Markdown
-              pct: 70
-              source: manual
-            - name: Shell
-              pct: 30
-
         - name: cleat
-          description: One AGENTS.md every coding agent reads
+          description: Project instructions written once, in the file every AI tool reads
           icon: https://chris-peterson.github.io/cleat/favicon.svg
           url: https://chris-peterson.github.io/cleat
           languages:
@@ -84,8 +73,20 @@
             - name: Python
               pct: 45
 
+        - name: sextant
+          description: Requirements in source control, synced with the code either direction
+          icon: https://chris-peterson.github.io/sextant/favicon.svg
+          url: https://chris-peterson.github.io/sextant
+          languages:
+            - name: Markdown
+              pct: 95
+              source: manual
+            - name: Shell
+              pct: 5
+
     - name: shipyard
       description: Shared build tooling for Claude Code plugins
+      hidden: true
       icon: https://chris-peterson.github.io/shipyard/favicon.svg
       url: https://chris-peterson.github.io/shipyard
       languages:
@@ -99,9 +100,6 @@
       description: Unified CLI for code forges
       icon: https://chris-peterson.github.io/pwsh-forge/favicon.svg
       url: https://chris-peterson.github.io/pwsh-forge
-      languages:
-        - name: PowerShell
-          pct: 100
       children:
         - name: pwsh-github
           description: GitHub provider
@@ -118,6 +116,69 @@
           languages:
             - name: PowerShell
               pct: 100
+
+    - name: pwsh-fmd
+      description: PowerShell objects to Markdown tables
+      icon: https://chris-peterson.github.io/pwsh-fmd/favicon.svg
+      url: https://chris-peterson.github.io/pwsh-fmd
+      languages:
+        - name: PowerShell
+          pct: 100
+
+    - name: futility
+      description: File utilities for PowerShell
+      icon: https://chris-peterson.github.io/futility/favicon.svg
+      url: https://chris-peterson.github.io/futility
+      languages:
+        - name: PowerShell
+          pct: 95
+        - name: Shell
+          pct: 5
+
+    - name: pwsh-artifactory
+      description: Artifactory's REST API from PowerShell
+      icon: https://chris-peterson.github.io/pwsh-artifactory/favicon.svg
+      url: https://chris-peterson.github.io/pwsh-artifactory
+      languages:
+        - name: PowerShell
+          pct: 100
+
+    - name: pwsh-taglib
+      description: Read and rewrite music file tags
+      icon: https://chris-peterson.github.io/pwsh-taglib/favicon.svg
+      url: https://chris-peterson.github.io/pwsh-taglib
+      languages:
+        - name: PowerShell
+          pct: 100
+
+    - name: pwsh-yelp
+      description: Search Yelp from PowerShell
+      icon: https://chris-peterson.github.io/pwsh-yelp/favicon.svg
+      url: https://chris-peterson.github.io/pwsh-yelp
+      languages:
+        - name: PowerShell
+          pct: 100
+
+- group: Developer Tools
+  description: Shell and workflow tooling
+  children:
+    - name: gitconfig
+      description: Git configuration, and the workflow it's tuned for
+      icon: https://chris-peterson.github.io/gitconfig/favicon.svg
+      url: https://chris-peterson.github.io/gitconfig
+      languages:
+        - name: Shell
+          pct: 100
+
+    - name: rmq-cli
+      description: RabbitMQ administration in a container
+      icon: https://chris-peterson.github.io/rmq-cli/favicon.svg
+      url: https://chris-peterson.github.io/rmq-cli
+      languages:
+        - name: Shell
+          pct: 50
+        - name: Dockerfile
+          pct: 50
 
 - group: .NET
   description: NuGet packages
@@ -178,4 +239,3 @@
           pct: 55
         - name: Dockerfile
           pct: 45
-

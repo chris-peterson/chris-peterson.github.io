@@ -68,6 +68,7 @@ function initProject(config) {
   var isHub = config.name === org;
   var sidebarMode = isHub && new URLSearchParams(window.location.search).get('mode') === 'sidebar';
   config.repo_source = isHub ? 'https://github.com/' + org : 'https://github.com/' + org + '/' + config.name;
+  config.search = !isHub || sidebarMode;
   var defaults = {
     loadSidebar: true,
     subMaxLevel: 2,
@@ -232,6 +233,26 @@ function initProject(config) {
   loadNext(0);
 }
 
+// The titlebar on a page that isn't a docsify site. bridge.ai is hand-built and
+// stays that way; this gives it the family's bar — brand, breadcrumb, blog, and
+// the theme toggle — off the same source as every other site, so the five of
+// them can't drift.
+//
+// The page supplies `name` (its key in projects.yml, which is what the
+// breadcrumb resolves its ancestry and label from), and loads tokens.css and
+// titlebar.css itself.
+function initTitlebar(config) {
+  var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
+  config.repo_source = config.repo_source ||
+    'https://github.com/' + org + '/' + config.name;
+  // docsify builds the search index; a page without it gets no search trigger.
+  if (config.search === undefined) config.search = false;
+  buildTitlebarDOM(config);
+  initTheme();
+  initBreadcrumb(config);
+  initTitlebarEvents();
+}
+
 // --- Global toggle functions (referenced by onclick attributes) ---
 
 function toggleSidebar() {
@@ -255,6 +276,10 @@ function toggleTheme() {
   toggle.setAttribute('data-scheme', newScheme);
   localStorage.setItem('theme', newScheme);
   syncCommentsTheme(newScheme);
+  // Anything that resolved a token to a literal when it drew — a canvas chart,
+  // an SVG built in JS — can't follow the swap on its own. This is how it hears
+  // about it.
+  window.dispatchEvent(new CustomEvent('themechange', { detail: { scheme: newScheme } }));
 
   if (typeof mermaid !== 'undefined') {
     var mermaidTheme = newScheme === 'light' ? 'default' : 'dark';
@@ -283,7 +308,7 @@ function buildTitlebarDOM(config) {
   var navSection =
     '<div class="breadcrumb-repo-selector" id="repoSelector">' +
       '<button class="breadcrumb-repo-toggle" onclick="toggleRepoSelector()">' +
-        toggleIcon + toggleLabel + ' ' + ICONS.chevronDown +
+        toggleIcon + '<span id="repoSelectorLabel">' + toggleLabel + '</span> ' + ICONS.chevronDown +
       '</button>' +
       '<div class="breadcrumb-repo-dropdown" id="repoDropdownContainer"></div>' +
     '</div>';
@@ -302,7 +327,7 @@ function buildTitlebarDOM(config) {
           ' class="titlebar-nav-link" id="titlebarBlog" title="Blog">' +
           ICONS.blog + '<span class="titlebar-nav-label">Blog</span>' +
         '</a>' +
-        (isHub ? '' :
+        (config.search === false ? '' :
         '<div class="titlebar-search" id="titlebarSearch">' +
           '<div class="titlebar-search-trigger" title="Search">' +
             ICONS.search +
@@ -321,9 +346,13 @@ function buildTitlebarDOM(config) {
       '</div>' +
     '</div>';
 
+  // docsify pages mount at #app and want the bar above it; a page without one
+  // (bridge.ai) takes it at the top of the body instead.
   var app = document.getElementById('app');
+  var parent = app ? app.parentNode : document.body;
+  var before = app || document.body.firstChild;
   while (wrapper.firstChild) {
-    app.parentNode.insertBefore(wrapper.firstChild, app);
+    parent.insertBefore(wrapper.firstChild, before);
   }
 }
 
@@ -651,6 +680,11 @@ function parseProjectsYaml(text) {
         // What the breadcrumb calls this project, when the repo name isn't the
         // name people use for it (claude-marketplace is bridge.ai to a reader).
         current.label = stripped.substring(6).trim();
+      } else if (stripped.indexOf('hidden:') === 0) {
+        // Kept in the manifest so the breadcrumb and the sub-site still resolve
+        // it, left out of the index. For a project that isn't meant to be found
+        // from here yet.
+        current.hidden = stripped.substring(7).trim() === 'true';
       } else if (stripped.indexOf('icon:') === 0) {
         current.icon = stripped.substring(5).trim();
       } else if (stripped.indexOf('url:') === 0) {
@@ -663,6 +697,23 @@ function parseProjectsYaml(text) {
     }
   });
   return projects;
+}
+
+// What a reader calls this project. `label` carries the name in use where it
+// isn't the repo name — claude-marketplace is bridge.ai everywhere but the URL.
+function displayName(item) {
+  return item.label || item.name;
+}
+
+function withoutHidden(items) {
+  return items.filter(function(item) { return !item.hidden; })
+    .map(function(item) {
+      if (!item.children) return item;
+      var copy = {};
+      Object.keys(item).forEach(function(k) { copy[k] = item[k]; });
+      copy.children = withoutHidden(item.children);
+      return copy;
+    });
 }
 
 function flattenProjects(projects) {
@@ -699,7 +750,7 @@ function loadProjects() {
         if (!r.ok) throw new Error('projects.yml responded with ' + r.status);
         return r.text();
       })
-      .then(function(text) { return parseProjectsYaml(text); });
+      .then(function(text) { return withoutHidden(parseProjectsYaml(text)); });
   }
   return _projectsPromise;
 }
@@ -735,6 +786,15 @@ function ancestorsOf(items, name, trail) {
 function renderAncestry(projects, config) {
   var selector = document.getElementById('repoSelector');
   if (!selector || !config || !config.name) return;
+
+  // The bar is built before projects.yml lands, so the button goes up carrying
+  // the repo name and is renamed here to whatever the manifest calls it.
+  var label = document.getElementById('repoSelectorLabel');
+  var self = flattenProjects(projects).filter(function(item) {
+    return item.name === config.name;
+  })[0];
+  if (label && self) label.textContent = displayName(self);
+
   var ancestors = ancestorsOf(projects, config.name, []);
   if (!ancestors || !ancestors.length) return;
   ancestors.forEach(function(a) {
@@ -765,7 +825,7 @@ function renderDropdownTree(items, depth) {
     var html = '<a class="' + classes + '" href="' + (item.url || '#') + '"' +
       (item.description ? ' title="' + item.description + '"' : '') + '>' +
       '<img class="repo-icon" src="' + faviconUrl + '" alt="" width="20" height="20"> ' +
-      item.name +
+      displayName(item) +
     '</a>';
     if (item.children && item.children.length) {
       html += renderDropdownTree(item.children, depth + 1);
@@ -793,7 +853,7 @@ function initSidebarProjects() {
             var nested = (item.children && item.children.length) ? renderNav(item.children) : '';
             return '<li><a href="' + (item.url || '#') + '">' +
               '<img src="' + faviconUrl + '" alt="" width="16" height="16" style="vertical-align:middle;margin-right:6px">' +
-              item.name + '</a>' + nested + '</li>';
+              displayName(item) + '</a>' + nested + '</li>';
           }).join('') + '</ul>';
         }
 
@@ -836,7 +896,7 @@ function initProjectCards() {
               '<div class="project-card-content">' +
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
                 '<div class="project-card-info">' +
-                  '<div class="project-card-name">' + project.name + '</div>' +
+                  '<div class="project-card-name">' + displayName(project) + '</div>' +
                   (project.description ? '<div class="project-card-desc">' + project.description + '</div>' : '') +
                 '</div>' +
               '</div>' +
@@ -868,6 +928,7 @@ function initProjectCards() {
           }
 
           container.innerHTML = renderItems(projects);
+          renderHero(projects);
 
           container.querySelectorAll('.project-card').forEach(function(card) {
             card.addEventListener('click', function() {
@@ -878,6 +939,33 @@ function initProjectCards() {
         .catch(function(err) { console.error('Failed to render project cards:', err); });
     });
   });
+}
+
+// The landing page's hero: every project's name, in its family's color, packed
+// into a field that runs off the right edge. Read from projects.yml rather than
+// authored, so it is the page's own contents and it grows when the manifest does.
+//
+// Names rather than shapes: bridge.ai's hero already sets faint panels behind
+// its wordmark, and an index of things should say what the things are.
+var HERO_FAMILY_COLORS = ['--color-cyan', '--color-purple', '--color-green', '--color-orange'];
+
+function renderHero(projects) {
+  var el = document.getElementById('hub-hero');
+  if (!el) return;
+
+  var names = [];
+  projects.forEach(function(group, familyIndex) {
+    var color = 'var(' + HERO_FAMILY_COLORS[familyIndex % HERO_FAMILY_COLORS.length] + ')';
+    flattenProjects(group.children || [group]).forEach(function(project) {
+      names.push({ color: color, name: displayName(project) });
+    });
+  });
+  if (!names.length) return;
+
+  el.innerHTML = names.map(function(item, i) {
+    var opacity = Math.max(0.1, 0.44 - i * 0.013).toFixed(3);
+    return '<span style="color:' + item.color + ';opacity:' + opacity + '">' + item.name + '</span>';
+  }).join('');
 }
 
 // '#/blog/a-post.md?id=a-heading' -> '/blog/a-post'. The route is what a
@@ -997,6 +1085,9 @@ function initBlogChrome(isHub, sidebarMode) {
       // takes the width back rather than running beside an empty rail.
       if (isHub) {
         document.body.classList.toggle('sidebar-hidden', !(inBlog || sidebarMode));
+        // The landing page is the one route that gets the masthead treatment:
+        // its own type scale, and the ambient wash behind it.
+        document.body.classList.toggle('hub-home', route === '/');
       }
 
       renderPostKicker(route);
@@ -1095,6 +1186,15 @@ function initLangTooltip() {
 
 // --- Global event listeners ---
 
+function initTitlebarEvents() {
+  document.addEventListener('click', function(e) {
+    var selector = document.getElementById('repoSelector');
+    if (selector && !selector.contains(e.target)) {
+      selector.classList.remove('open');
+    }
+  });
+}
+
 function initEventListeners() {
   document.addEventListener('click', function(e) {
     if (e.target.closest('.sidebar-nav a')) {
@@ -1110,20 +1210,17 @@ function initEventListeners() {
     }
   });
 
-  document.addEventListener('click', function(e) {
-    var selector = document.getElementById('repoSelector');
-    if (selector && !selector.contains(e.target)) {
-      selector.classList.remove('open');
-    }
-  });
-
+  initTitlebarEvents();
   initSidebarResize();
 }
 
-function initSidebarResize() {
+function initSidebarResize(tries) {
   var sidebar = document.querySelector('.sidebar');
   if (!sidebar) {
-    setTimeout(initSidebarResize, 100);
+    // docsify renders the sidebar a tick or two after this runs, so waiting is
+    // right; giving up is what keeps a page that has no sidebar from polling
+    // for one forever.
+    if ((tries || 0) < 50) setTimeout(function() { initSidebarResize((tries || 0) + 1); }, 100);
     return;
   }
 

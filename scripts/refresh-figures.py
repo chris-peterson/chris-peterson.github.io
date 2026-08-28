@@ -93,11 +93,12 @@ def legend(edges):
         labels.append(str(low) if low == edge else f"{low}\u2013{edge}")
     labels.append(f"{edges[-1] + 1}+")
 
-    out, x = [], 0.0
+    out, x = ['<g class="cpv-legend">'], 0.0
     for i, label in enumerate(labels):
         out.append(f'<rect class="cpv-h{i + 1}" x="{x:g}" y="2" width="11" height="11" rx="2"/>')
         out.append(f'<text class="cpv-ax" x="{x + 15:g}" y="12">{label}</text>')
         x += 15 + len(label) * 6.2 + 11.9
+    out.append('</g>')
     return out
 
 
@@ -396,7 +397,7 @@ def splice(text, marker, svg, width):
     if not pattern.search(text):
         sys.exit(f"{POST.name}: no cpv:begin/cpv:end markers for {marker!r}")
     figure = (f'<!-- cpv:begin {marker} -->\n'
-              f'<div class="cpv-fig" style="--fig-w:{width}px">\n'
+              f'<div class="cpv-fig cpv-fig--{marker}" style="--fig-w:{width}px">\n'
               f'<div class="cpv-scroll">{svg}</div>\n'
               f'<!-- cpv:end {marker} -->')
     return pattern.sub(lambda _: figure, text, count=1)

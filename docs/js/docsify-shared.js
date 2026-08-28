@@ -685,6 +685,12 @@ function parseProjectsYaml(text) {
         // it, left out of the index. For a project that isn't meant to be found
         // from here yet.
         current.hidden = stripped.substring(7).trim() === 'true';
+      } else if (stripped.indexOf('muted:') === 0) {
+        // Still listed and still linked, drawn quieter than the rest: a
+        // project kept for the people already using it rather than promoted to
+        // new ones. Set on a group to quiet all of it, or on a single project
+        // that stays in the group it belongs to.
+        current.muted = stripped.substring(6).trim() === 'true';
       } else if (stripped.indexOf('icon:') === 0) {
         current.icon = stripped.substring(5).trim();
       } else if (stripped.indexOf('url:') === 0) {
@@ -892,7 +898,8 @@ function initProjectCards() {
                 }).join('') +
               '</div>' : '';
             var hasChildren = !!(project.children && project.children.length);
-            var html = '<div class="project-card' + (hasChildren ? ' has-children' : '') + '" data-href="' + (project.url || '#') + '" style="animation-delay:' + (cardIndex * 60) + 'ms">' +
+            var html = '<div class="project-card' + (hasChildren ? ' has-children' : '') +
+              (project.muted ? ' project-card-muted' : '') + '" data-href="' + (project.url || '#') + '" style="animation-delay:' + (cardIndex * 60) + 'ms">' +
               '<div class="project-card-content">' +
                 '<img class="project-card-icon" src="' + faviconUrl + '" alt="">' +
                 '<div class="project-card-info">' +
@@ -909,7 +916,7 @@ function initProjectCards() {
           function renderItems(items) {
             return items.map(function(item) {
               if (item.group && item.children) {
-                return '<section class="project-group" style="animation-delay:' + (cardIndex * 60) + 'ms">' +
+                return '<section class="project-group' + (item.muted ? ' project-group-muted' : '') + '" style="animation-delay:' + (cardIndex * 60) + 'ms">' +
                   '<header class="project-group-label">' +
                     '<span class="project-group-name">' + item.group + '</span>' +
                     (item.description ? '<span class="project-group-desc">' + item.description + '</span>' : '') +
@@ -1080,6 +1087,12 @@ function initBlogChrome(isHub, sidebarMode) {
       var link = document.getElementById('titlebarBlog');
       if (link) link.classList.toggle('active', inBlog);
 
+      // The breadcrumb slot answers "where am I", so on a blog route it says
+      // blog rather than naming the picker it happens to open. The dropdown
+      // still lists the repos, which is how you leave.
+      var label = isHub && document.getElementById('repoSelectorLabel');
+      if (label) label.textContent = inBlog ? 'blog' : 'repos';
+
       // The hub's sidebar has the post list to show in the blog and the project
       // tree in ?mode=sidebar. Elsewhere it has nothing to say, so the page
       // takes the width back rather than running beside an empty rail.
@@ -1127,15 +1140,18 @@ function renderPostKicker(route) {
   heading.parentNode.insertBefore(kicker, heading);
 }
 
-// A narrow language segment has room for a bare percentage at best, so the
-// language itself is only reachable by pointing at it. The tooltip lives on
-// <body> because .project-card clips its overflow.
+// Two things are readable only by pointing at them: a narrow language segment,
+// which has room for a bare percentage at best, and a heatmap cell, which since
+// the charts dropped their legends is the only place a count appears. Both use
+// one tooltip, on <body>, because .project-card clips its overflow.
+var TIP_TARGETS = '.lang-bar-segment, .cpv [data-tip]';
+
 function initLangTooltip() {
   var GAP = 8;
   var tip = document.createElement('div');
   tip.className = 'lang-tooltip';
-  // The segment carries the same string as its own aria-label, so announcing the
-  // tooltip too would just repeat it.
+  // The target carries the same string itself, so announcing the tooltip too
+  // would just repeat it.
   tip.setAttribute('aria-hidden', 'true');
   document.body.appendChild(tip);
 
@@ -1146,19 +1162,21 @@ function initLangTooltip() {
     tip.classList.remove('visible');
   }
 
-  function show(segment) {
-    active = segment;
-    tip.textContent = segment.getAttribute('aria-label');
+  function show(target) {
+    active = target;
+    tip.textContent = target.getAttribute('data-tip') || target.getAttribute('aria-label');
     tip.classList.add('visible');
 
-    var box = segment.getBoundingClientRect();
+    var box = target.getBoundingClientRect();
     var edge = tip.offsetWidth / 2 + GAP;
     var center = Math.min(Math.max(box.left + box.width / 2, edge), window.innerWidth - edge);
-    // The stripe is still mid-expansion when the pointer first lands on it, so its
-    // measured top sits too low. Its bottom is pinned to the card, so derive the
+    // A heatmap cell is a fixed box, so it anchors to its own top. The language
+    // stripe is still mid-expansion when the pointer first lands on it, so its
+    // measured top sits too low — its bottom is pinned to the card, so derive the
     // settled top from that and the height CSS is animating towards.
-    var barTop = box.bottom - parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lang-bar-expanded'));
-    var above = barTop - tip.offsetHeight - GAP;
+    var anchorTop = target.hasAttribute('data-tip') ? box.top :
+      box.bottom - parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lang-bar-expanded'));
+    var above = anchorTop - tip.offsetHeight - GAP;
     // The titlebar is fixed and sits above the tooltip, so anything tucked under it
     // is invisible — treat its lower edge as the ceiling, not the viewport's.
     var titlebar = document.getElementById('titlebar');
@@ -1170,8 +1188,8 @@ function initLangTooltip() {
   }
 
   document.addEventListener('mouseover', function(e) {
-    var segment = e.target.closest('.lang-bar-segment');
-    if (segment) show(segment);
+    var target = e.target.closest(TIP_TARGETS);
+    if (target) show(target);
     else if (active) hide();
   });
 

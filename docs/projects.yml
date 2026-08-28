@@ -57,9 +57,7 @@
           url: https://chris-peterson.github.io/tack
           languages:
             - name: TypeScript
-              pct: 85
-            - name: JavaScript
-              pct: 10
+              pct: 95
             - name: Shell
               pct: 5
 
@@ -84,14 +82,24 @@
             - name: Shell
               pct: 5
 
-    - name: shipyard
-      description: Shared build tooling for Claude Code plugins
-      hidden: true
-      icon: https://chris-peterson.github.io/shipyard/favicon.svg
-      url: https://chris-peterson.github.io/shipyard
-      languages:
-        - name: Python
-          pct: 100
+        - name: shipyard
+          description: Shared build tooling for Claude Code plugins
+          icon: https://chris-peterson.github.io/shipyard/favicon.svg
+          url: https://chris-peterson.github.io/shipyard
+          languages:
+            - name: Python
+              pct: 100
+
+        - name: fairlead
+          description: Plugins react to each other's facts without naming each other
+          muted: true
+          icon: https://chris-peterson.github.io/fairlead/favicon.svg
+          url: https://chris-peterson.github.io/fairlead
+          languages:
+            - name: TypeScript
+              pct: 90
+            - name: Shell
+              pct: 10
 
 - group: PowerShell Modules
   description: Modules for automating workflows
@@ -125,16 +133,6 @@
         - name: PowerShell
           pct: 100
 
-    - name: futility
-      description: File utilities for PowerShell
-      icon: https://chris-peterson.github.io/futility/favicon.svg
-      url: https://chris-peterson.github.io/futility
-      languages:
-        - name: PowerShell
-          pct: 95
-        - name: Shell
-          pct: 5
-
     - name: pwsh-artifactory
       description: Artifactory's REST API from PowerShell
       icon: https://chris-peterson.github.io/pwsh-artifactory/favicon.svg
@@ -159,9 +157,33 @@
         - name: PowerShell
           pct: 100
 
+    - name: futility
+      description: File utilities for PowerShell
+      icon: https://chris-peterson.github.io/futility/favicon.svg
+      url: https://chris-peterson.github.io/futility
+      languages:
+        - name: PowerShell
+          pct: 95
+        - name: Shell
+          pct: 5
+
 - group: Developer Tools
   description: Shell and workflow tooling
   children:
+    - name: git-fi
+      description: Continuously merge WIP feature branches, so conflicts surface early
+      icon: https://gettyimages.github.io/git-fi/favicon.svg
+      url: https://gettyimages.github.io/git-fi
+      languages:
+        - name: TypeScript
+          pct: 87
+        - name: JavaScript
+          pct: 7
+        - name: Shell
+          pct: 3
+        - name: Go Template
+          pct: 3
+
     - name: gitconfig
       description: Git configuration, and the workflow it's tuned for
       icon: https://chris-peterson.github.io/gitconfig/favicon.svg
@@ -209,14 +231,6 @@
         - name: Shell
           pct: 5
 
-    - name: XmlTransform
-      description: XDT-style XML configuration transformation
-      icon: /icons/xmltransform.svg
-      url: https://github.com/Novakov/xmltransform
-      languages:
-        - name: C#
-          pct: 100
-
 - group: GitHub Actions
   description: Reusable workflow actions
   children:
@@ -239,3 +253,47 @@
           pct: 55
         - name: Dockerfile
           pct: 45
+
+- group: Maintenance Mode
+  description: Still here for anyone using them, no longer being built on
+  muted: true
+  children:
+    - name: moor
+      description: Diff viewer for reviewing AI-generated code
+      icon: https://chris-peterson.github.io/moor/favicon.svg
+      url: https://chris-peterson.github.io/moor
+      languages:
+        - name: JavaScript
+          pct: 95
+        - name: Shell
+          pct: 5
+
+    - name: logbook
+      description: Coding session retros committed to git
+      icon: https://chris-peterson.github.io/logbook/favicon.svg
+      url: https://chris-peterson.github.io/logbook
+      languages:
+        - name: Python
+          pct: 90
+        - name: Shell
+          pct: 10
+
+    - name: pinpoint
+      description: Tag your files and let the directory tree follow
+      icon: https://chris-peterson.github.io/pinpoint/favicon.svg
+      url: https://chris-peterson.github.io/pinpoint
+      languages:
+        - name: Python
+          pct: 70
+        - name: JavaScript
+          pct: 20
+        - name: CSS
+          pct: 10
+
+    - name: XmlTransform
+      description: XDT-style XML configuration transformation
+      icon: /icons/xmltransform.svg
+      url: https://github.com/Novakov/xmltransform
+      languages:
+        - name: C#
+          pct: 100

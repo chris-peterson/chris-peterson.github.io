@@ -3,5 +3,4 @@
 - [Blog](/blog/)
 
 - **2026**
-  - [Too Much](/blog/2026-08-23-too-much.md)
-  - [Launching Blog](/blog/2026-08-13-first.md)
+  - [Too Much](/blog/2026-08-28-too-much.md)

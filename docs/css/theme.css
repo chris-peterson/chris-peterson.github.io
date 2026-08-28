@@ -157,7 +157,6 @@
 }
 
 
-
 /* Card */
 .project-card {
   position: relative;
@@ -314,6 +313,33 @@
 [data-lang="typescript"] { background: var(--color-yellow); }
 [data-lang="javascript"] { background: var(--color-red); }
 [data-lang="markdown"]   { background: var(--color-comment); }
+
+/* The quieter tier of card is drawn, not dimmed: a project being promoted is a
+   filled tile, one that's listed without being pushed is the same tile as an
+   outline with the page showing through. Both keep their real colors. The
+   language stripe is a fact about the repo rather than a measure of how much
+   it's wanted, and desaturating it reads as "disabled" for software that works
+   — so the stripe only thins. Hovering fills the card back in.
+
+   These sit below .project-card and .lang-bar because they override them at
+   equal specificity, where source order decides. */
+.project-group-muted .project-card,
+.project-card-muted {
+  background: transparent;
+  transition: background 0.18s ease, border-color 0.2s ease;
+}
+
+.project-group-muted .project-card:not(:hover) .lang-bar,
+.project-card-muted:not(:hover) .lang-bar {
+  height: 2px;
+}
+
+.project-group-muted .project-card:hover,
+.project-group-muted .project-card:focus-within,
+.project-card-muted:hover,
+.project-card-muted:focus-within {
+  background: var(--color-current-line);
+}
 
 /* A parent and the projects it holds close into one panel. An indent alone left
    the question open at the bottom edge, where the group's next sibling picked up

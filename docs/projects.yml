@@ -101,6 +101,43 @@
             - name: Shell
               pct: 10
 
+- group: .NET
+  description: NuGet packages
+  children:
+    - name: assurance
+      description: Side-by-side code comparison
+      icon: https://chris-peterson.github.io/assurance/favicon.svg
+      url: https://chris-peterson.github.io/assurance
+      languages:
+        - name: C#
+          pct: 100
+
+    - name: kekiri
+      description: BDD testing
+      icon: https://chris-peterson.github.io/kekiri/favicon.svg
+      url: https://chris-peterson.github.io/kekiri
+      languages:
+        - name: C#
+          pct: 100
+
+    - name: spiffy
+      description: Structured logging
+      icon: https://chris-peterson.github.io/spiffy/favicon.svg
+      url: https://chris-peterson.github.io/spiffy
+      languages:
+        - name: C#
+          pct: 95
+        - name: Shell
+          pct: 5
+
+    - name: XmlTransform
+      description: XDT-style XML configuration transformation
+      icon: /icons/xmltransform.svg
+      url: https://github.com/Novakov/xmltransform
+      languages:
+        - name: C#
+          pct: 100
+
 - group: PowerShell Modules
   description: Modules for automating workflows
   children:
@@ -202,35 +239,6 @@
         - name: Dockerfile
           pct: 50
 
-- group: .NET
-  description: NuGet packages
-  children:
-    - name: assurance
-      description: Side-by-side code comparison
-      icon: https://chris-peterson.github.io/assurance/favicon.svg
-      url: https://chris-peterson.github.io/assurance
-      languages:
-        - name: C#
-          pct: 100
-
-    - name: kekiri
-      description: BDD testing
-      icon: https://chris-peterson.github.io/kekiri/favicon.svg
-      url: https://chris-peterson.github.io/kekiri
-      languages:
-        - name: C#
-          pct: 100
-
-    - name: spiffy
-      description: Structured logging
-      icon: https://chris-peterson.github.io/spiffy/favicon.svg
-      url: https://chris-peterson.github.io/spiffy
-      languages:
-        - name: C#
-          pct: 95
-        - name: Shell
-          pct: 5
-
 - group: GitHub Actions
   description: Reusable workflow actions
   children:
@@ -289,11 +297,3 @@
           pct: 20
         - name: CSS
           pct: 10
-
-    - name: XmlTransform
-      description: XDT-style XML configuration transformation
-      icon: /icons/xmltransform.svg
-      url: https://github.com/Novakov/xmltransform
-      languages:
-        - name: C#
-          pct: 100

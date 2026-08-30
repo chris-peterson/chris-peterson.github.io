@@ -478,10 +478,6 @@ pre[data-lang]::after {
   text-decoration: none;
 }
 
-.post-kicker-sep {
-  opacity: 0.4;
-}
-
 .markdown-section .post-kicker + h1 {
   margin-top: 0;
 }

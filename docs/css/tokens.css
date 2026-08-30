@@ -26,6 +26,13 @@
   --color-purple:        light-dark(#7c3aed, #bd93f9);
   --color-red:           light-dark(#dc2626, #ff5555);
   --color-yellow:        light-dark(#ca8a04, #f1fa8c);
+  /* The two hues that carry text. Alucard's are tuned to sit on a light
+     ground as fills, and neither clears 4.5:1 at text sizes: green reaches
+     2.6:1 on --color-current-line, where inline code sits, and cyan 3.5:1 on
+     the page, where every link sits. Dracula's clear it already, so only the
+     light half moves. Fills and chips keep the palette hue above. */
+  --color-cyan-strong:   light-dark(#0e7490, #8be9fd);
+  --color-green-strong:  light-dark(#166534, #50fa7b);
 
   /* Typography. The same three families bridge.ai sets, so a reader moving
      between the hub, a project's docs, and bridge.ai stays in one voice.
@@ -47,10 +54,10 @@
   --sidebar-nav-link-color: var(--color-foreground);
   --sidebar-nav-link-color--active: var(--color-purple);
   --sidebar-nav-link-border-color--active: var(--color-purple);
-  --link-color: var(--color-cyan);
+  --link-color: var(--color-cyan-strong);
   --link-color--hover: var(--color-pink);
   --code-inline-background: var(--color-current-line);
-  --code-inline-color: var(--color-green);
+  --code-inline-color: var(--color-green-strong);
   /* A step off --color-background, not equal to it: in dark these were the same
      #282a36, so a code block was an invisible panel and its padding read as void
      rather than as a block with room around its text. */

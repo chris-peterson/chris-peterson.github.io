@@ -110,6 +110,11 @@ def cell(cls, x, y, w, h, where, count):
             f'data-tip="{where} · {n}"/>')
 
 
+def clock(hour):
+    """An hour of the day as prose: 0 -> 12am, 13 -> 1pm."""
+    return f"{hour % 12 or 12}{'am' if hour < 12 else 'pm'}"
+
+
 def hour_figure(times):
     """Commits by weekday and hour."""
     grid = [[0] * 24 for _ in DAYS]
@@ -122,11 +127,15 @@ def hour_figure(times):
     height = top + len(DAYS) * pitch + 6
     weekend = sum(sum(grid[d]) for d in (5, 6))
     total = sum(sum(row) for row in grid)
+    # Read off the grid rather than stated, so the span the label claims is the
+    # one the cells actually show however the year turns out.
+    lit = [h for h in range(24) if any(grid[d][h] for d in range(len(DAYS)))]
 
     out = [
         f'<svg class="cpv" viewBox="0 0 {width} {height}" role="img" '
         f'aria-label="Heatmap of commits by weekday and hour of day. Activity fills every '
-        f'day of the week including Saturday and Sunday, and spans roughly 7am to 11pm. '
+        f'day of the week including Saturday and Sunday, and spans {clock(lit[0])} to '
+        f'{clock(lit[-1])}. '
         f'{round(weekend / total * 100)}% of commits land at the weekend.">'
     ] + legend(edges)
     for h in range(0, 24, 3):

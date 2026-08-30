@@ -193,6 +193,7 @@ function initProject(config) {
   initComments(config.comments);
   initBlogChrome(isHub, sidebarMode);
   initLangTooltip();
+  initWideFigures();
   if (sidebarMode) initSidebarProjects();
   initEventListeners();
 
@@ -1187,9 +1188,18 @@ function initLangTooltip() {
     tip.style.top = (below ? box.bottom + GAP : above) + 'px';
   }
 
+  // The frozen row-label strip passes the pointer through, so the figure still
+  // swipes under it. What is under it, though, is whatever week has scrolled
+  // behind the names - so pointing at a name must not answer for that cell.
+  function behindFrozen(target, x) {
+    var frozen = target.closest('.cpv-fig');
+    frozen = frozen && frozen.querySelector('.cpv-frozen');
+    return !!frozen && x < frozen.getBoundingClientRect().right;
+  }
+
   document.addEventListener('mouseover', function(e) {
     var target = e.target.closest(TIP_TARGETS);
-    if (target) show(target);
+    if (target && !behindFrozen(target, e.clientX)) show(target);
     else if (active) hide();
   });
 
@@ -1200,6 +1210,159 @@ function initLangTooltip() {
   // Capture phase so a scroll inside any container repositions-by-hiding, not just
   // one on the window.
   window.addEventListener('scroll', function() { if (active) hide(); }, true);
+}
+
+// What a figure does when its column can no longer hold it. Both halves are
+// declared in CSS, so they apply at the widths the figure itself decides, and
+// both are measured in the drawing's own units rather than in pixels.
+//
+//   --fig-scroll-start  the drawing coordinate to open on, for a chart whose
+//                       left edge is the least of what it has to say
+//   --fig-freeze-rows   pin the row labels to the left edge, so a scrolled
+//                       heatmap still says which row is which
+function initWideFigures() {
+  var NS = 'http://www.w3.org/2000/svg';
+
+  // A pinned copy of some part of the drawing, sized from what it holds. The
+  // backing rect is what makes it a strip rather than an overlay: whatever
+  // scrolls behind it goes under an opaque ground, not through the letters.
+  function buildStrip(nodes, cls, x0, y0, x1, y1) {
+    var strip = document.createElementNS(NS, 'svg');
+    strip.setAttribute('class', 'cpv ' + cls);
+    strip.setAttribute('viewBox', x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0));
+    // A second drawing of things that have not moved, and the figure's own
+    // description already names them.
+    strip.setAttribute('aria-hidden', 'true');
+
+    var bg = document.createElementNS(NS, 'rect');
+    bg.setAttribute('class', 'cpv-frozen-bg');
+    bg.setAttribute('x', x0);
+    bg.setAttribute('y', y0);
+    bg.setAttribute('width', x1 - x0);
+    bg.setAttribute('height', y1 - y0);
+    strip.appendChild(bg);
+
+    nodes.forEach(function(node) { strip.appendChild(node.cloneNode(true)); });
+    strip.figUnits = { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+    return strip;
+  }
+
+  function union(nodes) {
+    var b = null;
+    nodes.forEach(function(node) {
+      var box = node.getBBox();
+      if (!b) b = { x0: box.x, y0: box.y, x1: box.x + box.width, y1: box.y + box.height };
+      else {
+        b.x0 = Math.min(b.x0, box.x);
+        b.y0 = Math.min(b.y0, box.y);
+        b.x1 = Math.max(b.x1, box.x + box.width);
+        b.y1 = Math.max(b.y1, box.y + box.height);
+      }
+    });
+    return b;
+  }
+
+  // Two strips, because a scrolled heatmap loses two different things off its
+  // left edge. The labels' own boxes give the row strip its width, so it is as
+  // wide as the longest name and no wider; it runs from under the key to the
+  // bottom, since stopping any higher would leave a column heading stranded
+  // over the cells the strip is covering, pointing at ones nobody can see. The
+  // key is pinned in the band above it, which holds nothing else.
+  function buildFrozen(svg) {
+    var labels = [].slice.call(svg.querySelectorAll('.cpv-row'));
+    if (!labels.length) return null;
+    var rows = union(labels);
+    if (!rows) return null;
+
+    var strips = [];
+    var top = 0;
+    var legend = svg.querySelector('.cpv-legend');
+    if (legend) {
+      var key = legend.getBBox();
+      top = key.y + key.height + 5;
+      strips.push(buildStrip([legend], 'cpv-frozen-key', 0, 0, key.x + key.width + 8, top));
+    }
+    strips.push(buildStrip(labels, 'cpv-frozen', Math.max(0, rows.x0 - 4), top,
+                           rows.x1 + 8, svg.viewBox.baseVal.height));
+    return strips;
+  }
+
+  function apply() {
+    document.querySelectorAll('.cpv-fig').forEach(function(fig) {
+      var box = fig.querySelector('.cpv-scroll');
+      var svg = box && box.querySelector('svg');
+      if (!svg) return;
+
+      var style = getComputedStyle(fig);
+      var start = parseFloat(style.getPropertyValue('--fig-scroll-start')) || 0;
+      var freeze = parseFloat(style.getPropertyValue('--fig-freeze-rows')) || 0;
+      var room = box.scrollWidth - box.clientWidth;
+      var units = svg.viewBox.baseVal.width;
+      var drawn = svg.getBoundingClientRect().width;
+      if (!units || !drawn) return;
+      var scale = drawn / units;
+
+      // Rebuilt rather than resized: a strip is as wide as its contents measure,
+      // and they measure differently before the mono face they are set in has
+      // loaded. Rebuilding is a few dozen clones of a text node, and it can
+      // never be holding a width from a font that is no longer on screen.
+      fig.querySelectorAll('.cpv-frozen, .cpv-frozen-key').forEach(function(old) { old.remove(); });
+      var strips = (freeze && room > 0) ? buildFrozen(svg) : null;
+      (strips || []).forEach(function(strip) {
+        strip.style.width = (strip.figUnits.width * scale) + 'px';
+        strip.style.height = (strip.figUnits.height * scale) + 'px';
+        // Pinned flush to the box's edge. The strip's own x is where the crop
+        // starts in the drawing - it trims the empty margin left of the longest
+        // label - not where the strip sits on screen.
+        strip.style.left = box.offsetLeft + 'px';
+        strip.style.top = (box.offsetTop + strip.figUnits.y * scale) + 'px';
+        fig.appendChild(strip);
+      });
+      fig.classList.toggle('cpv-fig--frozen', !!strips);
+
+      // The row strip covers the left edge of the box, so the coordinate asked
+      // for has to clear it to be the first thing actually on screen.
+      var rowStrip = fig.querySelector('.cpv-frozen');
+      var hidden = rowStrip ? rowStrip.figUnits.width : 0;
+      var wanted = room > 0 ? start : 0;
+
+      // Only on the way into a state that asks for it. A phone fires resize for
+      // its own chrome, not just for a rotation, and re-running while the reader
+      // has the figure part-scrolled would drag it back under them. A strip that
+      // remeasures is a new state, so the offset it hides is applied once it is
+      // the real one.
+      var state = wanted + ':' + Math.round(hidden);
+      if (state === fig.figScrollApplied) return;
+      fig.figScrollApplied = state;
+      if (!wanted) return;
+
+      box.scrollLeft = Math.min(Math.max((wanted - hidden) * scale, 0), room);
+    });
+  }
+
+  function markCut() {
+    document.querySelectorAll('.cpv-fig--frozen').forEach(function(fig) {
+      var box = fig.querySelector('.cpv-scroll');
+      // The strip only needs an edge once there is something behind it.
+      fig.classList.toggle('cpv-fig--cut', box.scrollLeft > 0);
+    });
+  }
+
+  function refresh() { apply(); markCut(); }
+
+  if (window.$docsify) {
+    window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+      // A frame after the markup lands, so the figure is measured against the
+      // column it ends up in; and again once the mono face the labels are set in
+      // has loaded, since their measured width is what sizes the strip.
+      hook.doneEach(function() {
+        requestAnimationFrame(refresh);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+      });
+    });
+  }
+  window.addEventListener('resize', refresh);
+  document.addEventListener('scroll', markCut, true);
 }
 
 // --- Global event listeners ---

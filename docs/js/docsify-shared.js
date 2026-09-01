@@ -333,7 +333,6 @@ function buildTitlebarDOM(config) {
           '<div class="titlebar-search-trigger" title="Search">' +
             ICONS.search +
             '<span class="search-hint">Search</span>' +
-            '<kbd class="search-kbd">/</kbd>' +
           '</div>' +
           '<input type="text" class="titlebar-search-input" placeholder="Search..." id="titlebarSearchInput">' +
           '<div class="titlebar-search-results" id="titlebarSearchResults"></div>' +
@@ -590,18 +589,6 @@ function initSearch() {
       } else if (items.length > 0) {
         navigateToResult(items[0].dataset.url);
       }
-    }
-  });
-
-  document.addEventListener('keydown', function(e) {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
-      e.preventDefault();
-      expandSearch();
-      searchInput.select();
-    }
-    if (e.key === '/' && !e.target.matches('input, textarea, [contenteditable]')) {
-      e.preventDefault();
-      expandSearch();
     }
   });
 

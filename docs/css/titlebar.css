@@ -443,17 +443,6 @@ body.sidebar-hidden .content {
   font-size: 13px;
 }
 
-.search-kbd {
-  font-size: 11px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--kbd-bg);
-  border: 1px solid var(--button-border);
-  color: var(--muted-color);
-  font-family: monospace;
-  line-height: 1.5;
-}
-
 .titlebar-search.expanded .titlebar-search-trigger {
   display: none;
 }
@@ -734,7 +723,6 @@ section.content {
   }
 
   .search-hint,
-  .search-kbd,
   .titlebar-nav-label {
     display: none;
   }

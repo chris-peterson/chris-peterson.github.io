@@ -90,17 +90,6 @@
             - name: Python
               pct: 100
 
-        - name: fairlead
-          description: Plugins react to each other's facts without naming each other
-          muted: true
-          icon: https://chris-peterson.github.io/fairlead/favicon.svg
-          url: https://chris-peterson.github.io/fairlead
-          languages:
-            - name: TypeScript
-              pct: 90
-            - name: Shell
-              pct: 10
-
 - group: .NET
   description: NuGet packages
   children:

@@ -755,7 +755,8 @@ function initBreadcrumb(config) {
     .then(function(projects) {
       var dropdown = document.getElementById('repoDropdownContainer');
       if (!dropdown) return;
-      dropdown.innerHTML = renderBlogEntry(config) + renderDropdownTree(projects, 0);
+      dropdown.innerHTML = renderBlogEntry(config) +
+        '<div class="breadcrumb-repo-columns">' + renderDropdownTree(projects, 0) + '</div>';
       renderAncestry(projects, config);
     })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });
@@ -951,7 +952,16 @@ function initProjectCards() {
               }
               var card = renderCard(item);
               if (item.children && item.children.length) {
-                card += '<div class="project-card-children">' + renderItems(item.children) + '</div>';
+                // A parent and its projects place as one item, so a sibling tile
+                // can't land between the header and the block it heads. How many
+                // columns it takes is how many projects it holds: a pair reads as
+                // a tile with a shelf and lets its siblings wrap past it, where a
+                // family of four or more is a section and takes the row.
+                var wide = item.children.length > 3;
+                card = '<div class="project-family' + (wide ? ' project-family-wide' : '') + '"' +
+                  (wide ? '' : ' style="--family-span:' + item.children.length + '"') + '>' +
+                  card + '<div class="project-card-children">' + renderItems(item.children) + '</div>' +
+                '</div>';
               }
               return card;
             }).join('');

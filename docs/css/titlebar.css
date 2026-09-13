@@ -377,6 +377,41 @@ body.sidebar-hidden .content {
   opacity: 0.8;
 }
 
+/* The groups flow in columns, so the menu's height follows its tallest column
+   rather than the sum of every group — and it reads like the index it points at. */
+.breadcrumb-repo-columns {
+  columns: 3;
+  column-gap: 14px;
+  column-rule: 1px solid var(--border-subtle);
+  /* The dropdown is content-sized, so the columns set its width from here. */
+  min-width: 620px;
+}
+
+.breadcrumb-repo-columns .breadcrumb-repo-group {
+  break-inside: avoid;
+}
+
+/* The column rules do the dividing here, so groups stacked in one column are
+   separated by the space above their label instead. */
+.breadcrumb-repo-columns .breadcrumb-repo-group + .breadcrumb-repo-group {
+  border-top: none;
+  margin-top: 0;
+}
+
+/* Narrower than the three columns need, the menu goes back to one list. */
+@media (max-width: 860px) {
+  .breadcrumb-repo-columns {
+    columns: 1;
+    column-rule: none;
+    min-width: 0;
+  }
+
+  .breadcrumb-repo-columns .breadcrumb-repo-group + .breadcrumb-repo-group {
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 4px;
+  }
+}
+
 /* Grouped dropdown */
 .breadcrumb-repo-group { padding: 4px 0 6px; }
 

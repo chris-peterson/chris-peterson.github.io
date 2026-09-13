@@ -138,10 +138,39 @@
   gap: 0.7rem;
 }
 
-.project-group-children > .project-card.has-children,
-.project-group-children > .project-card-children,
 .project-group-children > .project-group {
   grid-column: 1 / -1;
+}
+
+/* Two tiles wide and about two tiles tall, which is what a header over a row of
+   projects measures. Claiming both rows is what lets the tiles beside it keep a
+   tile's height instead of stretching to the family's. */
+.project-group-children > .project-family {
+  grid-column: span var(--family-span, 2);
+  grid-row: span 2;
+}
+
+/* The panel takes the slack, so its bottom edge meets the column beside it. */
+.project-family {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-family > .project-card-children {
+  flex: 1;
+}
+
+.project-group-children > .project-family-wide {
+  grid-column: 1 / -1;
+  grid-row: auto;
+}
+
+/* Below two columns there is no room to wrap past anything. */
+@media (max-width: 620px) {
+  .project-group-children > .project-family {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
 }
 
 /* Nested group label is quieter than a top-level one */

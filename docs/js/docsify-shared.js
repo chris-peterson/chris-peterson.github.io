@@ -305,7 +305,7 @@ function buildTitlebarDOM(config) {
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
   var isHub = config.name === org;
 
-  var toggleLabel = isHub ? 'repos' : config.name;
+  var toggleLabel = isHub ? 'projects' : config.name;
   var toggleIcon = isHub ? '' : '<img class="breadcrumb-repo-icon" src="favicon.svg" alt="" width="16" height="16"> ';
   var navSection =
     '<div class="breadcrumb-repo-selector" id="repoSelector">' +
@@ -755,7 +755,7 @@ function initBreadcrumb(config) {
     .then(function(projects) {
       var dropdown = document.getElementById('repoDropdownContainer');
       if (!dropdown) return;
-      dropdown.innerHTML = renderDropdownTree(projects, 0);
+      dropdown.innerHTML = renderBlogEntry(config) + renderDropdownTree(projects, 0);
       renderAncestry(projects, config);
     })
     .catch(function(err) { console.error('Failed to load projects.yml:', err); });
@@ -805,6 +805,16 @@ function renderAncestry(projects, config) {
     selector.parentNode.insertBefore(node, selector);
     selector.parentNode.insertBefore(slash, selector);
   });
+}
+
+// The blog is the one destination in the menu that isn't a project, so it leads
+// and the projects follow under their own group rules. Someone opening the picker
+// is asking where they can go; behind 29 project rows it is not an answer.
+function renderBlogEntry(config) {
+  var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
+  var href = config.name === org ? '#' + BLOG_ROOT : HUB_ORIGIN + '/#' + BLOG_ROOT;
+  return '<a class="breadcrumb-repo-item breadcrumb-repo-blog" href="' + href + '">' +
+    ICONS.blog + 'Blog</a>';
 }
 
 function renderDropdownTree(items, depth) {
@@ -1101,10 +1111,10 @@ function initBlogChrome(isHub, sidebarMode) {
       if (link) link.classList.toggle('active', inBlog);
 
       // The breadcrumb slot answers "where am I", so on a blog route it says
-      // blog rather than naming the picker it happens to open. The dropdown
-      // still lists the repos, which is how you leave.
+      // blog rather than naming the picker it happens to open. The menu lists
+      // every destination, which is how you leave.
       var label = isHub && document.getElementById('repoSelectorLabel');
-      if (label) label.textContent = inBlog ? 'blog' : 'repos';
+      if (label) label.textContent = inBlog ? 'blog' : 'projects';
 
       // The hub's sidebar has the post list to show in the blog and the project
       // tree in ?mode=sidebar. Elsewhere it has nothing to say, so the page

@@ -90,28 +90,22 @@ body.sidebar-hidden .content {
   display: none !important;
 }
 
-/* The nav takes the scrolling so the source link below it stays put. A lone
-   overflow-y computes overflow-x to auto, which the rail is too narrow to avoid
-   putting a scrollbar under; the clipping the theme did on .sidebar moves here
-   with the scrolling. */
-.sidebar-nav {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.sidebar {
-  overflow-y: hidden;
-}
-
+/* The rail keeps its own scrolling, so its scrollbar stays flush against the
+   rail's edge; a scroller on .sidebar-nav sits inside the rail's right padding
+   and reads as a second edge. The source link sticks to the bottom of that
+   scrollport instead, ordered after the nav, which the theme puts at order 1. */
 .sidebar-source {
   order: 2;
+  position: sticky;
+  bottom: 0;
   flex: none;
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 13px 20px;
+  /* The browser paints its link-target bubble in this same bottom-left corner,
+     over whatever sits there. The deep bottom padding is the band it gets, so
+     the label stays readable while you are pointed at it. */
+  padding: 13px 20px 30px;
   border-top: 1px solid var(--border-subtle);
   background: var(--sidebar-background);
   font-family: var(--font-mono);
@@ -366,6 +360,21 @@ body.sidebar-hidden .content {
 
 .breadcrumb-repo-item .repo-description {
   display: none;
+}
+
+/* The blog leads the menu, held apart from the project groups by the same
+   hairline that divides them from each other. */
+.breadcrumb-repo-blog {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+.breadcrumb-repo-blog svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
 /* Grouped dropdown */

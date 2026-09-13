@@ -21,7 +21,8 @@ var ICONS = {
   chevronRight: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>',
   toggleSun: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
   toggleMoon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
-  blog: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a1 1 0 0 1 1-1h13v18H6a1 1 0 0 1-1-1z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>'
+  blog: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a1 1 0 0 1 1-1h13v18H6a1 1 0 0 1-1-1z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>',
+  grid: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>'
 };
 
 // The blog lives on the hub, under this route. The titlebar link, the sidebar
@@ -305,23 +306,32 @@ function buildTitlebarDOM(config) {
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
   var isHub = config.name === org;
 
-  var toggleLabel = isHub ? 'projects' : config.name;
-  var toggleIcon = isHub ? '' : '<img class="breadcrumb-repo-icon" src="favicon.svg" alt="" width="16" height="16"> ';
+  // The brand opens the menu: it is the node that means "everything of mine" on
+  // every site, which leaves the trail after it to mean "where you are". Holding
+  // both on one node made the hub name the same page twice.
   var navSection =
     '<div class="breadcrumb-repo-selector" id="repoSelector">' +
-      '<button class="breadcrumb-repo-toggle" onclick="toggleRepoSelector()">' +
-        toggleIcon + '<span id="repoSelectorLabel">' + toggleLabel + '</span> ' + ICONS.chevronDown +
+      '<button class="titlebar-brand" onclick="toggleRepoSelector()" aria-haspopup="menu">' +
+        '<span>' + org + '</span> ' + ICONS.chevronDown +
       '</button>' +
       '<div class="breadcrumb-repo-dropdown" id="repoDropdownContainer"></div>' +
-    '</div>';
+    '</div>' +
+    // The bar goes up before projects.yml lands, so a project site seeds the trail
+    // with its own name and favicon and renderAncestry replaces it.
+    '<nav class="breadcrumb-trail" id="breadcrumbTrail" aria-label="Breadcrumb">' +
+      (isHub ? '' :
+        '<span class="breadcrumb-separator">/</span>' +
+        '<span class="breadcrumb-current">' +
+          '<img class="breadcrumb-repo-icon" src="favicon.svg" alt="" width="16" height="16">' +
+          config.name +
+        '</span>') +
+    '</nav>';
 
   var wrapper = document.createElement('div');
   wrapper.innerHTML =
     '<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>' +
     '<div class="titlebar" id="titlebar">' +
       '<button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleSidebar()" title="Toggle menu">' + ICONS.bars + '</button>' +
-      '<a href="' + HUB_ORIGIN + '" class="titlebar-brand"><span>' + org + '</span></a>' +
-      '<span class="breadcrumb-separator">/</span>' +
       navSection +
       '<div class="titlebar-spacer"></div>' +
       '<div class="titlebar-actions">' +
@@ -755,7 +765,7 @@ function initBreadcrumb(config) {
     .then(function(projects) {
       var dropdown = document.getElementById('repoDropdownContainer');
       if (!dropdown) return;
-      dropdown.innerHTML = renderBlogEntry(config) +
+      dropdown.innerHTML = renderMenuHeader(config) +
         '<div class="breadcrumb-repo-columns">' + renderDropdownTree(projects, 0) + '</div>';
       renderAncestry(projects, config);
     })
@@ -780,48 +790,47 @@ function ancestorsOf(items, name, trail) {
 }
 
 function renderAncestry(projects, config) {
-  var selector = document.getElementById('repoSelector');
-  if (!selector || !config || !config.name) return;
+  var trail = document.getElementById('breadcrumbTrail');
+  if (!trail || !config || !config.name) return;
+  var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
+  // The hub sits above every project, so its trail follows the route instead.
+  if (config.name === org) return;
 
-  // The bar is built before projects.yml lands, so the button goes up carrying
-  // the repo name and is renamed here to whatever the manifest calls it.
-  var label = document.getElementById('repoSelectorLabel');
   var self = flattenProjects(projects).filter(function(item) {
     return item.name === config.name;
   })[0];
-  if (label && self) label.textContent = displayName(self);
+  var sep = '<span class="breadcrumb-separator">/</span>';
+  function mark(item) {
+    return '<img class="breadcrumb-repo-icon" src="' +
+      resolveHubPath(item.icon || (item.url + '/favicon.svg')) + '" alt="" width="16" height="16">';
+  }
 
-  var ancestors = ancestorsOf(projects, config.name, []);
-  if (!ancestors || !ancestors.length) return;
-  ancestors.forEach(function(a) {
-    var node = document.createElement('a');
-    node.className = 'breadcrumb-ancestor';
-    node.href = a.url || '#';
-    var icon = resolveHubPath(a.icon || (a.url + '/favicon.svg'));
-    node.innerHTML = '<img class="breadcrumb-repo-icon" src="' + icon + '" alt="" width="16" height="16"> ' +
-      (a.label || a.name);
-    var slash = document.createElement('span');
-    slash.className = 'breadcrumb-separator';
-    slash.textContent = '/';
-    selector.parentNode.insertBefore(node, selector);
-    selector.parentNode.insertBefore(slash, selector);
-  });
+  var html = (ancestorsOf(projects, config.name, []) || []).map(function(a) {
+    return sep + '<a class="breadcrumb-ancestor" href="' + (a.url || '#') + '">' +
+      mark(a) + displayName(a) + '</a>';
+  }).join('');
+  html += sep + '<span class="breadcrumb-current">' +
+    (self ? mark(self) : '<img class="breadcrumb-repo-icon" src="favicon.svg" alt="" width="16" height="16">') +
+    (self ? displayName(self) : config.name) + '</span>';
+  trail.innerHTML = html;
 }
 
-// The blog is the one destination in the menu that isn't a project, so it leads
-// and the projects follow under their own group rules. Someone opening the picker
-// is asking where they can go; behind 29 project rows it is not an answer.
-function renderBlogEntry(config) {
+// The index and the blog are the two destinations that aren't a project, so they
+// lead and the project groups follow. Someone opening the menu is asking where
+// they can go; behind 29 project rows that is not an answer.
+function renderMenuHeader(config) {
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
-  var href = config.name === org ? '#' + BLOG_ROOT : HUB_ORIGIN + '/#' + BLOG_ROOT;
-  return '<a class="breadcrumb-repo-item breadcrumb-repo-blog" href="' + href + '">' +
-    ICONS.blog + 'Blog</a>';
+  var root = config.name === org ? '#' : HUB_ORIGIN + '/#';
+  return '<div class="breadcrumb-repo-top">' +
+    '<a class="breadcrumb-repo-item" href="' + root + '/">' + ICONS.grid + 'Projects</a>' +
+    '<a class="breadcrumb-repo-item" href="' + root + BLOG_ROOT + '">' + ICONS.blog + 'Blog</a>' +
+  '</div>';
 }
 
 function renderDropdownTree(items, depth) {
   return items.map(function(item) {
     if (item.group && item.children) {
-      return '<div class="breadcrumb-repo-group">' +
+      return '<div class="breadcrumb-repo-group' + (item.muted ? ' breadcrumb-repo-group-muted' : '') + '">' +
         '<div class="breadcrumb-repo-group-label">' + item.group + '</div>' +
         renderDropdownTree(item.children, depth + 1) +
       '</div>';
@@ -1120,11 +1129,16 @@ function initBlogChrome(isHub, sidebarMode) {
       var link = document.getElementById('titlebarBlog');
       if (link) link.classList.toggle('active', inBlog);
 
-      // The breadcrumb slot answers "where am I", so on a blog route it says
-      // blog rather than naming the picker it happens to open. The menu lists
-      // every destination, which is how you leave.
-      var label = isHub && document.getElementById('repoSelectorLabel');
-      if (label) label.textContent = inBlog ? 'blog' : 'projects';
+      // A project site's trail comes from the manifest and holds still. The hub's
+      // follows the route, and the blog is the one place under it you can be.
+      if (isHub) {
+        var trail = document.getElementById('breadcrumbTrail');
+        if (trail) {
+          trail.innerHTML = inBlog
+            ? '<span class="breadcrumb-separator">/</span><span class="breadcrumb-current">blog</span>'
+            : '';
+        }
+      }
 
       // The hub's sidebar has the post list to show in the blog and the project
       // tree in ?mode=sidebar. Elsewhere it has nothing to say, so the page

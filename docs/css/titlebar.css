@@ -365,11 +365,14 @@ body.sidebar-hidden .content {
   display: none;
 }
 
-/* The index and the blog lead the menu, held apart from the project groups by
-   the same hairline that divides those from each other. */
+/* The blog is the one destination in the menu that isn't a project. It sits in
+   the menu's top corner, clear of the columns, held off them by the same
+   hairline that divides the groups from each other. */
 .breadcrumb-repo-top {
+  display: flex;
+  justify-content: flex-end;
   border-bottom: 1px solid var(--border-subtle);
-  padding: 4px 0 5px;
+  padding: 4px 6px 5px;
 }
 
 .breadcrumb-repo-top svg {
@@ -484,36 +487,6 @@ body.sidebar-hidden .content {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-/* ── Nav links ──────────────────────────────────────── */
-
-.titlebar-nav-link {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 10px;
-  border-radius: 8px;
-  color: var(--muted-color);
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.2s ease, background 0.2s ease;
-}
-
-.titlebar-nav-link:hover {
-  background: var(--button-bg);
-  color: var(--base-color);
-  text-decoration: none;
-}
-
-.titlebar-nav-link.active {
-  background: var(--button-bg);
-  color: var(--theme-color);
-}
-
-.titlebar-nav-link svg {
-  opacity: 0.75;
 }
 
 /* ── Search ─────────────────────────────────────────── */
@@ -830,12 +803,7 @@ section.content {
     width: 240px;
   }
 
-  .search-hint,
-  .titlebar-nav-label {
+  .search-hint {
     display: none;
-  }
-
-  .titlebar-nav-link {
-    padding: 5px 7px;
   }
 }

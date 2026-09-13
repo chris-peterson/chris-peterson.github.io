@@ -21,8 +21,7 @@ var ICONS = {
   chevronRight: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>',
   toggleSun: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
   toggleMoon: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
-  blog: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a1 1 0 0 1 1-1h13v18H6a1 1 0 0 1-1-1z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>',
-  grid: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>'
+  blog: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a1 1 0 0 1 1-1h13v18H6a1 1 0 0 1-1-1z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>'
 };
 
 // The blog lives on the hub, under this route. The titlebar link, the sidebar
@@ -318,14 +317,16 @@ function buildTitlebarDOM(config) {
     '</div>' +
     // The bar goes up before projects.yml lands, so a project site seeds the trail
     // with its own name and favicon and renderAncestry replaces it.
-    '<nav class="breadcrumb-trail" id="breadcrumbTrail" aria-label="Breadcrumb">' +
+    // A <nav> here is docsify's app-nav: its navbar plugin claims the first one
+    // in the document and the theme pins it to the top right.
+    '<div class="breadcrumb-trail" id="breadcrumbTrail" role="navigation" aria-label="Breadcrumb">' +
       (isHub ? '' :
         '<span class="breadcrumb-separator">/</span>' +
         '<span class="breadcrumb-current">' +
           '<img class="breadcrumb-repo-icon" src="favicon.svg" alt="" width="16" height="16">' +
           config.name +
         '</span>') +
-    '</nav>';
+    '</div>';
 
   var wrapper = document.createElement('div');
   wrapper.innerHTML =
@@ -335,10 +336,6 @@ function buildTitlebarDOM(config) {
       navSection +
       '<div class="titlebar-spacer"></div>' +
       '<div class="titlebar-actions">' +
-        '<a href="' + (isHub ? '#' + BLOG_ROOT : HUB_ORIGIN + '/#' + BLOG_ROOT) + '"' +
-          ' class="titlebar-nav-link" id="titlebarBlog" title="Blog">' +
-          ICONS.blog + '<span class="titlebar-nav-label">Blog</span>' +
-        '</a>' +
         (config.search === false ? '' :
         '<div class="titlebar-search" id="titlebarSearch">' +
           '<div class="titlebar-search-trigger" title="Search">' +
@@ -815,14 +812,13 @@ function renderAncestry(projects, config) {
   trail.innerHTML = html;
 }
 
-// The index and the blog are the two destinations that aren't a project, so they
-// lead and the project groups follow. Someone opening the menu is asking where
-// they can go; behind 29 project rows that is not an answer.
+// The blog is the one destination in the menu that isn't a project, so it sits
+// in the menu's top corner rather than in a group. Someone opening the menu is
+// asking where they can go; behind 29 project rows that is not an answer.
 function renderMenuHeader(config) {
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
   var root = config.name === org ? '#' : HUB_ORIGIN + '/#';
   return '<div class="breadcrumb-repo-top">' +
-    '<a class="breadcrumb-repo-item" href="' + root + '/">' + ICONS.grid + 'Projects</a>' +
     '<a class="breadcrumb-repo-item" href="' + root + BLOG_ROOT + '">' + ICONS.blog + 'Blog</a>' +
   '</div>';
 }
@@ -1125,9 +1121,6 @@ function initBlogChrome(isHub, sidebarMode) {
     hook.doneEach(function() {
       var route = currentRoute();
       var inBlog = route.indexOf(BLOG_ROOT) === 0;
-
-      var link = document.getElementById('titlebarBlog');
-      if (link) link.classList.toggle('active', inBlog);
 
       // A project site's trail comes from the manifest and holds still. The hub's
       // follows the route, and the blog is the one place under it you can be.

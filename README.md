@@ -2,7 +2,7 @@
 
 Hub site for Chris Peterson's open source project documentation.
 
-https://chris-peterson.github.io | [source](https://github.com/chris-peterson/chris-peterson.github.io)
+https://chris-peterson.github.io | [more projects](https://github.com/chris-peterson)
 
 ## Site Layout
 

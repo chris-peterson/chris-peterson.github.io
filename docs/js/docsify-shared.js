@@ -67,7 +67,8 @@ function initProject(config) {
   config.site_url = HUB_ORIGIN + '/' + config.name;
   var isHub = config.name === org;
   var sidebarMode = isHub && new URLSearchParams(window.location.search).get('mode') === 'sidebar';
-  config.repo_source = isHub ? 'https://github.com/' + org : 'https://github.com/' + org + '/' + config.name;
+  config.profile_url = 'https://github.com/' + org;
+  config.source_url = 'https://github.com/' + org + '/' + (isHub ? org + '.github.io' : config.name);
   config.search = !isHub || sidebarMode;
   var defaults = {
     loadSidebar: true,
@@ -195,6 +196,7 @@ function initProject(config) {
   initLangTooltip();
   initWideFigures();
   if (sidebarMode) initSidebarProjects();
+  initSidebarSource(config);
   initEventListeners();
 
   function loadNext(i) {
@@ -244,8 +246,7 @@ function initProject(config) {
 // titlebar.css itself.
 function initTitlebar(config) {
   var org = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
-  config.repo_source = config.repo_source ||
-    'https://github.com/' + org + '/' + config.name;
+  config.profile_url = config.profile_url || 'https://github.com/' + org;
   // docsify builds the search index; a page without it gets no search trigger.
   if (config.search === undefined) config.search = false;
   buildTitlebarDOM(config);
@@ -342,7 +343,7 @@ function buildTitlebarDOM(config) {
           '<span class="theme-toggle-option theme-toggle-moon">' + ICONS.toggleMoon + '</span>' +
           '<span class="theme-toggle-indicator"></span>' +
         '</div>' +
-        '<a href="' + config.repo_source + '" target="_blank" class="titlebar-github" title="View on GitHub">' + ICONS.github + '</a>' +
+        '<a href="' + config.profile_url + '" target="_blank" class="titlebar-github" title="' + org + ' on GitHub">' + ICONS.github + '</a>' +
       '</div>' +
     '</div>';
 
@@ -826,6 +827,30 @@ function renderDropdownTree(items, depth) {
     }
     return html;
   }).join('');
+}
+
+// The rail's footer: this site's own repo. The titlebar's octocat points at the
+// profile, so without this a project site names every sibling project and not
+// its own code. It is a child of .sidebar rather than .sidebar-nav so docsify's
+// re-render on each route leaves it alone; the theme gives .sidebar-nav order:1,
+// hence the order on the link. Only the href is built here — the mark beside it
+// is the stylesheet's.
+function initSidebarSource(config) {
+  if (!window.$docsify) return;
+
+  window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook) {
+    hook.doneEach(function() {
+      var sidebar = document.querySelector('.sidebar');
+      if (!sidebar || sidebar.querySelector(':scope > .sidebar-source')) return;
+      var link = document.createElement('a');
+      link.className = 'sidebar-source';
+      link.href = config.source_url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'source';
+      sidebar.appendChild(link);
+    });
+  });
 }
 
 function initSidebarProjects() {

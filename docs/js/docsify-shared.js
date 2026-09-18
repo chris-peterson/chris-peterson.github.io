@@ -97,6 +97,10 @@ function initProject(config) {
       placeholder: 'Search...',
       noData: 'No results',
       paths: 'auto',
+      // Every site in the family is a path on one origin, so they share one
+      // localStorage. Without this the index is one pile, and a row from a
+      // sibling resolves its site-relative route against this site — a 404.
+      namespace: config.name,
       // Matches the toc target above: at docsify's default of 2 an h3 folds into
       // the h2 before it, and a hit on it jumps to the wrong heading.
       depth: 3
@@ -485,6 +489,14 @@ function initSearch() {
     });
   }
 
+  // Mirrors the plugin's own resolveIndexKey: the namespace it was configured
+  // with is the suffix on the key it writes.
+  function searchIndexKey() {
+    var config = window.$docsify && window.$docsify.search;
+    var namespace = config && config.namespace;
+    return 'docsify.search.index' + (namespace ? '/' + namespace : '');
+  }
+
   // docsify's own index nests one level deeper than the prebuilt SEARCH_INDEX
   // shape: page path -> section slug -> {slug, title, body}. Flatten to
   // slug -> section so both sources read the same.
@@ -513,7 +525,7 @@ function initSearch() {
     var searchData = null;
 
     try {
-      var storedIndex = localStorage.getItem('docsify.search.index');
+      var storedIndex = localStorage.getItem(searchIndexKey());
       if (storedIndex) searchData = JSON.parse(storedIndex);
     } catch (e) {}
 

@@ -69,7 +69,7 @@ function initProject(config) {
   var sidebarMode = isHub && new URLSearchParams(window.location.search).get('mode') === 'sidebar';
   config.profile_url = 'https://github.com/' + org;
   config.source_url = 'https://github.com/' + org + '/' + (isHub ? org + '.github.io' : config.name);
-  config.search = !isHub || sidebarMode;
+  if (config.search === undefined) config.search = true;
   var defaults = {
     loadSidebar: true,
     subMaxLevel: 2,
@@ -89,10 +89,17 @@ function initProject(config) {
     // decides per route (initBlogChrome). docsify's own flag would rip the
     // sidebar out of the DOM on first render, with no way back for the next one.
     hideSidebar: false,
+    // The page's own headings, in the right rail. Generated, so it lists every
+    // section rather than the subset a hand-written sidebar tree happens to
+    // carry.
+    toc: { target: 'h2, h3', tocMaxLevel: 3 },
     search: {
       placeholder: 'Search...',
       noData: 'No results',
-      paths: 'auto'
+      paths: 'auto',
+      // Matches the toc target above: at docsify's default of 2 an h3 folds into
+      // the h2 before it, and a hit on it jumps to the wrong heading.
+      depth: 3
     },
     'flexible-alerts': {
       style: 'callout'
@@ -125,7 +132,8 @@ function initProject(config) {
   var steps = [
     { fn: function () { window.Docsify = { version: '4.0.0' }; } },
     { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts' },
-    { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' }
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-copy-code@2' },
+    { src: 'https://cdn.jsdelivr.net/npm/docsify-plugin-toc@1/dist/docsify-plugin-toc.min.js' }
   ];
 
   (config.plugins || []).forEach(function(name) {
@@ -178,9 +186,11 @@ function initProject(config) {
     });
   }
 
+  // The search plugin builds the index the titlebar box reads, so it loads
+  // wherever there is a box to read it.
   steps = steps.concat([
-    { src: 'https://cdn.jsdelivr.net/npm/docsify@4' },
-    !isHub && { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' }
+    config.search && { src: 'https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js' },
+    { src: 'https://cdn.jsdelivr.net/npm/docsify@4' }
   ].filter(Boolean));
 
   (config.code_languages || []).forEach(function(lang) {
@@ -189,7 +199,7 @@ function initProject(config) {
 
   buildTitlebarDOM(config);
   initTheme();
-  if (!isHub || sidebarMode) initSearch();
+  initSearch();
   initProjectCards();
   initComments(config.comments);
   initBlogChrome(isHub, sidebarMode);
@@ -398,7 +408,23 @@ function initSearch() {
   var searchInput = document.getElementById('titlebarSearchInput');
   var searchResults = document.getElementById('titlebarSearchResults');
   var searchIndex = [];
+  var projectIndex = [];
   var selectedIndex = -1;
+  var MAX_ROWS = 15;
+  // Leaves room in the list for body matches when a query hits many page titles.
+  var MAX_TITLE_ROWS = 10;
+
+  loadProjects().then(function(projects) {
+    projectIndex = flattenProjects(projects).map(function(project) {
+      var name = displayName(project);
+      return {
+        title: name,
+        url: project.url,
+        snippet: project.description || '',
+        searchText: (name + ' ' + (project.description || '')).toLowerCase()
+      };
+    });
+  });
 
   function buildSearchIndex() {
     searchIndex = [];
@@ -438,6 +464,10 @@ function initSearch() {
   }
 
   function navigateToResult(url) {
+    if (/^[a-z]+:\/\//i.test(url)) {
+      window.location.href = url;
+      return;
+    }
     window.location.hash = url.startsWith('#') ? url.substring(1) : url;
     collapseSearch();
     searchInput.blur();
@@ -455,8 +485,31 @@ function initSearch() {
     });
   }
 
-  function doFullTextSearch(query) {
-    var fullTextResults = [];
+  // docsify's own index nests one level deeper than the prebuilt SEARCH_INDEX
+  // shape: page path -> section slug -> {slug, title, body}. Flatten to
+  // slug -> section so both sources read the same.
+  function flattenIndex(data) {
+    var flat = {};
+    Object.keys(data).forEach(function(page) {
+      var entry = data[page];
+      if (!entry || typeof entry !== 'object') return;
+      if (typeof entry.body === 'string' || typeof entry.title === 'string') {
+        flat[page] = entry;
+        return;
+      }
+      Object.keys(entry).forEach(function(slug) {
+        var section = entry[slug];
+        if (section && typeof section === 'object' &&
+            (typeof section.body === 'string' || typeof section.title === 'string')) {
+          flat[slug] = section;
+        }
+      });
+    });
+    return flat;
+  }
+
+  function fullTextMatches(query) {
+    var results = [];
     var searchData = null;
 
     try {
@@ -470,59 +523,73 @@ function initSearch() {
         if (item.slug) searchData[item.slug] = { title: item.title, body: item.body };
       });
     }
+    if (!searchData) return results;
+    searchData = flattenIndex(searchData);
 
-    if (searchData) {
-      Object.keys(searchData).forEach(function(path) {
-        var item = searchData[path];
-        var title = item.title || '';
-        var body = item.body || '';
-        var titleLower = title.toLowerCase();
-        var bodyLower = body.toLowerCase();
-        var titleMatch = titleLower.includes(query);
-        var bodyMatch = bodyLower.includes(query);
+    Object.keys(searchData).forEach(function(path) {
+      var item = searchData[path];
+      var title = item.title || '';
+      // A generated figure lands in the index as raw SVG, and a snippet of tag
+      // soup names nothing — match the text between the tags.
+      var body = (item.body || '').replace(/<[^>]*>/g, ' ').replace(/[ \t]+/g, ' ');
+      var titleLower = title.toLowerCase();
+      var bodyLower = body.toLowerCase();
+      var titleMatch = titleLower.includes(query);
+      var bodyMatch = bodyLower.includes(query);
+      if (!titleMatch && !bodyMatch) return;
 
-        if (titleMatch || bodyMatch) {
-          var snippet = '';
-          if (bodyMatch) {
-            var idx = bodyLower.indexOf(query);
-            var start = Math.max(0, idx - 40);
-            var end = Math.min(body.length, idx + query.length + 60);
-            snippet = (start > 0 ? '...' : '') + body.substring(start, end).replace(/\n/g, ' ') + (end < body.length ? '...' : '');
-          }
-          if (path && path.length > 1 && !path.includes('#')) {
-            fullTextResults.push({
-              title: title || path.split('/').pop().replace('.md', ''),
-              url: '#' + path,
-              snippet: snippet,
-              score: titleMatch ? 2 : 1
-            });
-          }
-        }
-      });
+      var snippet = '';
+      if (bodyMatch) {
+        var idx = bodyLower.indexOf(query);
+        var start = Math.max(0, idx - 40);
+        var end = Math.min(body.length, idx + query.length + 60);
+        snippet = (start > 0 ? '...' : '') + body.substring(start, end).replace(/\n/g, ' ') + (end < body.length ? '...' : '');
+      }
 
-      fullTextResults.sort(function(a, b) { return b.score - a.score; });
-      var seen = new Set();
-      fullTextResults = fullTextResults.filter(function(r) {
-        if (seen.has(r.url)) return false;
-        seen.add(r.url);
-        return true;
-      }).slice(0, 15);
-    }
+      var slug = item.slug || path;
+      var url = slug.charAt(0) === '#' ? slug : '#' + slug;
+      // A section heading on its own ("Aliases", "Parameters") doesn't say which
+      // page it came from, so the row leads with the page and keeps the heading
+      // as context.
+      var pagePath = url.split('?')[0];
+      var pageName = pagePath.replace(/^#\/?/, '').split('/').filter(Boolean).pop() || '';
+      pageName = pageName.replace('.md', '');
+      var rowTitle = pageName || title;
+      if (title && pageName && title !== pageName) rowTitle = pageName + ' \u203a ' + title;
+      if (pagePath.length > 1) {
+        results.push({
+          title: rowTitle,
+          url: url,
+          snippet: snippet,
+          score: titleMatch ? 2 : 1
+        });
+      }
+    });
 
-    if (fullTextResults.length > 0) {
-      searchResults.innerHTML = fullTextResults.map(function(r, i) {
-        var snippetHtml = r.snippet ? '<div class="titlebar-search-result-content">' + r.snippet.replace(/</g, '&lt;') + '</div>' : '';
-        return '<div class="titlebar-search-result" data-url="' + r.url + '" data-index="' + i + '">' +
-          '<div class="titlebar-search-result-title">' + r.title + '</div>' +
-          snippetHtml +
-        '</div>';
-      }).join('');
-      searchContainer.classList.add('has-results');
-      addResultHandlers();
-    } else {
+    results.sort(function(a, b) { return b.score - a.score; });
+    var seen = new Set();
+    return results.filter(function(r) {
+      if (seen.has(r.url)) return false;
+      seen.add(r.url);
+      return true;
+    });
+  }
+
+  function renderResults(rows, query) {
+    if (rows.length === 0) {
       searchResults.innerHTML = '<div class="titlebar-search-result"><div class="titlebar-search-result-title" style="opacity: 0.6">No results for "' + query + '"</div></div>';
       searchContainer.classList.add('has-results');
+      return;
     }
+    searchResults.innerHTML = rows.map(function(r, i) {
+      var snippetHtml = r.snippet ? '<div class="titlebar-search-result-content">' + r.snippet.replace(/</g, '&lt;') + '</div>' : '';
+      return '<div class="titlebar-search-result" data-url="' + r.url + '" data-index="' + i + '">' +
+        '<div class="titlebar-search-result-title">' + r.title + '</div>' +
+        snippetHtml +
+      '</div>';
+    }).join('');
+    searchContainer.classList.add('has-results');
+    addResultHandlers();
   }
 
   function performSearch() {
@@ -549,19 +616,26 @@ function initSearch() {
       return a.title.localeCompare(b.title);
     });
 
-    var topResults = results.slice(0, 15);
-
-    if (topResults.length > 0) {
-      searchResults.innerHTML = topResults.map(function(r, i) {
-        return '<div class="titlebar-search-result" data-url="' + r.url + '" data-index="' + i + '">' +
-          '<div class="titlebar-search-result-title">' + r.title + '</div>' +
-        '</div>';
-      }).join('');
-      searchContainer.classList.add('has-results');
-      addResultHandlers();
-    } else {
-      doFullTextSearch(query);
+    // Page titles, then the sibling projects, then body matches. All three run
+    // every time: searching a page's own name is how a reader finds what its
+    // title doesn't say — an alias, a parameter — and that lives in the body.
+    var taken = {};
+    var rows = [];
+    function take(row) {
+      if (taken[row.url]) return;
+      taken[row.url] = true;
+      rows.push(row);
     }
+
+    results.slice(0, MAX_TITLE_ROWS).forEach(function(r) {
+      take({ title: r.title, url: r.url });
+    });
+    projectIndex.forEach(function(p) {
+      if (p.searchText.includes(query)) take(p);
+    });
+    fullTextMatches(query).forEach(take);
+
+    renderResults(rows.slice(0, MAX_ROWS), query);
   }
 
   searchTrigger.addEventListener('click', function(e) {

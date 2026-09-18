@@ -529,6 +529,121 @@ pre[data-lang]::after {
 }
 
 /* ─────────────────────────────────────────────────
+   Page contents rail (docsify-plugin-toc)
+   ───────────────────────────────────────────────── */
+
+/* The rail takes its colors from the tokens, in place of the stylesheet the
+   plugin ships. */
+:root {
+  --toc-width: 15rem;
+}
+
+/* Under three columns' worth of width the sidebar is the only nav that fits. */
+aside.toc-nav {
+  display: none;
+}
+
+@media (min-width: 1400px) {
+  aside.toc-nav {
+    display: block;
+    position: fixed;
+    top: 52px; /* clears the fixed titlebar */
+    right: 0;
+    z-index: 5;
+    box-sizing: border-box;
+    width: var(--toc-width);
+    max-height: calc(100vh - 52px);
+    overflow-y: auto;
+    padding: 1.6rem 1.1rem 2rem 0.4rem;
+  }
+
+  /* The rail is fixed, so the column it sits beside has to give up the width
+     itself — .content is what the centered measure is centered inside. */
+  .content {
+    padding-right: var(--toc-width);
+  }
+
+  /* A rail with nothing to jump to gives the width back to the content — and
+     goes, rather than sitting over the page as an empty box that eats clicks. */
+  aside.toc-nav.nothing {
+    display: none;
+  }
+
+  .content:not(:has(.page_toc div[class^="lv"] a)) {
+    padding-right: 0;
+  }
+}
+
+.page_toc {
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.page_toc::before {
+  content: 'On this page';
+  display: block;
+  margin: 0 0 0.6rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-color);
+}
+
+.page_toc div[class^="lv"] {
+  border-left: 2px solid var(--border-subtle);
+  padding: 0.12rem 0;
+  cursor: pointer;
+}
+
+/* Only the headings docsify rendered carry an anchor to jump to. One injected
+   afterwards (the comments heading) would be a row that goes nowhere — and the
+   rail's scroll-spy indexes rows by position, so it is hidden rather than
+   removed. */
+.page_toc div[class^="lv"]:not(:has(a)) {
+  display: none;
+}
+
+.page_toc:not(:has(div[class^="lv"] a)) {
+  display: none;
+}
+
+.page_toc div.lv3 {
+  padding-left: 0.8rem;
+}
+
+.page_toc div[class^="lv"] a {
+  display: block;
+  padding-left: 0.75rem;
+  text-decoration: none;
+}
+
+/* docsify's heading anchor carries the text in a span and appends a '#' on
+   hover; the rail wants the text alone, on one line. */
+.page_toc div[class^="lv"] a span {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--muted-color);
+  transition: color 0.2s ease;
+}
+
+.page_toc .anchor:hover:after {
+  content: "";
+}
+
+.page_toc div[class^="lv"] a:hover span,
+.page_toc div.active a span {
+  color: var(--theme-color);
+}
+
+.page_toc div.active {
+  border-left-color: var(--theme-color);
+  transition: border-left-color 0.23s ease;
+}
+
+/* ─────────────────────────────────────────────────
    Typography
    ───────────────────────────────────────────────── */
 

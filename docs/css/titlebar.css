@@ -807,3 +807,23 @@ section.content {
     display: none;
   }
 }
+
+/* The current crumb doubles as a picker for the set it belongs to, so it takes
+   a button's affordances without a button's chrome: it still reads as the
+   emphasized node in the trail. */
+.breadcrumb-current-toggle {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  gap: 6px;
+}
+.breadcrumb-current-toggle svg {
+  opacity: 0.55;
+  transition: transform 0.2s ease;
+}
+.breadcrumb-repo-selector.open .breadcrumb-current-toggle svg {
+  transform: rotate(180deg);
+}

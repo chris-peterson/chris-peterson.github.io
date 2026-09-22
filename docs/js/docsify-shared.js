@@ -308,9 +308,15 @@ function toggleTheme() {
   }
 }
 
-function toggleRepoSelector() {
-  var selector = document.getElementById('repoSelector');
-  if (selector) selector.classList.toggle('open');
+function toggleRepoSelector(id) {
+  var selector = document.getElementById(id || 'repoSelector');
+  if (!selector) return;
+  // One open at a time, so the brand menu and a crumb's sibling list do not
+  // overlap each other.
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.breadcrumb-repo-selector.open'),
+    function(el) { if (el !== selector) el.classList.remove('open'); });
+  selector.classList.toggle('open');
 }
 
 // --- DOM builders ---
@@ -872,6 +878,33 @@ function ancestorsOf(items, name, trail) {
   return null;
 }
 
+// The crumb you are standing on is the one place a reader looks to move sideways
+// — from one bridge.ai plugin to the next — so it carries its own list. The
+// brand menu holds everything; this holds the set you are already inside.
+function siblingsOf(items, name) {
+  var here = [];
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    if (item.group && item.children) {
+      var inGroup = siblingsOf(item.children, name);
+      if (inGroup) return inGroup;
+      here = here.concat(item.children.filter(function(c) { return !c.group; }));
+    } else {
+      here.push(item);
+    }
+  }
+  for (var j = 0; j < here.length; j++) {
+    if (here[j].name === name) return here;
+  }
+  for (var k = 0; k < items.length; k++) {
+    if (items[k].children && !items[k].group) {
+      var deeper = siblingsOf(items[k].children, name);
+      if (deeper) return deeper;
+    }
+  }
+  return null;
+}
+
 function renderAncestry(projects, config) {
   var trail = document.getElementById('breadcrumbTrail');
   if (!trail || !config || !config.name) return;
@@ -892,9 +925,34 @@ function renderAncestry(projects, config) {
     return sep + '<a class="breadcrumb-ancestor" href="' + (a.url || '#') + '">' +
       mark(a) + displayName(a) + '</a>';
   }).join('');
-  html += sep + '<span class="breadcrumb-current">' +
-    (self ? mark(self) : '<img class="breadcrumb-repo-icon" src="favicon.svg" alt="" width="16" height="16">') +
-    (self ? displayName(self) : config.name) + '</span>';
+  var icon = self ? mark(self)
+    : '<img class="breadcrumb-repo-icon" src="favicon.svg" alt="" width="16" height="16">';
+  var label = self ? displayName(self) : config.name;
+  var peers = (siblingsOf(projects, config.name) || []).filter(function(item) {
+    return item.name !== config.name;
+  });
+
+  if (peers.length) {
+    html += sep +
+      '<span class="breadcrumb-repo-selector" id="crumbSelector">' +
+        '<button class="breadcrumb-current breadcrumb-current-toggle"' +
+          ' onclick="toggleRepoSelector(\'crumbSelector\')" aria-haspopup="menu">' +
+          icon + label + ' ' + ICONS.chevronDown +
+        '</button>' +
+        '<div class="breadcrumb-repo-dropdown">' +
+          peers.map(function(item) {
+            return '<a class="breadcrumb-repo-item" href="' + (item.url || '#') + '"' +
+              (item.description ? ' title="' + item.description + '"' : '') + '>' +
+              '<img class="repo-icon" src="' +
+                resolveHubPath(item.icon || (item.url + '/favicon.svg')) +
+                '" alt="" width="20" height="20"> ' + displayName(item) +
+            '</a>';
+          }).join('') +
+        '</div>' +
+      '</span>';
+  } else {
+    html += sep + '<span class="breadcrumb-current">' + icon + label + '</span>';
+  }
   trail.innerHTML = html;
 }
 

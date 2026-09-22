@@ -29,7 +29,7 @@
               pct: 30
 
         - name: anchor
-          description: Consistency across issues, reviews, commits, and releases
+          description: anchor your development practices.
           icon: https://chris-peterson.github.io/anchor/favicon.svg
           url: https://chris-peterson.github.io/anchor
           languages:

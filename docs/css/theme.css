@@ -898,3 +898,60 @@ body.hub-home .hub-head h1 {
 .project-card.has-children .lang-bar-segment[data-label]::after {
   display: none;
 }
+
+/* bridge.ai plugin hero.
+
+   One row per plugin home: the tagline leads, and the glyph sits with the
+   version chip docs/_tags.md generates in a tinted panel at the end. Every
+   tagline opens with the plugin's own name, so the name is both the wordmark
+   and the sentence's subject and is said once. Names that cannot act as a verb
+   (ClaudeWatch, shipshape, sextant) take a colon after the name instead.
+
+   --accent is the plugin's group colour from the marketplace catalog, so the
+   colour carries the same grouping here as on a changelog row. Each site sets
+   it on .ph-hero. */
+.ph-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 0 0 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle, rgba(128, 128, 128, 0.22));
+}
+.markdown-section .ph-hero .ph-lede {
+  flex: 1 1 auto;
+  margin: 0;
+  font-family: Fraunces, "Iowan Old Style", Georgia, serif;
+  font-weight: 700;
+  font-size: 1.85em;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--base-color);
+}
+.ph-hero .ph-name { color: var(--accent, var(--theme-color)); }
+
+.ph-badge {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 auto;
+  padding: 5px 13px 5px 6px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--accent, var(--theme-color)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, var(--theme-color)) 22%, transparent);
+}
+/* _tags.md ships its own <style>, which lands here as a flex child. */
+.ph-badge > style { display: none; }
+.ph-badge .ph-mark { width: 26px; height: 26px; border-radius: 7px; display: block; }
+.markdown-section .ph-badge .ph-tags { margin: 0; }
+.markdown-section .ph-badge .ph-tag {
+  border: 0;
+  padding: 0;
+  color: var(--base-color);
+  opacity: 0.72;
+}
+
+@media (max-width: 640px) {
+  .ph-hero { flex-wrap: wrap; gap: 14px; }
+  .markdown-section .ph-hero .ph-lede { flex-basis: 100%; font-size: 1.5em; }
+}

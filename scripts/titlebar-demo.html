@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Titlebar demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/titlebar.css">
+  <style>
+    body { margin: 0; background: var(--bg, #fff); color: var(--text, #222); font-family: system-ui, sans-serif; }
+    main { max-width: 720px; margin: 96px auto 0; padding: 0 16px; line-height: 1.5; }
+    select { font: inherit; padding: 4px 8px; }
+    #blocked { font-family: ui-monospace, monospace; min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Titlebar demo</h1>
+    <p>The bar above renders as it does on the site you pick. Links to another
+      project in projects.yml switch the demo to that project; every other link
+      is held here and shown below instead of leaving the page.</p>
+    <p><label>Project <select id="project"></select></label></p>
+    <p>Held link: <span id="blocked">none</span></p>
+  </main>
+  <script src="/js/docsify-shared.js"></script>
+  <script>
+    var params = new URLSearchParams(location.search);
+    var name = params.get('project') || 'pwsh-forge';
+    initTitlebar({ name: name });
+
+    function canonical(url) {
+      return url.replace(/#\/?$/, '').replace(/\/+$/, '');
+    }
+
+    function show(project) {
+      location.search = '?project=' + encodeURIComponent(project);
+    }
+
+    loadProjects().then(function(projects) {
+      var flat = flattenProjects(projects);
+      var byUrl = {};
+      flat.forEach(function(item) { if (item.url) byUrl[canonical(item.url)] = item.name; });
+      var hub = HUB_ORIGIN.replace('https://', '').replace('.github.io', '');
+      byUrl[HUB_ORIGIN] = hub;
+
+      var picker = document.getElementById('project');
+      [hub].concat(flat.map(function(item) { return item.name; })).forEach(function(n) {
+        var option = document.createElement('option');
+        option.value = option.textContent = n;
+        option.selected = n === name;
+        picker.appendChild(option);
+      });
+      picker.addEventListener('change', function() { show(picker.value); });
+
+      // Capture phase, so a link is caught before the browser follows it.
+      document.addEventListener('click', function(e) {
+        var link = e.target.closest('a[href]');
+        if (!link) return;
+        e.preventDefault();
+        var target = byUrl[canonical(link.href)];
+        if (target) show(target);
+        else document.getElementById('blocked').textContent = link.href;
+      }, true);
+    });
+  </script>
+</body>
+</html>

@@ -878,9 +878,10 @@ function ancestorsOf(items, name, trail) {
   return null;
 }
 
-// The crumb you are standing on is the one place a reader looks to move sideways
-// — from one bridge.ai plugin to the next — so it carries its own list. The
-// brand menu holds everything; this holds the set you are already inside.
+// The crumb you are standing on is the one place a reader looks to move on
+// — from bridge.ai into its plugins, from one plugin to the next — so it carries
+// its own list: a project's children when it has them, its siblings otherwise.
+// The brand menu holds everything; this holds the set you are already inside.
 function siblingsOf(items, name) {
   var here = [];
   for (var i = 0; i < items.length; i++) {
@@ -921,16 +922,47 @@ function renderAncestry(projects, config) {
       resolveHubPath(item.icon || (item.url + '/favicon.svg')) + '" alt="" width="16" height="16">';
   }
 
-  var html = (ancestorsOf(projects, config.name, []) || []).map(function(a) {
-    return sep + '<a class="breadcrumb-ancestor" href="' + (a.url || '#') + '">' +
+  function peersOf(name) {
+    return (siblingsOf(projects, name) || []).filter(function(item) {
+      return item.name !== name;
+    });
+  }
+  function menu(items) {
+    return '<div class="breadcrumb-repo-dropdown">' +
+      items.map(function(item) {
+        return '<a class="breadcrumb-repo-item" href="' + (item.url || '#') + '"' +
+          (item.description ? ' title="' + item.description + '"' : '') + '>' +
+          '<img class="repo-icon" src="' +
+            resolveHubPath(item.icon || (item.url + '/favicon.svg')) +
+            '" alt="" width="20" height="20"> ' + displayName(item) +
+        '</a>';
+      }).join('') +
+    '</div>';
+  }
+
+  // An ancestor keeps its link and gains a list of the projects beside it, so
+  // the trail can move sideways at every level, not only the last.
+  var html = (ancestorsOf(projects, config.name, []) || []).map(function(a, i) {
+    var link = '<a class="breadcrumb-ancestor" href="' + (a.url || '#') + '">' +
       mark(a) + displayName(a) + '</a>';
+    var beside = peersOf(a.name);
+    if (!beside.length) return sep + link;
+    var id = 'crumbAncestor' + i;
+    return sep +
+      '<span class="breadcrumb-repo-selector breadcrumb-ancestor-selector" id="' + id + '">' +
+        link +
+        '<button class="breadcrumb-ancestor-toggle" onclick="toggleRepoSelector(\'' + id + '\')"' +
+          ' aria-haspopup="menu" aria-label="Projects beside ' + displayName(a) + '">' +
+          ICONS.chevronDown +
+        '</button>' +
+        menu(beside) +
+      '</span>';
   }).join('');
   var icon = self ? mark(self)
     : '<img class="breadcrumb-repo-icon" src="favicon.svg" alt="" width="16" height="16">';
   var label = self ? displayName(self) : config.name;
-  var peers = (siblingsOf(projects, config.name) || []).filter(function(item) {
-    return item.name !== config.name;
-  });
+  var children = self && self.children ? self.children.filter(function(c) { return !c.group; }) : [];
+  var peers = children.length ? children : peersOf(config.name);
 
   if (peers.length) {
     html += sep +
@@ -939,16 +971,7 @@ function renderAncestry(projects, config) {
           ' onclick="toggleRepoSelector(\'crumbSelector\')" aria-haspopup="menu">' +
           icon + label + ' ' + ICONS.chevronDown +
         '</button>' +
-        '<div class="breadcrumb-repo-dropdown">' +
-          peers.map(function(item) {
-            return '<a class="breadcrumb-repo-item" href="' + (item.url || '#') + '"' +
-              (item.description ? ' title="' + item.description + '"' : '') + '>' +
-              '<img class="repo-icon" src="' +
-                resolveHubPath(item.icon || (item.url + '/favicon.svg')) +
-                '" alt="" width="20" height="20"> ' + displayName(item) +
-            '</a>';
-          }).join('') +
-        '</div>' +
+        menu(peers) +
       '</span>';
   } else {
     html += sep + '<span class="breadcrumb-current">' + icon + label + '</span>';
@@ -1551,10 +1574,50 @@ function initWideFigures() {
 // --- Global event listeners ---
 
 function initTitlebarEvents() {
+  // Once a menu is open the bar behaves like a menubar: pointing at another
+  // crumb hands the open state to it, so moving up the trail from a crumb's
+  // list to the brand menu takes no second click. Passing over a plain link
+  // closes the open list without ending that, so the pointer can cross one on
+  // the way; leaving the bar with nothing open does. The click that usually
+  // follows the pointer onto a crumb would toggle the menu hover just opened
+  // straight back shut, so that one click is swallowed.
+  var browsing = false;
+  var hoverOpened = null;
+
+  document.addEventListener('click', function(e) {
+    var opened = hoverOpened;
+    hoverOpened = null;
+    if (opened && opened.contains(e.target) && !e.target.closest('.breadcrumb-repo-dropdown')) {
+      e.stopPropagation();
+    }
+  }, true);
+
   document.addEventListener('click', function(e) {
     var selector = document.getElementById('repoSelector');
     if (selector && !selector.contains(e.target)) {
       selector.classList.remove('open');
+    }
+    browsing = !!document.querySelector('.breadcrumb-repo-selector.open');
+  });
+
+  document.addEventListener('mouseover', function(e) {
+    var open = document.querySelector('.breadcrumb-repo-selector.open');
+    if (open) browsing = true;
+    if (!browsing) return;
+    var bar = document.getElementById('titlebar');
+    if (!bar || !bar.contains(e.target)) {
+      if (!open) browsing = false;
+      return;
+    }
+    if (open && open.contains(e.target)) return;
+    var crumb = e.target.closest('.titlebar-brand, .breadcrumb-ancestor, .breadcrumb-ancestor-toggle, .breadcrumb-current-toggle');
+    if (!crumb) return;
+    var selector = crumb.closest('.breadcrumb-repo-selector');
+    if (selector) {
+      toggleRepoSelector(selector.id);
+      hoverOpened = selector;
+    } else if (open) {
+      open.classList.remove('open');
     }
   });
 }

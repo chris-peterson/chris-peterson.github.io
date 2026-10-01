@@ -828,3 +828,30 @@ section.content {
 .breadcrumb-repo-selector.open .breadcrumb-current-toggle svg {
   transform: rotate(180deg);
 }
+
+/* An ancestor with projects beside it: the name still links to it, and the
+   chevron after it opens the list. */
+.breadcrumb-ancestor-selector {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.breadcrumb-ancestor-toggle {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: 0;
+  padding: 2px;
+  color: var(--muted-color);
+  cursor: pointer;
+}
+.breadcrumb-ancestor-toggle svg {
+  opacity: 0.55;
+  transition: transform 0.2s ease;
+}
+.breadcrumb-ancestor-toggle:hover {
+  color: var(--base-color);
+}
+.breadcrumb-repo-selector.open .breadcrumb-ancestor-toggle svg {
+  transform: rotate(180deg);
+}

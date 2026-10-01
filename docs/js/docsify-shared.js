@@ -1593,10 +1593,9 @@ function initTitlebarEvents() {
   }, true);
 
   document.addEventListener('click', function(e) {
-    var selector = document.getElementById('repoSelector');
-    if (selector && !selector.contains(e.target)) {
-      selector.classList.remove('open');
-    }
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.breadcrumb-repo-selector.open'),
+      function(el) { if (!el.contains(e.target)) el.classList.remove('open'); });
     browsing = !!document.querySelector('.breadcrumb-repo-selector.open');
   });
 

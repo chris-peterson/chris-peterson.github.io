@@ -7,6 +7,16 @@
       icon: https://chris-peterson.github.io/claude-marketplace/favicon.svg
       url: https://chris-peterson.github.io/claude-marketplace/#/
       children:
+        - name: rig
+          description: customize your rig.
+          icon: https://chris-peterson.github.io/rig/favicon.svg
+          url: https://chris-peterson.github.io/rig
+          languages:
+            - name: Python
+              pct: 95
+            - name: Shell
+              pct: 5
+
         - name: ClaudeWatch
           description: "ClaudeWatch: agents move fast; watch them closely."
           icon: https://chris-peterson.github.io/ClaudeWatch/favicon.svg
@@ -92,6 +102,28 @@
               source: manual
             - name: Shell
               pct: 5
+
+        - name: fathom
+          description: "fathom: facts at different depths."
+          icon: https://chris-peterson.github.io/fathom/favicon.svg
+          url: https://chris-peterson.github.io/fathom
+          languages:
+            - name: Markdown
+              pct: 50
+              source: manual
+            - name: Python
+              pct: 40
+            - name: HTML
+              pct: 10
+
+        - name: masthead
+          description: create masthead docs for end users.
+          icon: https://chris-peterson.github.io/masthead/favicon.svg
+          url: https://chris-peterson.github.io/masthead
+          languages:
+            - name: Markdown
+              pct: 100
+              source: manual
 
         - name: shipyard
           description: Shared build tooling for Claude Code plugins
@@ -266,26 +298,6 @@
   description: Still here for anyone using them, no longer being built on
   muted: true
   children:
-    - name: moor
-      description: Diff viewer for reviewing AI-generated code
-      icon: https://chris-peterson.github.io/moor/favicon.svg
-      url: https://chris-peterson.github.io/moor
-      languages:
-        - name: JavaScript
-          pct: 95
-        - name: Shell
-          pct: 5
-
-    - name: logbook
-      description: Coding session retros committed to git
-      icon: https://chris-peterson.github.io/logbook/favicon.svg
-      url: https://chris-peterson.github.io/logbook
-      languages:
-        - name: Python
-          pct: 90
-        - name: Shell
-          pct: 10
-
     - name: pinpoint
       description: Tag your files and let the directory tree follow
       icon: https://chris-peterson.github.io/pinpoint/favicon.svg

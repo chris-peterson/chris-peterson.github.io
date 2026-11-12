@@ -60,6 +60,15 @@
             - name: Shell
               pct: 5
 
+        - name: sonar
+          description: "sonar: ping for what you're looking for."
+          icon: https://chris-peterson.github.io/sonar/favicon.svg
+          url: https://chris-peterson.github.io/sonar
+          languages:
+            - name: Markdown
+              pct: 100
+              source: manual
+
         - name: anchor
           description: anchor your development practices.
           icon: https://chris-peterson.github.io/anchor/favicon.svg

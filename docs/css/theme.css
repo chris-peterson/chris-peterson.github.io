@@ -85,6 +85,46 @@
   font-weight: bold;
 }
 
+/* A blog post's month and day, set as a column ahead of its title so the
+   titles line up under each other. */
+.sidebar-nav .post-date {
+  display: inline-block;
+  min-width: 3.6em;
+  margin-right: 0.4em;
+  color: var(--color-comment);
+  font: 500 0.78em var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* A name set in code in a post title reads as part of the title: in the nav,
+   plain text; in the heading, the mono face without the inline-code chip. */
+.sidebar-nav a code {
+  background: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+}
+
+/* A name set in code in a title is still part of the title: the heading's own
+   face and weight, marked by color alone. The theme's inline-code rule
+   (`.markdown-section code:not(…):not(…)`) outranks any plain selector here, but
+   it reads its chip from these variables, and a variable set on the element
+   itself is the one it reads. */
+.markdown-section h1 code {
+  --code-inline-background: transparent;
+  --code-inline-color: var(--color-purple);
+  --code-inline-padding: 0;
+  --code-inline-margin: 0;
+  font: inherit;
+}
+
+/* The blog index links each post by its title, so code there reads as link text. */
+.markdown-section a[href^="#/blog/"] {
+  --code-inline-background: transparent;
+  --code-inline-color: currentColor;
+  --code-inline-padding: 0;
+}
+
 /* ─────────────────────────────────────────────────
    Project archive — editorial / index aesthetic
    ───────────────────────────────────────────────── */

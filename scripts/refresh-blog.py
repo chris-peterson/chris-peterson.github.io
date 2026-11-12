@@ -24,6 +24,7 @@ BEGIN = "<!-- generated from blog/*; the deploy regenerates it, `just refresh-bl
 END = "<!-- /generated -->"
 
 DATED_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
+MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 
 def post_entry(path):
@@ -33,23 +34,31 @@ def post_entry(path):
         sys.exit(f"{path.name}: post filenames carry a YYYY-MM-DD- prefix")
     for line in path.read_text().split("\n"):
         if line.startswith("# "):
-            return match.group(1), path.stem, line[2:].strip()
+            # Inline HTML in a heading (a fathom citation span) belongs to the
+            # post; the lists take its words and code ticks.
+            return match.group(1), path.stem, re.sub(r"<[^>]+>", "", line[2:]).strip()
     sys.exit(f"{path.name}: no `# ` heading to take the title from")
 
 
 def sidebar(posts):
     """The nav docsify loads on a blog route: the index, then posts by year.
 
-    An entry is the title alone. docsify titles the browser tab after the active
-    sidebar link, so anything else in the label ends up in the tab, and the year
-    heading already carries where the post sits in time.
+    An entry leads with its month and day; the year heading above it carries the
+    rest. docsify titles the browser tab after the active sidebar link's `title`
+    attribute when it has one, so each link names the post there, as plain text,
+    and the date stays out of the tab.
     """
     lines = [BEGIN, "", "- [Blog](/blog/)", ""]
     for year in sorted({date[:4] for date, _, _ in posts}, reverse=True):
         lines.append(f"- **{year}**")
         for date, slug, title in posts:
             if date.startswith(year):
-                lines.append(f"  - [{title}](/blog/{slug}.md)")
+                month, day = int(date[5:7]), int(date[8:10])
+                # The space after the date is text, not styling, so the label
+                # still reads "Nov 11 Title" on a stale or missing stylesheet.
+                label = f'<span class="post-date">{MONTHS[month - 1]} {day}</span> {title}'
+                tab = title.replace("`", "").replace('"', "&quot;")
+                lines.append(f'  - [{label}](/blog/{slug}.md "{tab}")')
         lines.append("")
     return "\n".join(lines)
 

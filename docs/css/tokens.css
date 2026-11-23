@@ -63,6 +63,15 @@
      rather than as a block with room around its text. */
   --code-theme-background: light-dark(#eeeeea, #1e1f28);
   --code-theme-text: var(--color-foreground);
+  /* Keycaps. themeable fills a <kbd> with a light tint and leaves its text
+     color to inherit, so in dark the label was page-white on near-white. Sized
+     to sit in a line of prose rather than as a 2.5em tile. */
+  --kbd-background: var(--color-current-line);
+  --kbd-color: var(--color-foreground);
+  --kbd-border: 1px solid var(--button-border);
+  --kbd-padding: 0.1em 0.45em;
+  --kbd-min-width: 1.6em;
+  --kbd-font-size: var(--code-font-size);
   --blockquote-border-color: var(--color-purple);
   --blockquote-background: var(--color-current-line);
   --heading-color: var(--color-foreground);
